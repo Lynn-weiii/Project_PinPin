@@ -1,0 +1,43 @@
+﻿<h3>Login</h3>
+<div class="container">
+    <div class="mb-3">
+        <label class="form-label">Email:</label>
+        <input id="email" type="text" class="form-control" placeholder="請輸入Email" />
+        <label class="form-label">密碼:</label>
+        <input id="password" type="password" class="form-control" placeholder="請輸入密碼" />
+        <button id="Login" class="btn btn-primary">登入</button>
+    </div>
+    <div class="mb-3">
+        <div id="result" class="text-danger"></div>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        var baseAddress = "https://localhost:7280"; // 注意結尾沒有斜線!
+
+        $("#Login").on("click", async function () {
+            const email = $("#email").val();
+            const password = $("#password").val();
+
+            const response = await fetch(`${baseAddress}/api/Auth/Login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const token = await response.text(); // 這裡直接獲取文本響應
+                const data = { Token: token }; // 將文本響應轉換為 JSON 格式
+                localStorage.setItem('token', data.Token);
+                //alert(data);
+                alert('登入成功');
+                //alert(JSON.stringify(data));
+            } else {
+                alert('登入失敗');
+            }
+        });
+    </script>
+}

@@ -1,0 +1,99 @@
+﻿@section Styles {
+    <link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" rel="stylesheet" />
+}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員資料</title>
+</head>
+<form id="userForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name"><br>
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" disabled><br>
+    <label for="phone">Phone:</label>
+    <input type="text" id="phone" name="phone"><br>
+    <label for="birthday">Birthday:</label>
+    <input type="date" id="birthday" name="birthday"><br>
+    <label for="gender">Gender:</label>
+    <input type="text" id="gender" name="gender"><br>
+    <label for="photo">Photo:</label>
+    <input type="text" id="photo" name="photo"><br>
+    <button id="Update" type="button" onclick="updateUser()" class="btn btn-danger"><i class="fa-solid fa-pen"></i> Update</button>
+</form>
+
+@section Scripts
+{
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js"></script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js"></script>
+    <script>
+        new AirDatepicker('#birthday', {
+            locale: window.airdatepickerZh,
+        })
+        var baseAddress = "https://localhost:7280";       //Developr Server //注意結尾沒有斜線!
+        //var baseAddress = "https://localhost:xx";       //Staging Server(Testing Server)
+        //var baseAddress = "https://localhost:yy";       //Production Server(上線營運Server)
+
+        async function getUserData(email) {
+            //取出token
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('No token found. Please log in.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${baseAddress}/api/Auth/SearchMemberInfo?email=${email}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `bearer ${token}` //token放在headers，Bearer+token可解密
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('name').value = data.name;
+                    document.getElementById('email').value = data.email;
+                    document.getElementById('phone').value = data.phone;
+                    document.getElementById('birthday').value = data.birthday ? data.birthday.split('T')[0] : '';
+                    document.getElementById('gender').value = data.gender;
+                    document.getElementById('photo').value = data.photo;
+                } else {
+                    alert('Failed to fetch user data');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        }
+
+        async function updateUser() {
+            const email = document.getElementById('email').value;
+            const user = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                birthday: document.getElementById('birthday').value,
+                gender: document.getElementById('gender').value,
+                photo: document.getElementById('photo').value
+            };
+
+            const response = await fetch(`${baseAddress}/api/Auth/${email}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            });
+
+            if (response.ok) {
+                alert('User updated successfully');
+            } else {
+                alert('Failed to update user');
+            }
+        }
+
+        getUserData('lemon@com.tw');
+
+    </script>
+
+}
+
