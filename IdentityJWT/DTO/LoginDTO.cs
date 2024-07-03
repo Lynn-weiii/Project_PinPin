@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IdentityJWT.DTO
+namespace PinPinServer.DTO
 {
     public class LoginDTO
     {

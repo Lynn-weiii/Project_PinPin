@@ -1,6 +1,4 @@
 ﻿using Azure.Core;
-using IdentityJWT.DTO;
-using IdentityJWT.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -8,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using PinPinServer.DTO;
 using PinPinServer.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace IdentityJWT.Controllers
+namespace PinPinServer.Controllers
 {
 
     [EnableCors("PinPinPolicy")]
@@ -33,7 +32,7 @@ namespace IdentityJWT.Controllers
         }
 
         //POST:api/Auth/Register
-        
+
         [HttpPost("Register")]
         public async Task<string> Register(UserDTO userDTO)
         {
@@ -45,11 +44,11 @@ namespace IdentityJWT.Controllers
 
             if (userDTO.Password != userDTO.PasswordConfirm)
             {
-                return ("請再次確認密碼!");
+                return "請再次確認密碼!";
             }
             string passwordHash
                = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
-       
+
 
             User user = new User
             {
@@ -79,13 +78,13 @@ namespace IdentityJWT.Controllers
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
-            
+
             if (user == null)
             {
                 return BadRequest("帳號錯誤");
             }
 
-            
+
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
                 return BadRequest("密碼錯誤");

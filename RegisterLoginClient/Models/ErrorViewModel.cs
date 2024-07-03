@@ -1,4 +1,4 @@
-namespace RegisterLoginClient.Models
+namespace PinPinClient.Models
 {
     public class ErrorViewModel
     {
