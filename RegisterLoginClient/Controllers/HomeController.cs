@@ -33,13 +33,15 @@ namespace PinPinClient.Controllers
             return View();
         }
 
-
-
         public IActionResult MemberInfo()
         {
             return View();
         }
 
+        public IActionResult Schdules() //by bao
+        {
+            return View();
+        }
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
