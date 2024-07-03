@@ -3,13 +3,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace IdentityJWT.Models;
+namespace PinPinServer.Models;
 
-public class User
+public partial class User
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } //NOT NULL UNIQUE
+    public string Name { get; set; }
 
     public DateOnly? Birthday { get; set; }
 
@@ -21,9 +21,37 @@ public class User
 
     public int? Gender { get; set; }
 
-    public string Email { get; set; }//NOT NULL UNIQUE
+    public string Email { get; set; }
 
-    public string Phone { get; set; }//UNIQUE
+    public string Phone { get; set; }
 
-    public string PasswordHash { get; set; }//NOT NULL 
+    public string PasswordHash { get; set; }
+
+    public virtual ICollection<ChatroomChat> ChatroomChats { get; set; } = new List<ChatroomChat>();
+
+    public virtual ICollection<LocationCategory> LocationCategories { get; set; } = new List<LocationCategory>();
+
+    public virtual ICollection<ScheduleAuthority> ScheduleAuthorities { get; set; } = new List<ScheduleAuthority>();
+
+    public virtual ICollection<ScheduleDetail> ScheduleDetails { get; set; } = new List<ScheduleDetail>();
+
+    public virtual ICollection<ScheduleGroup> ScheduleGroups { get; set; } = new List<ScheduleGroup>();
+
+    public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+
+    public virtual ICollection<SearchHistory> SearchHistories { get; set; } = new List<SearchHistory>();
+
+    public virtual ICollection<SplitExpenseParticipant> SplitExpenseParticipants { get; set; } = new List<SplitExpenseParticipant>();
+
+    public virtual ICollection<SplitExpense> SplitExpenses { get; set; } = new List<SplitExpense>();
+
+    public virtual ICollection<TransportationCategory> TransportationCategories { get; set; } = new List<TransportationCategory>();
+
+    public virtual ICollection<UserFavor> UserFavors { get; set; } = new List<UserFavor>();
+
+    public virtual ICollection<VoteResult> VoteResults { get; set; } = new List<VoteResult>();
+
+    public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
+
+    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

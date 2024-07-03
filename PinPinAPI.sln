@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityJWT", "IdentityJWT\IdentityJWT.csproj", "{C4A1B4FA-42F5-4AEE-AF94-4FCEDFB13AC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PinPinServer", "IdentityJWT\PinPinServer.csproj", "{C4A1B4FA-42F5-4AEE-AF94-4FCEDFB13AC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegisterLoginClient", "RegisterLoginClient\RegisterLoginClient.csproj", "{0ACC22C1-F3E6-4165-B6DD-AB6085A9C703}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PinPinClient", "RegisterLoginClient\PinPinClient.csproj", "{0ACC22C1-F3E6-4165-B6DD-AB6085A9C703}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

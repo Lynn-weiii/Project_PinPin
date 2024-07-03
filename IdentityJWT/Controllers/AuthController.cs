@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using PinPinServer.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,9 +24,9 @@ namespace IdentityJWT.Controllers
         public static User user = new User();
         private readonly IConfiguration _configuration;
 
-        private readonly PinPinRegisterContext _context;
+        private readonly PinPinContext _context;
 
-        public AuthController(PinPinRegisterContext context, IConfiguration configuration)
+        public AuthController(PinPinContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));

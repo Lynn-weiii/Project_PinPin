@@ -1,6 +1,6 @@
 ﻿{
    "CodeGenerationMode": 4,
-   "ContextClassName": "PinPinRegisterContext",
+   "ContextClassName": "PinPinContext",
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": false,
@@ -8,14 +8,102 @@
    "OutputContextPath": null,
    "OutputPath": "Models",
    "PreserveCasingWithRegex": true,
-   "ProjectRootNamespace": "IdentityJWT",
+   "ProjectRootNamespace": "PinPinServer",
    "Schemas": null,
    "SelectedHandlebarsLanguage": 2,
    "SelectedToBeGenerated": 0,
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[chatroom_chat]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[cost_currency_category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[favor_category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[location_category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[schedule]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[schedule_authority]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[schedule_authority_category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[schedule_details]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[schedule_group]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[schedule_preview]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[search_history]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[split_category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[split_expense]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[split_expense_participant]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[transportation]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[transportation_category]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[user]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[user_favor]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[vote_options]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[vote_result]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[votes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[wishlist]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[wishlist_detail]",
          "ObjectType": 0
       }
    ],
