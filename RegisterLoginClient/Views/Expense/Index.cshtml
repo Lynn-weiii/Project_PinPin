@@ -23,7 +23,6 @@
         function resetPage(partialresponse) {
             partialtable.empty();
             $('#datadetial').empty();
-
             partialtable.html(partialresponse.data);
         }
 
@@ -99,19 +98,6 @@
                     $('#datadetial').append(formGroup);
                 });
             });
-        }
-
-        async function loadDropdownOptions() {
-            try {
-                populateDropdown('#schedule', schedules.data);
-                populateDropdown('#payer', payers.data);
-                populateDropdown('#category', categories.data);
-                populateDropdown('#currency', currencies.data);
-
-            } catch (error) {
-                console.log(error);
-                alert("Failed to load dropdown options.");
-            }
         }
     </script>
 }

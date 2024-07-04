@@ -1,31 +1,109 @@
-﻿<form id="expenseForm">
-    <div class="form-group">
-        <label for="schedule">Schedule</label>
-        <select class="form-control" id="schedule" name="schedule" required></select>
-    </div>
-    <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-    </div>
-    <div class="form-group">
-        <label for="payer">Payer</label>
-        <select class="form-control" id="payer" name="payer" required></select>
-    </div>
-    <div class="form-group">
-        <label for="category">Category</label>
-        <select class="form-control" id="category" name="category" required></select>
-    </div>
-    <div class="form-group">
-        <label for="currency">Currency</label>
-        <select class="form-control" id="currency" name="currency" required></select>
-    </div>
-    <div class="form-group">
-        <label for="amount">Amount</label>
-        <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
-    </div>
-    <div class="form-group">
-        <label for="remark">Remark</label>
-        <input type="text" class="form-control" id="remark" name="remark">
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+﻿<div class="container mt-5">
+    <h2>創建費用表</h2>
+    <form class="form border border-dark rounded p-3">
+        <legend>付款人</legend>
+        <div class="form-group col-md-6">
+            <label for="userId">User ID</label>
+            <span class="input-group-text">User ID</span>
+            <input type="text" class="form-control mb-3" id="userId" placeholder="輸入ID" />
+            <button type="button" class="btn btn-secondary" id="btnGetSchedule">行程表搜尋</button>
+        </div>
+        <div class="form-group col-md-6">
+            <span class="input-group-text">行程表</span>
+            <select class="form-control mb-3" id="scheduleSelect">
+                <option value="" disabled selected>請選擇一個行程表</option>
+            </select>
+            <button type="button" class="btn btn-secondary" id="btnGetUser">行程表相關使用者搜尋</button>
+        </div>
+        <div class="form-group col-md-6">
+            <span class="input-group-text">付款者</span>
+            <select class="form-control" id="payerSelect">
+                <option value="" disabled selected>請選擇一個付款者</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <span class="input-group-text">付款種類</span>
+            <select class="form-control" id="categorySelect"></select>
+        </div>
+        <div class="form-group col-md-6">
+            <span class="input-group-text">幣別</span>
+            <select class="form-control" id="currencySelect"></select>
+        </div>
+        <div class="form-group col-md-6">
+            <span class="input-group-text">金額</span>
+            <input type="number" class="form-control mb-3" id="amount" placeholder="輸入金額" />
+        </div>
+        <div class="form-group col-md-6">
+            <div class="input-group">
+                <span class="input-group-text">備註</span>
+                <textarea class="form-control" id="remark" style="resize:none" aria-label="新增備註"></textarea>
+            </div>
+        </div>
+    </form>
+    <form>
+        <legend>欠款人</legend>
+
+    </form>
+</div>
+
+<script src="~/js/datapopulator.js" asp-append-version="true"></script>
+<script>
+    var user_id = $('#userId');
+
+    $(function () {
+        GetCurrency_category();
+        GetSplit_category();
+    });
+
+    $('#btnGetSchedule').on("click", async () => {
+        try {
+            var response = await axios.get(`${baseAddress}/api/schedule/GetRelatedSchedules`, {
+                params: {
+                    user_id: user_id.val(),
+                }
+            })
+
+            populateSelect('#scheduleSelect', response.data);
+        } catch (error) {
+            console.log(error);
+            alert("獲取資料失敗");
+        }
+    })
+
+    $('#btnGetUser').on("click", async () => {
+        btnGetUser
+        try {
+            var response = await axios.get(`${baseAddress}/api/ScheduleGroups`, {
+                params: {
+                    schedule_id: $('#scheduleSelect').val(),
+                }
+            })
+            var data = response.data
+
+            console.log(data)
+
+            delete data[user_id.val()]
+
+            console.log(data)
+
+            populateSelect('#payerSelect', data);
+        } catch (error) {
+            console.log(error);
+            alert("獲取資料失敗");
+        }
+    })
+
+    async function GetCurrency_category() {
+        var response = await axios.get(`${baseAddress}/api/category/Getcurrency_category`)
+        var data = response.data;
+
+        populateSelect('#currencySelect', data);
+    }
+
+    async function GetSplit_category() {
+        var response = await axios.get(`${baseAddress}/api/category/GetSplitCategory`)
+        var data = response.data;
+
+        populateSelect('#categorySelect', data);
+    }
+</script>
