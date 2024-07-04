@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace IdentityJWT.Models;
+namespace PinPinServer.Models;
 
-    public partial class PinPinRegisterContext : DbContext
+    public partial class PinPinContext : DbContext
 {
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

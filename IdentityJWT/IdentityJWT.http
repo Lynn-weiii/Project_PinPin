@@ -1,6 +1,6 @@
-@IdentityJWT_HostAddress = http://localhost:5169
+@PinPinServer_HostAddress = http://localhost:5169
 
-GET {{IdentityJWT_HostAddress}}/weatherforecast/
+GET {{PinPinServer_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###

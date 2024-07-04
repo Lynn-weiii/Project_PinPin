@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using RegisterLoginClient.Models;
+using PinPinClient.Models;
 using System.Diagnostics;
 using System.Security.Claims;
 
-namespace RegisterLoginClient.Controllers
+namespace PinPinClient.Controllers
 {
     public class HomeController : Controller
     {

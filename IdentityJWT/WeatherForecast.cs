@@ -1,4 +1,4 @@
-namespace IdentityJWT
+namespace PinPinServer
 {
     public class WeatherForecast
     {

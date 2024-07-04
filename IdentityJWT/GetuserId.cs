@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace IdentityJWT
+namespace PinPinServer
 {
     public class GetuserId
     {
@@ -32,6 +32,5 @@ namespace IdentityJWT
                 return new ActionResult<int>(-1); // 返回一个错误码，表示没有找到
             }
         }
-
     }
 }

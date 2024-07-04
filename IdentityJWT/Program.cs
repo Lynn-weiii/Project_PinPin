@@ -1,17 +1,17 @@
-using IdentityJWT;
-using IdentityJWT.Models;
+using PinPinServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PinPinServer.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<PinPinRegisterContext>(options => {
+builder.Services.AddDbContext<PinPinContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("PinPinSQL"));
 });
 
