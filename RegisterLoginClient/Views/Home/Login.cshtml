@@ -1,16 +1,23 @@
-﻿<h3>Login</h3>
-<div class="container">
-    <div class="mb-3">
-        <label class="form-label">Email:</label>
-        <input id="email" type="text" class="form-control" placeholder="請輸入Email" />
-        <label class="form-label">密碼:</label>
-        <input id="password" type="password" class="form-control" placeholder="請輸入密碼" />
-        <button id="Login" class="btn btn-primary">登入</button>
-    </div>
-    <div class="mb-3">
-        <div id="result" class="text-danger"></div>
+﻿<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h1>登入</h1>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input id="email" type="text" class="form-control" placeholder="請輸入Email" />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密碼:</label>
+                <input id="password" type="password" class="form-control" placeholder="請輸入密碼" />
+            </div>
+            <button id="Login" class="btn btn-secondary w-100">登入</button>
+            <div class="mb-3">
+                <div id="result" class="text-danger mt-3"></div>
+            </div>
+        </div>
     </div>
 </div>
+
 @section Scripts
 {
     <script>

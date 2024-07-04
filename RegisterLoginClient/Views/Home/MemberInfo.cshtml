@@ -1,29 +1,49 @@
-﻿<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>會員資料</title>
-</head>
-<form id="userForm">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name"><br>
-    <label for="email">Email:</label>
-    <input type="text" id="email" name="email" disabled><br>
-    <label for="phone">Phone:</label>
-    <input type="text" id="phone" name="phone"><br>
-    <label for="birthday">Birthday:</label>
-    <input type="date" id="birthday" name="birthday"><br>
-    <label for="gender">Gender:</label>
-    <input type="text" id="gender" name="gender"><br>
-    <label for="photo">Photo:</label>
-    <input type="text" id="photo" name="photo"><br>
-    <button id="btnUpdate" type="button" onclick="updateUser()" class="btn btn-danger"><i class="fa-solid fa-pen"></i> Update</button>
-</form>
-
+﻿<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h1 class="mb-4">會員資料</h1>
+            <form id="userForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="text" class="form-control" id="email" name="email" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone:</label>
+                    <input type="text" class="form-control" id="phone" name="phone">
+                </div>
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">Birthday:</label>
+                    <input type="date" class="form-control" id="birthday" name="birthday">
+                    <span id="birthdayDisplay"></span>
+                </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">Gender:</label>
+                    <select class="form-control" id="gender" name="gender">
+                        <option value="0">不公開</option>
+                        <option value="1">生理男</option>
+                        <option value="2">生理女</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="photo" class="form-label">Photo:</label>
+                    <input type="text" class="form-control" id="photo" name="photo" disabled>
+                </div>
+                <div class="mb-3 text-center">
+                    <button id="btnUpdate" type="button" class="btn btn-danger w-100"><i class="fa-solid fa-pen"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
-    
+
     <script>
-        
+
         var baseAddress = "https://localhost:7280";       //Developr Server //注意結尾沒有斜線!
         //var baseAddress = "https://localhost:xx";       //Staging Server(Testing Server)
         //var baseAddress = "https://localhost:yy";       //Production Server(上線營運Server)
@@ -52,6 +72,11 @@
                     document.getElementById('birthday').value = data.birthday ? data.birthday.split('T')[0] : '';
                     document.getElementById('gender').value = data.gender;
                     document.getElementById('photo').value = data.photo;
+                    // if ($("#birthday").val() == "1970-01-01") 
+                    // {
+                    //     $("#birthday").hide(); // 隱藏輸入框
+                    //     $("#birthdayDisplay").text("不公開"); // 顯示"不公開"
+                    // }
                 } else {
                     alert('Failed to fetch user data');
                 }
@@ -60,53 +85,42 @@
             }
         }
 
-        // $("#btnUpdate").on("click", async function () {
-            
-        //     var body = {
-        //         "Name": "",
-        //         "description": "HELLO",
-        //         "picture": null
-        //     }
-        //     //alert("btnGetAll");
-        //     var result = await fetch(`${baseAddress}/api/Categories/17`, {
-        //         method: "PUT",
-        //         body: JSON.stringify(body),
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         }
-        //     });
-        //     var data = await result.text();
-        //     alert(data);
-        // })
+        $(document).ready(function () {
+            // 從隱藏輸入框中獲取 email
+            //const email = $("#userEmail").val();
+            const token = localStorage.getItem('token');
+
+            $("#btnUpdate").on("click", async function () {
 
 
-        // async function updateUser() {
-        //     const email = document.getElementById('email').value;
-        //     const user = {
-        //         name: document.getElementById('name').value,
-        //         phone: document.getElementById('phone').value,
-        //         birthday: document.getElementById('birthday').value,
-        //         gender: document.getElementById('gender').value,
-        //         photo: document.getElementById('photo').value
-        //     };
+                const name = $("#name").val();
+                const phone = $("#phone").val();
+                var birthday = $("#birthday").val();
+                const gender = $("#gender").val();
+                const email = $("#email").val();
 
-        //     const response = await fetch(`${baseAddress}/api/Auth/${email}`, {
-        //         method: 'PUT',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify(user)
-        //     });
+                var body = {
+                    "Name": name,
+                    "Phone": phone,
+                    "Birthday": birthday,
+                    "Gender": gender,
+                    "Email": email
+                }
+                //alert("btnGetAll");
+                var result = await fetch(`${baseAddress}/api/Auth/${email}`, {
+                    method: "PUT",
+                    body: JSON.stringify(body),
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Authorization': `bearer ${token}`
+                    }
+                });
+                var data = await result.text();
+                alert(data);
+            });
 
-        //     if (response.ok) {
-        //         alert('User updated successfully');
-        //     } else {
-        //         alert('Failed to update user');
-        //     }
-        // }
-
-        getUserData();
-
+            getUserData();
+        });
     </script>
 
 }
