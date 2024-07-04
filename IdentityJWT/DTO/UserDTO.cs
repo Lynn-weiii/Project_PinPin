@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IdentityJWT.DTO
+namespace PinPinServer.DTO
 {
     public class UserDTO
     {
@@ -11,15 +11,15 @@ namespace IdentityJWT.DTO
         public string Name { get; set; }
 
         public DateOnly? Birthday { get; set; }
-       
-        public string? Photo { get; set; } //IFormFile為檔案上傳
+
+        public string? Photo { get; set; } 
 
         public int? Gender { get; set; }
 
         [Required(ErrorMessage = "Email為必填欄位!")]
         public string Email { get; set; }
 
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
         [Required(ErrorMessage = "密碼為必填欄位")]
         public string Password { get; set; }

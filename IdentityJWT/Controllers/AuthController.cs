@@ -118,19 +118,21 @@ namespace IdentityJWT.Controllers
             return jwt;
         }
 
+
+
         //GET:api/Auth/SearchMemberInfo
         [Authorize]
         [HttpGet("SearchMemberInfo")]
-        public async Task<ActionResult<User>> SearchMemberInfo(string Email)
+        public async Task<ActionResult<User>> SearchMemberInfo()
         {
-            //string userEmail = User.Identity.Name;
+            //取出token中email的值
+            string userEmail = User.Claims.First(x => x.Type == ClaimTypes.Email).Value;
 
-            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (user == null)
             {
                 return NotFound();
             }
-
             UserDTO userDto = new UserDTO
             {
                 Id = user.Id,
@@ -141,35 +143,41 @@ namespace IdentityJWT.Controllers
                 Gender = user.Gender,
                 Photo = user.Photo
             };
-
             // 回傳 UserDTO
             return Ok(userDto);
         }
 
-
-
         //PUT:api/Auth/{email}
         [HttpPut("{email}")]
-        public async Task<IActionResult> UpdateUser(string email, UserDTO userDto)
+        public async Task<string> UpdateUser(string email, [FromBody] UserDTO userDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-
-            if (user == null)
+            if (email != userDto.Email)
             {
-                return NotFound();
+                return "修改紀錄失敗";
             }
 
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return "修改紀錄失敗";
+            }
+            else
+            {
+                user.Name = userDto.Name;
+                user.Phone = userDto.Phone;
+                user.Birthday = userDto.Birthday;
+                user.Gender = userDto.Gender;
+                user.Photo = userDto.Photo;
+            }
+
+
             // 更新用戶資料
-            user.Name = userDto.Name;
-            user.Phone = userDto.Phone;
-            user.Birthday = userDto.Birthday;
-            user.Gender = userDto.Gender;
-            user.Photo = userDto.Photo;
+
 
             // 保存變更
             await _context.SaveChangesAsync();
 
-            return Ok("修改成功!");
+            return "修改成功!";
         }
     }
 }

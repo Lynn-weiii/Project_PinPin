@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RegisterLoginClient.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace RegisterLoginClient.Controllers
 {
@@ -35,7 +36,7 @@ namespace RegisterLoginClient.Controllers
 
 
 
-        public IActionResult MemberInfo()
+        public IActionResult MemberInfo(ClaimsPrincipal user)
         {
             return View();
         }
