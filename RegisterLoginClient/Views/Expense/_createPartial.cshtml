@@ -1,49 +1,60 @@
 ﻿<div class="container mt-5">
     <h2>創建費用表</h2>
-    <form class="form border border-dark rounded p-3">
+    <form class="form border border-dark rounded p-3 mb-3">
         <legend>付款人</legend>
         <div class="form-group col-md-6">
             <label for="userId">User ID</label>
-            <span class="input-group-text">User ID</span>
-            <input type="text" class="form-control mb-3" id="userId" placeholder="輸入ID" />
-            <button type="button" class="btn btn-secondary" id="btnGetSchedule">行程表搜尋</button>
+            <div class="input-group mb-3">
+                <span class="input-group-text">User ID</span>
+                <input type="text" class="form-control" id="userId" placeholder="輸入ID" />
+                <button type="button" class="btn btn-secondary" id="btnGetSchedule">行程表搜尋</button>
+            </div>
         </div>
         <div class="form-group col-md-6">
-            <span class="input-group-text">行程表</span>
-            <select class="form-control mb-3" id="scheduleSelect">
-                <option value="" disabled selected>請選擇一個行程表</option>
-            </select>
-            <button type="button" class="btn btn-secondary" id="btnGetUser">行程表相關使用者搜尋</button>
+            <div class="input-group mb-3">
+                <span class="input-group-text">行程表</span>
+                <select class="form-control" id="scheduleSelect">
+                    <option value="" disabled selected>請選擇一個行程表</option>
+                </select>
+                <button type="button" class="btn btn-secondary" id="btnGetUser">行程表相關使用者搜尋</button>
+            </div>
         </div>
         <div class="form-group col-md-6">
-            <span class="input-group-text">付款者</span>
-            <select class="form-control" id="payerSelect">
-                <option value="" disabled selected>請選擇一個付款者</option>
-            </select>
+            <div class="input-group mb-3">
+                <span class="input-group-text">付款者</span>
+                <select class="form-control" id="payerSelect">
+                    <option value="" disabled selected>請選擇一個付款者</option>
+                </select>
+            </div>
         </div>
         <div class="form-group col-md-6">
-            <span class="input-group-text">付款種類</span>
-            <select class="form-control" id="categorySelect"></select>
+            <div class="input-group mb-3">
+                <span class="input-group-text">付款種類</span>
+                <select class="form-control" id="categorySelect"></select>
+            </div>
         </div>
         <div class="form-group col-md-6">
-            <span class="input-group-text">幣別</span>
-            <select class="form-control" id="currencySelect"></select>
+            <div class="input-group mb-3">
+                <span class="input-group-text">幣別</span>
+                <select class="form-control" id="currencySelect"></select>
+            </div>
         </div>
         <div class="form-group col-md-6">
-            <span class="input-group-text">金額</span>
-            <input type="number" class="form-control mb-3" id="amount" placeholder="輸入金額" />
+            <div class="input-group mb-3">
+                <span class="input-group-text">金額</span>
+                <input type="number" class="form-control" id="amount" placeholder="輸入金額" />
+            </div>
         </div>
         <div class="form-group col-md-6">
             <div class="input-group">
                 <span class="input-group-text">備註</span>
-                <textarea class="form-control" id="remark" style="resize:none" aria-label="新增備註"></textarea>
+                <textarea class="form-control" id="remark" style="resize:vertical" aria-label="新增備註"></textarea>
             </div>
         </div>
     </form>
-    <form>
-        <legend>欠款人</legend>
-
-    </form>
+    <div id="participantBlock">
+    </div>
+    <button type="button" class="btn btn-secondary" id="btncreateParticipant">新增欠款人</button>
 </div>
 
 <script src="~/js/datapopulator.js" asp-append-version="true"></script>
@@ -53,6 +64,7 @@
     $(function () {
         GetCurrency_category();
         GetSplit_category();
+        CreateParticipant();
     });
 
     $('#btnGetSchedule').on("click", async () => {
@@ -93,6 +105,47 @@
         }
     })
 
+    $('#btncreateParticipant').on("click",()=>{
+        CreateParticipant();
+    })
+
+    function CreateParticipant() {
+        var form = $('<form class="form border border-dark rounded p-3" id="participant"></form>')
+        var legend = $('<legend>欠款人</legend>')
+
+        var formGroup = $('<div class="form-group col-md-6"></div>');
+
+        var nameInputGroup = $('<div class="input-group mb-3"></div>');
+        var nameLabel = $('<span class="input-group-text">欠款人</span>');
+        var nameSelect = $('<select class="form-control">')
+            .attr('id', 'name')
+            .append('<option value="" disabled selected>請選擇一個欠款人</option>');
+
+        nameInputGroup.append(nameLabel).append(nameSelect);
+
+        var amountInputGroup = $('<div class="input-group mb-3"></div>');
+        var amountLabel = $('<span class="input-group-text">金額</span>');
+        var amountInput = $('<input type="number" class="form-control">').attr('id', 'amount');
+
+        amountInputGroup.append(amountLabel).append(amountInput);
+
+        var checkboxInputGroup = $('<div class="input-group mb-3 d-flex align-items-center"></div>');
+        var checkboxLabel = $('<span class="input-group-text">是否付款</span>');
+        var checkbox = $('<input type="checkbox" class="form-check-input ms-2">').attr('id', 'isPaid');
+
+
+        checkboxInputGroup.append(checkboxLabel).append(checkbox);
+
+        formGroup.append(nameInputGroup)
+            .append(amountInputGroup)
+            .append(checkboxInputGroup);
+
+        form.append(legend).append(formGroup);
+
+        $('#participantBlock').append(form);
+
+    }
+
     async function GetCurrency_category() {
         var response = await axios.get(`${baseAddress}/api/category/Getcurrency_category`)
         var data = response.data;
@@ -101,7 +154,7 @@
     }
 
     async function GetSplit_category() {
-        var response = await axios.get(`${baseAddress}/api/category/GetSplitCategory`)
+        var response = await axios.get(`${baseAddress}/api/category/GetSplitCategories`)
         var data = response.data;
 
         populateSelect('#categorySelect', data);

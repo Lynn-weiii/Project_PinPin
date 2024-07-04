@@ -55,10 +55,11 @@ function PopulatorExpense(data) {
     })
 }
 
-function populateDropdown(selector, data) {
-    const dropdown = $(selector);
-    dropdown.empty();
-    data.forEach(item => {
-        dropdown.append(new Option(item.name, item.id));
+//注入下拉式選單
+function populateSelect(selector, data) {
+    const select = $(selector);
+    select.empty();
+    $.each(data, function (key, value) {
+        select.append(new Option(value, key));
     });
 }
