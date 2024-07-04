@@ -2,9 +2,8 @@
 
 namespace PinPinServer.DTO
 {
-    public class ScheduleDTO
+    public class EditScheduleDTO
     {
-        public int Id { get; set; }
 
         [Display(Name = "行程名稱")]
         public string Name { get; set; }
@@ -17,8 +16,12 @@ namespace PinPinServer.DTO
 
         public int UserId { get; set; }
 
-        [Display(Name = "編輯者")]
-        public string UserName { get; set; }
+
+
+        //允許空值
+
+        public int? Id { get; set; }
+
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
     }

@@ -5,6 +5,8 @@ using PinPinServer.Models;
 using PinPinServer.Services;
 
 
+
+
 namespace PinPinServer.Controllers
 {
     [Route("api/[controller]")]
@@ -60,7 +62,7 @@ namespace PinPinServer.Controllers
 
         // GET: api/Schedules/{name}
         [HttpGet("{name}")]
-        public async Task<ActionResult<IEnumerable<ScheduleDTO>>> GetUserSpecifiedSch(string name)
+        public async Task<ActionResult<IEnumerable<EditScheduleDTO>>> GetUserSpecifiedSch(string name)
         {
             try
             {
@@ -71,7 +73,7 @@ namespace PinPinServer.Controllers
                         _context.Users,
                         sch => sch.UserId,
                         usr => usr.Id,
-                        (sch, usr) => new ScheduleDTO
+                        (sch, usr) => new EditScheduleDTO
                         {
                             Id = sch.Id,
                             UserId = sch.UserId,

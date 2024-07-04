@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Schedules2Controller.cs" />
     <Compile Remove="GetuserId.cs" />
+    <Compile Remove="Models\Services\GetuserIdBase.cs" />
   </ItemGroup>
 
   <ItemGroup>

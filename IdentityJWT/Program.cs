@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<PinPinContext>(options => { options.UseSqlServer(builder.Configuration.GetConnectionString("PinPinSQL")); });
-builder.Services.AddScoped<GetuserId>();
+builder.Services.AddScoped<AuthGetuserId>();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
