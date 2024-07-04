@@ -1,0 +1,31 @@
+﻿<form id="expenseForm">
+    <div class="form-group">
+        <label for="schedule">Schedule</label>
+        <select class="form-control" id="schedule" name="schedule" required></select>
+    </div>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="payer">Payer</label>
+        <select class="form-control" id="payer" name="payer" required></select>
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select class="form-control" id="category" name="category" required></select>
+    </div>
+    <div class="form-group">
+        <label for="currency">Currency</label>
+        <select class="form-control" id="currency" name="currency" required></select>
+    </div>
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+    </div>
+    <div class="form-group">
+        <label for="remark">Remark</label>
+        <input type="text" class="form-control" id="remark" name="remark">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

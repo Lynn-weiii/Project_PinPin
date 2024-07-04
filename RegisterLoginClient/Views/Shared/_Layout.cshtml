@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - RegisterLoginClient</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/RegisterLoginClient.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PinPinClient.styles.css" asp-append-version="true" />
     <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -31,7 +31,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MemberInfo">修改會員資料</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="" asp-action="">PoleEast</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Expense" asp-action="Index">PoleEast</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="" asp-action="">bao</a>
@@ -63,6 +63,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/axios/axios.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
