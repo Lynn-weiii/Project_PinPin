@@ -29,23 +29,36 @@ namespace PinPinServer.Controllers
             IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
             {
-                int userID = (await _getUserId.PinGetUserId(User)).Value;
+                int userID = _getUserId.PinGetUserId(User).Value;
+                //schedules = await _context.Schedules
+                //        .Where(s => s.UserId == userID)
+                //        .Join(
+                //            _context.Users,
+                //            sch => sch.UserId,
+                //            usr => usr.Id,
+                //            (sch, usr) => new ScheduleDTO
+                //            {
+                //                Id = sch.Id,
+                //                UserId = sch.UserId,
+                //                Name = sch.Name,
+                //                StartTime = sch.StartTime,
+                //                EndTime = sch.EndTime,
+                //                CreatedAt = sch.CreatedAt,
+                //                UserName = usr.Name
+                //            }).ToListAsync();
                 schedules = await _context.Schedules
-                        .Where(s => s.UserId == userID)
-                        .Join(
-                            _context.Users,
-                            sch => sch.UserId,
-                            usr => usr.Id,
-                            (sch, usr) => new ScheduleDTO
-                            {
-                                Id = sch.Id,
-                                UserId = sch.UserId,
-                                Name = sch.Name,
-                                StartTime = sch.StartTime,
-                                EndTime = sch.EndTime,
-                                CreatedAt = sch.CreatedAt,
-                                UserName = usr.Name
-                            }).ToListAsync();
+        .Where(s => s.UserId == userID)
+.Include(s => s.User)
+.Select(s => new ScheduleDTO
+{
+    Id = s.Id,
+    UserId = s.UserId,
+    Name = s.Name,
+    StartTime = s.StartTime,
+    EndTime = s.EndTime,
+    CreatedAt = s.CreatedAt,
+    UserName = s.User.Name,
+}).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -69,7 +82,7 @@ namespace PinPinServer.Controllers
             IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
             {
-                int userID = (await _getUserId.PinGetUserId(User)).Value;
+                int userID = _getUserId.PinGetUserId(User).Value;
                 schedules = await _context.Schedules
                     .Where(s => s.UserId == userID && s.Name.Contains(name))
                     .Join(
@@ -109,8 +122,8 @@ namespace PinPinServer.Controllers
         public async Task<IActionResult> PutSchedule(int id, ScheduleDTO schDTO)
         {
 
-            int userID = (await _getUserId.PinGetUserId(User)).Value;
-            Schedule sch = await _context.Schedules.FindAsync(id);
+            int userID = _getUserId.PinGetUserId(User).Value;
+            Schedule? sch = await _context.Schedules.FindAsync(id);
 
             if (sch == null)
             {
@@ -148,7 +161,7 @@ namespace PinPinServer.Controllers
         [HttpPost]
         public async Task<ActionResult<EditScheduleDTO>> PostSchedule([FromBody] EditScheduleDTO editschDTO)
         {
-            int userID = (await _getUserId.PinGetUserId(User)).Value;
+            int userID = _getUserId.PinGetUserId(User).Value;
             Schedule newschDTO = new Schedule
             {
                 Id = 0,
@@ -169,7 +182,7 @@ namespace PinPinServer.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
-            int userID = (await _getUserId.PinGetUserId(User)).Value;
+            int userID = _getUserId.PinGetUserId(User).Value;
             var schedule = await _context.Schedules.FindAsync(id);
 
             if (schedule == null)

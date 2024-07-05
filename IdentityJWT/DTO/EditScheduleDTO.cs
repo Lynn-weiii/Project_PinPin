@@ -6,7 +6,8 @@ namespace PinPinServer.DTO
     {
 
         [Display(Name = "行程名稱")]
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
 
         [Display(Name = "出發日期")]
         public DateOnly StartTime { get; set; }
