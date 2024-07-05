@@ -1,0 +1,117 @@
+﻿<h1>資料庫工具</h1>
+
+<div class="container mt-4">
+    <div class="p-3 my-3">
+        <button type="button" class="btn btn-secondary mb-3" id="btnGetExpense">查詢所有費用表</button>
+        <button type="button" class="btn btn-secondary mb-3" id="btnCreateExpense">新增費用表</button>
+    </div>
+    <div class="row" id="partialtable">
+    </div>
+    <div class="row mt-4">
+        <h2>詳細資料</h2>
+        <div id="datadetial"></div>
+        <button type="button" class="btn btn-secondary mt-3 col-1" id="btneditData">修改</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/datapopulator.js" asp-append-version="true"></script>
+    <script>
+        const baseAddress = "https://localhost:7280";
+        var partialtable = $("#partialtable");
+
+        function resetPage(partialresponse) {
+            partialtable.empty();
+            $('#datadetial').empty();
+            partialtable.html(partialresponse.data);
+        }
+
+        $("#btnGetExpense").on("click", async () => {
+            try {
+                var partialresponse = await axios("/Expense/LoadExpense")
+
+                resetPage(partialresponse)
+
+                var response = await axios.post(`${baseAddress}/api/SplitExpenses/GetAllExpense`)
+                var expense = response.data;
+                PopulatorExpense(expense);
+
+                ShowDetail();
+            } catch (error) {
+                console.log(error);
+                alert("獲取資料失敗");
+            }
+        })
+
+        $("#btnCreateExpense").on("click", async () => {
+            try {
+                var partialresponse = await axios("/Expense/LoadCreate")
+
+                resetPage(partialresponse)
+
+            } catch (error) {
+                console.log(error);
+                alert("獲取資料失敗");
+            }
+        })
+
+        function ShowDetail() {
+            $('#DataTable tbody').off('click', 'tr').on('click', 'tr', function () {
+                var cells = $(this).find('td');
+                $('#datadetial').empty();
+
+                cells.each(function (index) {
+                    var cellContent = $(this).text();
+                    var headerText = $('#DataTable th').eq(index).text();
+                    var formGroup = $('<div class="form-group"></div>');
+                    var label = $('<label></label>').attr('for', headerText).text(headerText);
+                    var input = $('<input type="text" class="form-control">')
+                        .attr('id', headerText)
+                        .val(cellContent);
+                    formGroup.append(label).append(input);
+                    $('#datadetial').append(formGroup);
+                })
+
+                ShowParticipant($(cells[0]).text())
+            })
+        }
+
+        async function ShowParticipant(id) {
+            var response = await axios.post(`${baseAddress}/api/SplitExpenses/GetExpense_participant`, new URLSearchParams(
+                {
+                    id: `${id}`,
+                }));
+            var data = response.data;
+            var keys = Object.keys(data[0]);
+
+            var title = $('<h2></h2>').text("詳細內容");
+            $('#datadetial').append(title);
+
+            data.forEach(participant => {
+                delete participant['userId']
+                var keys = Object.keys(participant);
+                var formGroup = $('<div class="form-group border border-2 border-dark mb-3 p-2 rounded"></div>');
+                keys.forEach((key, index) => {
+                    
+                    if (key == 'isPaid') {
+                        console.log(key)
+                        var formcheck = $('<div class="form-check"></div>');
+                        var input = $('<input class="form-check-input" type="checkbox" >').attr('id', key).val(participant[key]).prop('checked', participant[key] === true);
+                        var label = $('<label></label>').attr('for', key).text(key);
+
+                        formcheck.append(input).append(label);
+                        formGroup.append(formcheck);
+                        $('#datadetial').append(formGroup);
+
+                        return;
+                    }
+                    var label = $('<label></label>').attr('for', key).text(key);
+                    var input = $('<input type="text" class="form-control">').attr('id', key).val(participant[key]);
+
+                    formGroup.append(label).append(input);
+                    $('#datadetial').append(formGroup);
+                });
+            });
+        }
+    </script>
+}
