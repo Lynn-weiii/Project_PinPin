@@ -45,7 +45,7 @@ namespace PinPinServer.Controllers
             }
         }
 
-        //Get:api/SplitExpenses/{?}
+        //Get:api/SplitExpenses/{id}
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetExpense(int Payer_Id)
         {
@@ -195,5 +195,117 @@ namespace PinPinServer.Controllers
             }
         }
 
+        // PUT: api/SplitExpenses/{id}
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateExpense(int id, [FromBody] CreateNewExpensedDTO dto)
+        {
+            SplitExpense? splitExpense = await _context.SplitExpenses.FirstOrDefaultAsync(expense => expense.Id == id);
+            if (splitExpense == null)
+            {
+                return NotFound("Not found this id");
+            }
+
+            var groupUserList = await _context.ScheduleGroups
+                .Where(group => group.ScheduleId == splitExpense.ScheduleId)
+                .Include(group => group.User)
+                .Select(group => group.User.Id)
+                .ToListAsync();
+
+            List<int> users = dto.Participants.Select(participant => participant.UserId).ToList();
+            users.Add(dto.PayerId);
+
+            //檢查所有傳入值是吼有問題
+            if (users.GroupBy(x => x).Any(g => g.Count() > 1))
+            {
+                return BadRequest("There are duplicate users.");
+            }
+
+            if (!users.All(payerId => groupUserList.Contains(payerId)))
+            {
+                return BadRequest("Some users are not in the group.");
+            }
+
+            bool splitCategoryExists = await _context.SplitCategories.AnyAsync(category => category.Id == dto.SplitCategoryId);
+            if (!splitCategoryExists)
+            {
+                return BadRequest("Invalid SplitCategory.");
+            }
+
+            bool currencyCategoryExists = await _context.CostCurrencyCategories.AnyAsync(category => category.Id == dto.CurrencyId);
+            if (!currencyCategoryExists)
+            {
+                return BadRequest("Invalid CostCurrencyCategory.");
+            }
+
+            if (string.IsNullOrEmpty(dto.Name))
+            {
+                return BadRequest("Name cannot be empty.");
+            }
+
+            if (dto.Amount <= 0)
+            {
+                return BadRequest("Main amount must be greater than zero.");
+            }
+
+            if (dto.Participants.Any(participant => participant.Amount <= 0))
+            {
+                return BadRequest("Each participant's amount must be greater than zero.");
+            }
+
+            decimal total = dto.Participants.Sum(participant => participant.Amount);
+            if (dto.Amount != total)
+            {
+                return BadRequest("The total amount of participants does not match the main amount.");
+            }
+
+            List<SplitExpenseParticipant> participants = await _context.SplitExpenseParticipants
+                .Where(ep => ep.SplitExpenseId == id)
+                .ToListAsync();
+
+            List<ExpenseParticipantDTO> participantDTOs = dto.Participants.ToList();
+
+            if (participantDTOs.Count != participants.Count)
+                return BadRequest("The number of participants does not match.");
+
+            //修改資料庫
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                splitExpense.PayerId = dto.PayerId;
+                splitExpense.SplitCategoryId = dto.SplitCategoryId;
+                splitExpense.Name = dto.Name;
+                splitExpense.CurrencyId = dto.CurrencyId;
+                splitExpense.Amount = dto.Amount;
+                splitExpense.Remark = dto.Remark;
+
+                _context.SplitExpenses.Update(splitExpense); ;
+
+                _context.SplitExpenseParticipants.RemoveRange(participants);
+                await _context.SaveChangesAsync();
+
+                foreach (var epdto in participantDTOs)
+                {
+                    var newParticipant = new SplitExpenseParticipant
+                    {
+                        SplitExpenseId = id,
+                        UserId = epdto.UserId,
+                        Amount = epdto.Amount,
+                        IsPaid = epdto.IsPaid
+                    };
+
+                    _context.SplitExpenseParticipants.Add(newParticipant);
+                };
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { Error = "An error occurred while updating the Expense.", Details = ex.Message });
+            }
+        }
     }
 }
