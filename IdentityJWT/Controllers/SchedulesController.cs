@@ -24,7 +24,7 @@ namespace PinPinServer.Controllers
 
         // GET: api/Schedules
         [HttpGet]
-        public async Task<IEnumerable<ScheduleDTO>> GetUserAllSchedule()
+        public async Task<IActionResult> GetUserAllSchedule()
         {
             IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
@@ -59,7 +59,7 @@ namespace PinPinServer.Controllers
                 Console.WriteLine("查無使用者相關紀錄");
             }
 
-            return schedules;
+            return Ok(schedules);
         }
 
         //Get:api/Schedules/{name}
