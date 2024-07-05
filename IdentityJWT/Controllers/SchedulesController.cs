@@ -135,6 +135,7 @@ namespace PinPinServer.Controllers
                 {
                     return BadRequest("系統發生錯誤");
                 }
+                throw;
             }
         }
 
