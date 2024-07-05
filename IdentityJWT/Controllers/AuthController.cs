@@ -46,6 +46,13 @@ namespace PinPinServer.Controllers
             {
                 return "請再次確認密碼!";
             }
+
+            if (!ValidatePassword(userDTO.Password))
+            {
+                return "密碼必須為8-16個字符，且包含英文及數字。";
+            }
+
+
             string passwordHash
                = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
 
@@ -65,6 +72,16 @@ namespace PinPinServer.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return $"註冊成功!會員編號:{user.Id}";
+        }
+
+        private bool ValidatePassword(string password)
+        {
+            const int minLength = 8;
+            const int maxLength = 16;
+            bool hasLetter = password.Any(char.IsLetter);
+            bool hasNumber = password.Any(char.IsDigit);
+
+            return password.Length >= minLength && password.Length <= maxLength && hasLetter && hasNumber;
         }
 
         //POST:api/Auth/Login
