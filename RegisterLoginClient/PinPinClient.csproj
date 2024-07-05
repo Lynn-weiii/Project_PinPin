@@ -18,8 +18,4 @@
     <ProjectReference Include="..\IdentityJWT\PinPinServer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Schdules\Partials\" />
-  </ItemGroup>
-
 </Project>

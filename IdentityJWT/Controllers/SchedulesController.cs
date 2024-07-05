@@ -49,7 +49,6 @@ namespace PinPinServer.Controllers
             }
             catch (Exception ex)
             {
-                // 记录异常日志
                 Console.WriteLine($"Exception: {ex}");
                 throw new Exception("伺服器發生錯誤，請稍後再試");
             }
@@ -148,22 +147,28 @@ namespace PinPinServer.Controllers
         [HttpPost]
         public async Task<ActionResult<EditScheduleDTO>> PostSchedule([FromBody] EditScheduleDTO editschDTO)
         {
-            int userID = (await _getUserId.PinGetUserId(User)).Value;
-            Schedule newschDTO = new Schedule
+            try
             {
-                Id = 0,
-                Name = editschDTO.Name,
-                StartTime = editschDTO.StartTime,
-                EndTime = editschDTO.EndTime,
-                CreatedAt = DateTime.Now,
-                UserId = userID
-            };
+                int userID = (await _getUserId.PinGetUserId(User)).Value;
+                Schedule newschDTO = new Schedule
+                {
+                    Name = editschDTO.Name,
+                    StartTime = editschDTO.StartTime,
+                    EndTime = editschDTO.EndTime,
+                    CreatedAt = DateTime.Now,
+                    UserId = userID
+                };
 
 
-            _context.Schedules.Add(newschDTO);
-            await _context.SaveChangesAsync();
+                _context.Schedules.Add(newschDTO);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("新增行程", new { id = newschDTO }, editschDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
         // DELETE: api/Schedules/5
         [HttpDelete("{id}")]
