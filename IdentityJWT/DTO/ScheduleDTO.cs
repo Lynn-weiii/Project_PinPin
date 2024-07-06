@@ -22,6 +22,5 @@ namespace PinPinServer.DTO
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
 
-        public int UserId { get; set; }
     }
 }
