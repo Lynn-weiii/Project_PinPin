@@ -35,7 +35,6 @@ namespace PinPinClient.Controllers
         }
 
 
-
         public IActionResult MemberInfo(ClaimsPrincipal user)
         {
             return View();

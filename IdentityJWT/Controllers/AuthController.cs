@@ -37,24 +37,35 @@ namespace PinPinServer.Controllers
         public async Task<string> Register(UserDTO userDTO)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email);
+
+            var existingPhone = await _context.Users.FirstOrDefaultAsync(p => p.Phone == userDTO.Phone);
             if (existingUser != null)
             {
+                //return BadRequest("該電子郵件已經被註冊");
                 return "該電子郵件已經被註冊";
+            }
+
+            if (existingPhone != null)
+            {
+                //return BadRequest("該電子郵件已經被註冊");
+                return "該電話號碼已經被註冊";
             }
 
             if (userDTO.Password != userDTO.PasswordConfirm)
             {
-                return "請再次確認密碼!";
+                //return BadRequest( "請再次確認密碼!");
+                return "請再次確認密碼";
             }
 
             if (!ValidatePassword(userDTO.Password))
             {
-                return "密碼必須為8-16個字符，且包含英文及數字。";
+                //return BadRequest("密碼必須為8-16個字符，且包含英文及數字。");
+                return "密碼必須為8-16個字符，且包含英文及數字";
             }
 
 
             string passwordHash
-               = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
+                   = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
 
 
             User user = new User
@@ -197,5 +208,12 @@ namespace PinPinServer.Controllers
 
             return "修改成功!";
         }
+
+        //[Authorize]
+        //[HttpPost("Logout")]
+        //public IActionResult Logout()
+        //{   
+        //    return Ok("登出成功");
+        //}
     }
 }

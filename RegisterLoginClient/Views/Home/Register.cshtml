@@ -30,11 +30,17 @@
                 <div class="mb-3">
                     <label for="password" class="form-label">密碼:</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="請輸入8-16碼英數字，英文需區分大小寫" required>
+                    <input type="checkbox" id="showPassword">顯示密碼</input>
+
                 </div>
                 <div class="mb-3">
                     <label for="passwordconfirm" class="form-label">確認密碼:</label>
                     <input type="password" class="form-control" id="passwordconfirm" name="passwordconfirm" placeholder="請再次輸入密碼" required>
                 </div>
+                @* <div class="mb-3">
+                <label for="photo" class="form-label">大頭貼照:</label>
+                <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                </div> *@
                 <button type="submit" class="btn btn-secondary w-100">註冊</button>
             </form>
         </div>
@@ -48,8 +54,21 @@
         //document.getElementById('registerForm').addEventListener('submit', async function (event) {
         //event.preventDefault();
         $(document).ready(function () {
+            $("#showPassword").on("change", function () {
+                const passwordField = $("#password");
+                const type = this.checked ? "text" : "password";
+                passwordField.attr("type", type);
+            });
+
             $("#registerForm").on("submit", async function () {
                 event.preventDefault();
+
+                // if (photo.size > 2 * 1024 * 1024) { // 2MB
+                //     alert("圖片大小不能超過2MB");
+                //     return;
+                // }
+
+
                 const name = $("#name").val();
                 const email = $("#email").val();
                 const phone = $("#phone").val();
@@ -74,6 +93,16 @@
                     birthday = "1970-01-01";
                 }
 
+                // const formData = new FormData();
+                // formData.append('name', name);
+                // formData.append('email', email);
+                // formData.append('phone', phone);
+                // formData.append('birthday', birthday);
+                // formData.append('gender', gender);
+                // formData.append('password', password);
+                // formData.append('passwordconfirm', passwordconfirm);
+                // formData.append('photo', photo); // Append photo file to FormData
+
                 try {
                     const response = await fetch(`${baseAddress}/api/Auth/Register`, {
                         method: 'POST',
@@ -81,10 +110,12 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ name, email, phone, birthday, gender, password, passwordconfirm })
+                        //body: formData // Send FormData instead of JSON.stringify
                     });
 
                     const result = await response.text();
                     alert(result);
+
                 } catch (error) {
                     console.error('Error:', error);
                     alert('註冊失敗，請稍後再試');

@@ -48,6 +48,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GetuserId>();
 
 builder.Services.AddControllers();

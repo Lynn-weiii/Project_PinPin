@@ -25,3 +25,5 @@
   "password": "lemonning",
   "passwordConfirm": "lemonning"
 }
+
+tina@com.tw/tina1234
