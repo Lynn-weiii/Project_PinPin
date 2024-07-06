@@ -80,11 +80,15 @@
 
     $('#btnGetSchedule').on("click", async () => {
         try {
-            var response = await axios.get(`${baseAddress}/api/schedule/GetRelatedSchedules`, {
-                params: {
-                    user_id: user_id.val(),
+            console.log(token);
+            var response = await axios.get(`${baseAddress}/api/Schedules`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
             })
+
+            var data = response.data;
+            console.log(data);
 
             populateSelect('#scheduleSelect', response.data);
         } catch (error) {
@@ -131,7 +135,7 @@
         })
     })
 
-    $('#btnSubmit').on("click",async function (event) {
+    $('#btnSubmit').on("click", async function (event) {
         event.preventDefault();
 
         var isValid = true;
@@ -197,13 +201,13 @@
                 isPaid: participantForm.find('#isPaid').is(':checked')
             });
         });
-        
+
         try {
             var response = await axios.post(`${baseAddress}/api/SplitExpenses/CreateNewExpense`, formData);
             console.log('成功提交:', response.data);
             alert('成功提交');
             $("#btnGetExpense").click();
-        } catch(error) {
+        } catch (error) {
             console.error('提交時發生錯誤:', error);
         }
     })

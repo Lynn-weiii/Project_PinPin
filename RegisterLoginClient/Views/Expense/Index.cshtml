@@ -18,6 +18,7 @@
     <script src="~/js/datapopulator.js" asp-append-version="true"></script>
     <script>
         const baseAddress = "https://localhost:7280";
+        const token = localStorage.getItem('token');
         var partialtable = $("#partialtable");
 
         function resetPage(partialresponse) {
