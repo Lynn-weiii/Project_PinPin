@@ -29,7 +29,7 @@ namespace PinPinServer.Controllers
             IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
             {
-                int userID = (await _getUserId.PinGetUserId(User)).Value;
+                int userID = _getUserId.PinGetUserId(User).Value;
                 schedules = await _context.Schedules
                         .Where(s => s.UserId == userID)
                         .Join(
@@ -68,7 +68,7 @@ namespace PinPinServer.Controllers
             IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
             {
-                int userID = (await _getUserId.PinGetUserId(User)).Value;
+                int userID = _getUserId.PinGetUserId(User).Value;
                 schedules = await _context.Schedules
                     .Where(s => s.UserId == userID && s.Name.Contains(name))
                     .Join(
@@ -108,7 +108,7 @@ namespace PinPinServer.Controllers
         public async Task<IActionResult> PutSchedule(int id, ScheduleDTO schDTO)
         {
 
-            int userID = (await _getUserId.PinGetUserId(User)).Value;
+            int userID = _getUserId.PinGetUserId(User).Value;
             Schedule sch = await _context.Schedules.FindAsync(id);
 
             if (sch == null)
@@ -149,7 +149,7 @@ namespace PinPinServer.Controllers
         {
             try
             {
-                int userID = (await _getUserId.PinGetUserId(User)).Value;
+                int userID = _getUserId.PinGetUserId(User).Value;
                 Schedule newschDTO = new Schedule
                 {
                     Name = editschDTO.Name,
@@ -174,7 +174,7 @@ namespace PinPinServer.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
-            int userID = (await _getUserId.PinGetUserId(User)).Value;
+            int userID = _getUserId.PinGetUserId(User).Value;
             var schedule = await _context.Schedules.FindAsync(id);
 
             if (schedule == null)

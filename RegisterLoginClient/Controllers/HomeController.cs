@@ -43,6 +43,10 @@ namespace PinPinClient.Controllers
             return View();
         }
 
+        public IActionResult AddSchmodal() //by bao
+        {
+            return PartialView();
+        }
 
 
 
