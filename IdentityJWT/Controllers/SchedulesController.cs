@@ -31,34 +31,32 @@ namespace PinPinServer.Controllers
             {
                 int userID = _getUserId.PinGetUserId(User).Value;
                 schedules = await _context.Schedules
-                        .Where(s => s.UserId == userID)
-                        .Join(
-                            _context.Users,
-                            sch => sch.UserId,
-                            usr => usr.Id,
-                            (sch, usr) => new ScheduleDTO
+                            .Where(s => s.UserId == userID)
+                            .Include(s => s.User)
+                            .Select(s => new ScheduleDTO
                             {
-                                Id = sch.Id,
-                                UserId = sch.UserId,
-                                Name = sch.Name,
-                                StartTime = sch.StartTime,
-                                EndTime = sch.EndTime,
-                                CreatedAt = sch.CreatedAt,
-                                UserName = usr.Name
+                                Id = s.Id,
+                                UserId = s.UserId,
+                                Name = s.Name,
+                                StartTime = s.StartTime,
+                                EndTime = s.EndTime,
+                                CreatedAt = s.CreatedAt,
+                                UserName = s.User.Name,
                             }).ToListAsync();
+
+                if (schedules == null || !schedules.Any())
+                {
+                    Console.WriteLine("查無使用者相關紀錄");
+                    return NotFound(new { message = "未找到匹配的行程" });
+                }
+
+                return Ok(schedules);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex}");
                 throw new Exception("伺服器發生錯誤，請稍後再試");
             }
-
-            if (schedules == null || !schedules.Any())
-            {
-                Console.WriteLine("查無使用者相關紀錄");
-            }
-
-            return Ok(schedules);
         }
 
         //Get:api/Schedules/{name}
@@ -109,7 +107,7 @@ namespace PinPinServer.Controllers
         {
 
             int userID = _getUserId.PinGetUserId(User).Value;
-            Schedule sch = await _context.Schedules.FindAsync(id);
+            Schedule? sch = await _context.Schedules.FindAsync(id);
 
             if (sch == null)
             {
@@ -129,16 +127,14 @@ namespace PinPinServer.Controllers
                 await _context.SaveChangesAsync();
                 return Ok("行程修改成功!");
             }
+            //這段是啥?
             catch (DbUpdateConcurrencyException)
             {
                 if (!ScheduleExists(id))
                 {
                     return BadRequest("系統發生錯誤");
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
         }
 
@@ -147,34 +143,28 @@ namespace PinPinServer.Controllers
         [HttpPost]
         public async Task<ActionResult<EditScheduleDTO>> PostSchedule([FromBody] EditScheduleDTO editschDTO)
         {
-            try
+            int userID = _getUserId.PinGetUserId(User).Value;
+            Schedule newschDTO = new Schedule
             {
-                int userID = _getUserId.PinGetUserId(User).Value;
-                Schedule newschDTO = new Schedule
-                {
-                    Name = editschDTO.Name,
-                    StartTime = editschDTO.StartTime,
-                    EndTime = editschDTO.EndTime,
-                    CreatedAt = DateTime.Now,
-                    UserId = userID
-                };
+                Id = 0,
+                Name = editschDTO.Name,
+                StartTime = editschDTO.StartTime,
+                EndTime = editschDTO.EndTime,
+                CreatedAt = DateTime.Now,
+                UserId = userID
+            };
 
 
                 _context.Schedules.Add(newschDTO);
                 await _context.SaveChangesAsync();
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            return CreatedAtAction("新增行程", new { id = newschDTO }, editschDTO);
         }
+
         // DELETE: api/Schedules/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
-            int userID = _getUserId.PinGetUserId(User).Value;
             var schedule = await _context.Schedules.FindAsync(id);
 
             if (schedule == null)

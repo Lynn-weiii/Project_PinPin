@@ -7,7 +7,7 @@ namespace PinPinServer.DTO
         public int Id { get; set; }
 
         [Display(Name = "行程名稱")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Display(Name = "出發日期")]
         public DateOnly StartTime { get; set; }
@@ -18,9 +18,8 @@ namespace PinPinServer.DTO
         public int UserId { get; set; }
 
         [Display(Name = "編輯者")]
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
-
     }
 }
