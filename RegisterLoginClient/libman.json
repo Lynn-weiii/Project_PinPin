@@ -9,6 +9,14 @@
     {
       "library": "axios@1.7.2",
       "destination": "wwwroot/axios/"
+    },
+    {
+      "library": "moment.js@2.18.1",
+      "destination": "wwwroot/moment.js/"
+    },
+    {
+      "library": "moment.js@2.30.1",
+      "destination": "wwwroot/lib/moment.js/"
     }
   ]
 }

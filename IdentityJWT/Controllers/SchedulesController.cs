@@ -15,7 +15,6 @@ namespace PinPinServer.Controllers
     {
         PinPinContext _context;
         AuthGetuserId _getUserId;
-        private int userID;
         public SchedulesController(PinPinContext context, AuthGetuserId getuserId)
         {
             _context = context;
@@ -155,8 +154,8 @@ namespace PinPinServer.Controllers
             };
 
 
-                _context.Schedules.Add(newschDTO);
-                await _context.SaveChangesAsync();
+            _context.Schedules.Add(newschDTO);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("新增行程", new { id = newschDTO }, editschDTO);
         }

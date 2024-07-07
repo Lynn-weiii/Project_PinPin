@@ -1,18 +1,15 @@
 ﻿@*Header*@
 @section Styles {
-    <link rel="stylesheet" href="/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" asp-append-version="true" />
-    
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" asp-append-version="true" />
 }
 
 @*Body*@
+
 @*-Head-*@
 <head>
 </head>
 
 @*-Main-*@
-
 <a></a>
 <div class="Container">
     <div class="row">
@@ -25,146 +22,130 @@
         <div id="resultmessage"></div>
     </div>
 </div>
-
-
-<!-- modal start -->
+<!--Creat New Schedule Modal-->
 <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title w-100 text-center" id="newschduleLabel">登入</h5>
+                <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <!-- form start -->
-                <form action="" id="CreateSchdule" class="needs-validation" method="post" novalidate autocomplete="off">
-                    <!-- 行程名稱 -->
-
-                    <div class="mb-3">
-                        <label for="Name" class="form-label mb-2">行程名稱</label>
-                        <input type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="StartTime" class="form-label mb-1">出發日期</label>
-                        <input type="text" name="StartTime" id="StartTime" class="form-control mb-1" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="EndTime" class="form-label mb-1">結束日期</label>
-                        <input type="text" name="EndTime" id="EndTime" class="form-control mb-1" required />
-                    </div>
-                    <div class="mb-3">
-                        <input type="submit" value="登入" class="btn btn-primary"></input>
-                    </div>
-                </form>
-                <!-- form end -->
+            <div class="container-fluid modal-body">
+                <partial name="_NewSchdule" />
             </div>
-        </div>
-    </div>
-</div>
-<!-- modal end -->
-@*-Footer-*@
-<footer></footer>
+
+            @*-Footer-*@
+            <footer></footer>
 
 
-@*-JS-*@
-@section Scripts {
-    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js"></script>
-    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js"></script>
-    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js"></script>
-    <script>
-        $(document).ready(async function () {
-            try {
-                var baseaddress = "https://localhost:7280";
-                $('#holdon').show();
-                // Check for JWT token
-                const token = localStorage.getItem('token');
-                const contentDiv = document.getElementById('userlogin');
-                const scheduleDiv = document.getElementById('schlisttable');
+            @*-JS-*@
+            @section Scripts {
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" asp-fallback-src="~/lib/moment/min/moment.min.js" asp-append-version="true"></script>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" asp-append-version="true"></script>
+                <script>
+                    $(document).ready(async function () {
 
-                if (!token) {
-                    $('#holdon').hide();
-                    contentDiv.innerHTML = `
-                                    <h3>快點<a href="/Home/Login">登入</a>PinPin，規劃美好的旅程吧</h3>
-                                    `;
-                    return;
-                }
-                var result = await fetch(`${baseaddress}/api/Schedules`, {
-                    method: "GET",
-                    headers: {
-                        'Authorization': `bearer ${token}`
-                    }
-                });
-                if (result.status === 401) {
-                    $('#holdon').hide();
-                    contentDiv.innerHTML = `
-                                <h3>快點<a href="/Home/Login">登入</a>PinPin，規劃美好的旅程吧</h3>
-                            `;
-                    return;
-                }
-                var data = await result.json();
-                $('#holdon').hide();
-                if (data == null) {
-                    alert('目前尚無行程~快點新增行程吧!');
-                    return;
-                }
-                $("#sch_alldetails").empty();
-                scheduleDiv.innerHTML =
-                    ` <table id="sch_list" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th id="sch_name" scope="col">行程名稱</th>
-                                        <th id="sch_startdate" scope="col">出發日期</th>
-                                        <th id="sch_enddate" scope="col">結束日期</th>
-                                        <th id="sch_creatdate" scope="col">建立日期</th>
-                                        <th id="sch_username" scope="col">編輯者</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sch_alldetails">
-                                </tbody>
-                            </table>
-                            `
-                data.forEach(item => {
-                    const createdAtFormatted = new Date(item.createdAt).toLocaleDateString();
-                    var row = `<tr>
-                                                            <td><a href="api/Schedules/${item.id}">${item.name}</a></td>
-                                                            <td>${item.startTime}</td>
-                                                            <td>${item.endTime}</td>
-                                                            <td>${createdAtFormatted}</td>
-                                                            <td>${item.userName}</td>
-                                                        </tr>`;
-                    $("#sch_alldetails").append(row);
+                        $(function () {
+                            var today = new Date();
+                            var formattedToday = today.toISOString().split('T')[0].replace(/-/g, '/');  // 格式化為 "YYYY/MM/DD"
+                            $('input[name="StartTime"]').daterangepicker({
+                                "autoApply": true,
+                                "locale": {
+                                    "format": "YYYY/MM/DD",
+                                    "separator": " - ",
+                                    "applyLabel": "Apply",
+                                    "cancelLabel": "Cancel",
+                                    "fromLabel": "From",
+                                    "toLabel": "To",
+                                    "customRangeLabel": "Custom",
+                                    "weekLabel": "W",
+                                    "daysOfWeek": [
+                                        "Su", "Mo","Tu","We","Th","Fr","Sa"
+                                    ],
+                                    "monthNames": [
+                                        "Jan","Feb","Mar","Apr","May","June",
+                                        "July","Aug","Sep","Oct","Nov","Dec"
+                                    ],
+                                    "firstDay": 1
+                                },
+                                "minDate": formattedToday,
+                                "startDate": formattedToday,
+                                "endDate": formattedToday
+                            }, function (start, end, label) {
+                                console.log("New date range selected: " + start.format('YYYY-MM-DD') + " to " + end.format('YYYY-MM-DD') + " (predefined range: " + label + ")");
+                            });
+                        });
 
-                });
-                contentDiv.innerHTML = `
-                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newschdule" class="fs-3 mx-1">
-                                                    新增行程
-                                                </button>
-                                            `;
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            };
+                        try {
+                            var baseaddress = "https://localhost:7280";
+                            $('#holdon').show();
+                            // Check for JWT token
+                            const token = localStorage.getItem('token');
+                            const contentDiv = document.getElementById('userlogin');
+                            const scheduleDiv = document.getElementById('schlisttable');
 
-            //air-datepiker setting
-            let dpMin, dpMax;
-            dpMin = new AirDatepicker('#StartTime', {
-                onSelect({ date }) {
-                    dpMax.update({
-                        minDate: date
+                            if (!token) {
+                                $('#holdon').hide();
+                                contentDiv.innerHTML = `<h3>快點<a href="/Home/Login">登入</a>PinPin，規劃美好的旅程吧</h3>`;
+                                return;
+                            }
+                            var result = await fetch(`${baseaddress}/api/Schedules`, {
+                                method: "GET",
+                                headers: {
+                                    'Authorization': `bearer ${token}`
+                                }
+                            });
+                            if (result.status === 401) {
+                                $('#holdon').hide();
+                                contentDiv.innerHTML = `<h3>快點<a href="/Home/Login">登入</a>PinPin，規劃美好的旅程吧</h3>`;
+                                return;
+                            }
+                            var data = await result.json();
+                            $('#holdon').hide();
+                            if (data == null) {
+                                alert('目前尚無行程~快點新增行程吧!');
+                                return;
+                            }
+                            $("#sch_alldetails").empty();
+                            scheduleDiv.innerHTML =
+                                `<table id="sch_list" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th id="sch_name" scope="col">行程名稱</th>
+                                                            <th id="sch_startdate" scope="col">出發日期</th>
+                                                            <th id="sch_enddate" scope="col">結束日期</th>
+                                                            <th id="sch_creatdate" scope="col">建立日期</th>
+                                                            <th id="sch_username" scope="col">編輯者</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="sch_alldetails">
+                                                    </tbody>
+                                                </table>`
+                                                
+                            data.forEach(item => {
+                                const createdAtFormatted = new Date(item.createdAt).toLocaleDateString();
+                                var row = `<tr>
+                                                <td><a href="api/Schedules/${item.id}">${item.name}</a></td>
+                                                <td>${item.startTime}</td>
+                                                <td>${item.endTime}</td>
+                                                <td>${createdAtFormatted}</td>
+                                                <td>${item.userName}</td>
+                                          </tr>`;
+                                $("#sch_alldetails").append(row);
+
+                                $("#createbtn").on('click', function () {
+                                    //alert('收');
+                                });
+
+                            });
+                            contentDiv.innerHTML = `<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newschdule"  />新增行程</button>`;
+                            //air-datepiker setting
+
+                        }
+                        catch (error) {
+                            console.error("Error fetching data:", error);
+                        }
+                        /*document end*/
                     });
-                }
-            });
-            dpMax = new AirDatepicker('#EndTime', {
-                onSelect({ date }) {
-                    dpMin.update({
-                        maxDate: date
-                    });
-                }
-            });
-
-
-
-            /*document end*/
-        });
-
-    </script>
-}
+                </script>
+            }

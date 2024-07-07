@@ -7,13 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Schdules\Partials\**" />
+    <Compile Remove="wwwroot\lib\moment.js\**" />
+    <Content Remove="Views\Schdules\Partials\**" />
+    <Content Remove="wwwroot\lib\moment.js\**" />
+    <EmbeddedResource Remove="Views\Schdules\Partials\**" />
+    <EmbeddedResource Remove="wwwroot\lib\moment.js\**" />
+    <None Remove="Views\Schdules\Partials\**" />
+    <None Remove="wwwroot\lib\moment.js\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Views\Schdules\Index.cshtml.cs" />
-    <Compile Remove="Views\Schdules\Partials\_CreatedSchdule.cshtml.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="Views\Home\Schedule.cshtml" />
-    <Content Remove="Views\Schdules\Partials\_createdSchdule.cshtml" />
+    <Content Remove="Views\Schdules\CreateNewSchdule.cshtml" />
+    <Content Remove="wwwroot\js\newschdule.js" />
   </ItemGroup>
 
   <ItemGroup>
