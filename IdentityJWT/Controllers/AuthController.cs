@@ -34,11 +34,12 @@ namespace PinPinServer.Controllers
         //POST:api/Auth/Register
 
         [HttpPost("Register")]
-        public async Task<string> Register(UserDTO userDTO)
+        public async Task<string> Register([FromForm] UserDTO userDTO)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email);
 
-            var existingPhone = await _context.Users.FirstOrDefaultAsync(p => p.Phone == userDTO.Phone);
+            var existingPhone = userDTO.Phone != null ? await _context.Users.FirstOrDefaultAsync(u => u.Phone == userDTO.Phone) : null;
+            //var existingPhone = await _context.Users.FirstOrDefaultAsync(p => p.Phone == userDTO.Phone);
             if (existingUser != null)
             {
                 //return BadRequest("該電子郵件已經被註冊");
@@ -63,26 +64,58 @@ namespace PinPinServer.Controllers
                 return "密碼必須為8-16個字符，且包含英文及數字";
             }
 
-
             string passwordHash
                    = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
 
-
-            User user = new User
+            //圖檔
+            string photoBase64 = null;
+            if (userDTO.Photo != null && userDTO.Photo.Length > 0)
             {
+                using (var ms = new MemoryStream())
+                {
+                    await userDTO.Photo.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+                    photoBase64 = Convert.ToBase64String(fileBytes);
+                }
+            }
 
-                Name = userDTO.Name,
-                PasswordHash = passwordHash,
-                Email = userDTO.Email,
-                Phone = userDTO.Phone,
-                Birthday = userDTO.Birthday,
-                Gender = userDTO.Gender,
-                Photo = userDTO.Photo,
-                CreatedAt = DateTime.Now
-            };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return $"註冊成功!會員編號:{user.Id}";
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // 創建User物件
+                    User user = new User
+                    {
+                        Name = userDTO.Name,
+                        PasswordHash = passwordHash,
+                        Email = userDTO.Email,
+                        Phone = userDTO.Phone,
+                        Birthday = userDTO.Birthday,
+                        Gender = userDTO.Gender,
+                        Photo = photoBase64,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    // 將User物件加入資料庫上下文中
+                    _context.Users.Add(user);
+
+                    // 執行資料庫儲存異動，將User實體寫入資料庫
+                    await _context.SaveChangesAsync();
+
+                    // 提交事務
+                    transaction.Commit();
+
+                    // 返回成功訊息，包含用戶編號
+                    return $"註冊成功!會員編號:{user.Id}";
+                }
+                catch (Exception ex)
+                {
+                    // 如果發生異常，回滾事務
+                    transaction.Rollback();
+                    // 返回錯誤訊息或適當的異常處理
+                    return $"註冊失敗: {ex.Message}";
+                }
+            }
         }
 
         private bool ValidatePassword(string password)
@@ -161,6 +194,8 @@ namespace PinPinServer.Controllers
             {
                 return NotFound();
             }
+
+
             UserDTO userDto = new UserDTO
             {
                 Id = user.Id,
@@ -169,7 +204,7 @@ namespace PinPinServer.Controllers
                 Phone = user.Phone,
                 Birthday = user.Birthday,
                 Gender = user.Gender,
-                Photo = user.Photo
+                //Photo = user.Photo
             };
             // 回傳 UserDTO
             return Ok(userDto);

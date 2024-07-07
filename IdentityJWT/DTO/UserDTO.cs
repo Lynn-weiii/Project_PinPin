@@ -12,7 +12,7 @@ namespace PinPinServer.DTO
 
         public DateOnly? Birthday { get; set; }
 
-        public string? Photo { get; set; } 
+        public IFormFile? Photo { get; set; } 
 
         public int? Gender { get; set; }
 
@@ -26,5 +26,8 @@ namespace PinPinServer.DTO
 
         [Required(ErrorMessage = "請再次確認密碼!")]
         public string PasswordConfirm { get; set; }
+
+        public int? favor { get; set; }
+
     }
 }

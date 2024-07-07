@@ -37,10 +37,14 @@
                     <label for="passwordconfirm" class="form-label">確認密碼:</label>
                     <input type="password" class="form-control" id="passwordconfirm" name="passwordconfirm" placeholder="請再次輸入密碼" required>
                 </div>
-                @* <div class="mb-3">
-                <label for="photo" class="form-label">大頭貼照:</label>
-                <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
-                </div> *@
+                <div class="mb-3">
+                    <label for="photo" class="form-label">大頭貼照:</label>
+                    <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+
+                </div>
+                <div class="mb-3">
+                    <img id="photoPreview" src="#" alt="頭像預覽" style="max-width: 200px; max-height: 200px; display: none;">
+                </div>
                 <button type="submit" class="btn btn-secondary w-100">註冊</button>
             </form>
         </div>
@@ -51,8 +55,6 @@
 {
     <script>
         var baseAddress = "https://localhost:7280";
-        //document.getElementById('registerForm').addEventListener('submit', async function (event) {
-        //event.preventDefault();
         $(document).ready(function () {
             $("#showPassword").on("change", function () {
                 const passwordField = $("#password");
@@ -60,14 +62,10 @@
                 passwordField.attr("type", type);
             });
 
-            $("#registerForm").on("submit", async function () {
+            $("#registerForm").on("submit", async function (event) {
                 event.preventDefault();
 
-                // if (photo.size > 2 * 1024 * 1024) { // 2MB
-                //     alert("圖片大小不能超過2MB");
-                //     return;
-                // }
-
+                const formData = new FormData();
 
                 const name = $("#name").val();
                 const email = $("#email").val();
@@ -76,6 +74,7 @@
                 const gender = $("#gender").val();
                 const password = $("#password").val();
                 const passwordconfirm = $("#passwordconfirm").val();
+                const photo = $("#photo")[0].files[0];
 
                 if (!validatePassword(password)) {
                     alert('密碼必須為8-16個字符，且包含英文及數字。');
@@ -88,29 +87,36 @@
                     return;
                 }
 
-                //若未選擇生日，則預設為"1970-01-01"
+                //若未選擇生日，則預設為"1900-01-01"
                 if (!birthday) {
-                    birthday = "1970-01-01";
+                    birthday = "1900-01-01";
                 }
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('phone', phone);
+                formData.append('birthday', birthday);
+                formData.append('gender', gender);
+                formData.append('password', password);
+                formData.append('passwordconfirm', passwordconfirm);
+                // if (photo) {
+                //     formData.append('photo', photo); // Append photo file to FormData
+                // }
 
-                // const formData = new FormData();
-                // formData.append('name', name);
-                // formData.append('email', email);
-                // formData.append('phone', phone);
-                // formData.append('birthday', birthday);
-                // formData.append('gender', gender);
-                // formData.append('password', password);
-                // formData.append('passwordconfirm', passwordconfirm);
-                // formData.append('photo', photo); // Append photo file to FormData
+                //壓縮圖檔
+                const photoFile = document.getElementById("photo").files[0];
+                if (photoFile) {
+                    const compressedBase64 = await compressAndConvertToBase64(photoFile);
+                    formData.append("photo", compressedBase64);
+                }
 
                 try {
                     const response = await fetch(`${baseAddress}/api/Auth/Register`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ name, email, phone, birthday, gender, password, passwordconfirm })
-                        //body: formData // Send FormData instead of JSON.stringify
+                        //headers: {
+                        //     'Content-Type': 'application/json'
+                        // },
+                        //body: JSON.stringify({ name, email, phone, birthday, gender, password, passwordconfirm })
+                        body: formData // Send FormData instead of JSON.stringify
                     });
 
                     const result = await response.text();
@@ -122,6 +128,37 @@
                 }
             });
         });
+
+        $("#photo").on("change", function () {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                $("#photoPreview").attr("src", e.target.result);
+                $("#photoPreview").css("display", "block"); // 顯示預覽圖片
+            };
+
+            // 讀取選擇的圖片檔案
+            const file = this.files[0];
+            reader.readAsDataURL(file);
+        });
+        //壓縮圖檔
+        async function compressAndConvertToBase64(file) {
+            const maxLength = 255;  // Adjust this value based on your database column size
+
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    let base64String = reader.result.split(',')[1];
+                    if (base64String.length > maxLength) {
+                        base64String = base64String.substring(0, maxLength);
+                    }
+                    resolve(base64String);
+                };
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
         function validatePassword(password) {
             const minLength = 8;
             const maxLength = 16;
