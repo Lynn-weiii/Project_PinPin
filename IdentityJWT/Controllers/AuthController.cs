@@ -34,37 +34,98 @@ namespace PinPinServer.Controllers
         //POST:api/Auth/Register
 
         [HttpPost("Register")]
-        public async Task<string> Register(UserDTO userDTO)
+        public async Task<string> Register([FromForm] UserDTO userDTO)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email);
+
+            var existingPhone = userDTO.Phone != null ? await _context.Users.FirstOrDefaultAsync(u => u.Phone == userDTO.Phone) : null;
+            //var existingPhone = await _context.Users.FirstOrDefaultAsync(p => p.Phone == userDTO.Phone);
             if (existingUser != null)
             {
+                //return BadRequest("該電子郵件已經被註冊");
                 return "該電子郵件已經被註冊";
+            }
+
+            if (existingPhone != null)
+            {
+                //return BadRequest("該電子郵件已經被註冊");
+                return "該電話號碼已經被註冊";
             }
 
             if (userDTO.Password != userDTO.PasswordConfirm)
             {
-                return "請再次確認密碼!";
+                //return BadRequest( "請再次確認密碼!");
+                return "請再次確認密碼";
             }
-            string passwordHash
-               = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
 
-
-            User user = new User
+            if (!ValidatePassword(userDTO.Password))
             {
+                //return BadRequest("密碼必須為8-16個字符，且包含英文及數字。");
+                return "密碼必須為8-16個字符，且包含英文及數字";
+            }
 
-                Name = userDTO.Name,
-                PasswordHash = passwordHash,
-                Email = userDTO.Email,
-                Phone = userDTO.Phone,
-                Birthday = userDTO.Birthday,
-                Gender = userDTO.Gender,
-                Photo = userDTO.Photo,
-                CreatedAt = DateTime.Now
-            };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return $"註冊成功!會員編號:{user.Id}";
+            string passwordHash
+                   = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
+
+            //圖檔
+            string photoBase64 = null;
+            if (userDTO.Photo != null && userDTO.Photo.Length > 0)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    await userDTO.Photo.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+                    photoBase64 = Convert.ToBase64String(fileBytes);
+                }
+            }
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // 創建User物件
+                    User user = new User
+                    {
+                        Name = userDTO.Name,
+                        PasswordHash = passwordHash,
+                        Email = userDTO.Email,
+                        Phone = userDTO.Phone,
+                        Birthday = userDTO.Birthday,
+                        Gender = userDTO.Gender,
+                        Photo = photoBase64,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    // 將User物件加入資料庫上下文中
+                    _context.Users.Add(user);
+
+                    // 執行資料庫儲存異動，將User實體寫入資料庫
+                    await _context.SaveChangesAsync();
+
+                    // 提交事務
+                    transaction.Commit();
+
+                    // 返回成功訊息，包含用戶編號
+                    return $"註冊成功!會員編號:{user.Id}";
+                }
+                catch (Exception ex)
+                {
+                    // 如果發生異常，回滾事務
+                    transaction.Rollback();
+                    // 返回錯誤訊息或適當的異常處理
+                    return $"註冊失敗: {ex.Message}";
+                }
+            }
+        }
+
+        private bool ValidatePassword(string password)
+        {
+            const int minLength = 8;
+            const int maxLength = 16;
+            bool hasLetter = password.Any(char.IsLetter);
+            bool hasNumber = password.Any(char.IsDigit);
+
+            return password.Length >= minLength && password.Length <= maxLength && hasLetter && hasNumber;
         }
 
         //POST:api/Auth/Login
@@ -118,18 +179,22 @@ namespace PinPinServer.Controllers
             return jwt;
         }
 
+
+
         //GET:api/Auth/SearchMemberInfo
         [Authorize]
         [HttpGet("SearchMemberInfo")]
-        public async Task<ActionResult<User>> SearchMemberInfo(string Email)
+        public async Task<ActionResult<User>> SearchMemberInfo()
         {
-            //string userEmail = User.Identity.Name;
+            //取出token中email的值
+            string userEmail = User.Claims.First(x => x.Type == ClaimTypes.Email).Value;
 
-            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (user == null)
             {
                 return NotFound();
             }
+
 
             UserDTO userDto = new UserDTO
             {
@@ -139,37 +204,51 @@ namespace PinPinServer.Controllers
                 Phone = user.Phone,
                 Birthday = user.Birthday,
                 Gender = user.Gender,
-                Photo = user.Photo
+                //Photo = user.Photo
             };
-
             // 回傳 UserDTO
             return Ok(userDto);
         }
 
-
-
         //PUT:api/Auth/{email}
+        [Authorize]
         [HttpPut("{email}")]
-        public async Task<IActionResult> UpdateUser(string email, UserDTO userDto)
+        public async Task<string> UpdateUser(string email, [FromBody] EditMemberInfoDTO userDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-
-            if (user == null)
+            if (email != userDto.Email)
             {
-                return NotFound();
+                return "修改紀錄失敗";
             }
 
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return "修改紀錄失敗";
+            }
+            else
+            {
+                user.Name = userDto.Name;
+                user.Phone = userDto.Phone;
+                user.Birthday = userDto.Birthday;
+                user.Gender = userDto.Gender;
+                //user.Photo = userDto.Photo;
+            }
+
+
             // 更新用戶資料
-            user.Name = userDto.Name;
-            user.Phone = userDto.Phone;
-            user.Birthday = userDto.Birthday;
-            user.Gender = userDto.Gender;
-            user.Photo = userDto.Photo;
+
 
             // 保存變更
             await _context.SaveChangesAsync();
 
-            return Ok("修改成功!");
+            return "修改成功!";
         }
+
+        //[Authorize]
+        //[HttpPost("Logout")]
+        //public IActionResult Logout()
+        //{   
+        //    return Ok("登出成功");
+        //}
     }
 }
