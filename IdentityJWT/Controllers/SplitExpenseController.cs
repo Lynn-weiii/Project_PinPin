@@ -2,18 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using PinPinServer.DTO;
 using PinPinServer.Models;
+using PinPinServer.Services;
 
 namespace PinPinServer.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SplitExpensesController : ControllerBase
     {
         private readonly PinPinContext _context;
-
-        public SplitExpensesController(PinPinContext context)
+        private readonly AuthGetuserId _getUserId;
+        public SplitExpensesController(PinPinContext context, AuthGetuserId getuserId)
         {
             _context = context;
+            _getUserId = getuserId;
         }
 
         //POST:api/SplitExpenses/GetAllExpense
@@ -45,15 +48,20 @@ namespace PinPinServer.Controllers
             }
         }
 
-        //Get:api/SplitExpenses/{id}
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetExpense(int Payer_Id)
+        /// <summary>
+        /// 獲取付款人為user的所有付費表
+        /// </summary>
+        /// <returns></returns>
+        //Get:api/SplitExpenses/GetExpense
+        [HttpGet("GetExpense")]
+        public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetExpense()
         {
+            int userID = _getUserId.PinGetUserId(User).Value;
             try
             {
                 List<ExpenseDTO> ExpenseDTOs = await _context.SplitExpenses
                     .AsNoTracking()
-                    .Where(expens => expens.PayerId == Payer_Id)
+                    .Where(expens => expens.PayerId == userID)
                     .Select(expens => new ExpenseDTO
                     {
                         Id = expens.Id,
@@ -79,6 +87,14 @@ namespace PinPinServer.Controllers
         [HttpPost("GetExpense_participant")]
         public async Task<ActionResult<IEnumerable<ExpenseParticipantDTO>>> GetExpense_participant([FromForm] int Id)
         {
+
+            List<int> userIds = await _context.SplitExpenses
+                .Where(se => se.Id == Id)
+                .Include(se => se.Schedule)
+                .ThenInclude(s => s.ScheduleGroups)
+                .SelectMany(se => se.Schedule.ScheduleGroups.Select(sg => sg.UserId))
+                .ToListAsync();
+
             try
             {
                 List<ExpenseParticipantDTO> participantDTOs = await _context.SplitExpenseParticipants
@@ -89,6 +105,7 @@ namespace PinPinServer.Controllers
                         UserName = participant.User.Name,
                         Amount = participant.Amount,
                         IsPaid = participant.IsPaid,
+
                     }).ToListAsync();
 
 
