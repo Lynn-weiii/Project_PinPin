@@ -39,7 +39,7 @@ namespace PinPinClient.Controllers
             return View();
         }
 
-        public IActionResult MemberInfo(ClaimsPrincipal user)
+        //public IActionResult MemberInfo(ClaimsPrincipal user)
         public IActionResult Schdules() //by bao
         {
             return View();
