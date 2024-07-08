@@ -1,5 +1,4 @@
-﻿<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/css/multi-select-tag.css">
-<div class="container">
+﻿<div class="container">
     <div class="row">
         <div class="col-md-4">
             <h1>註冊</h1>
@@ -39,17 +38,6 @@
                     <input type="password" class="form-control" id="passwordconfirm" name="passwordconfirm" placeholder="請再次輸入密碼" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">旅遊喜好:</label>
-                    <select name="favor" id="favor" multiple>
-                        <option value="1">自然風景</option>
-                        <option value="2">人文藝術</option>
-                        <option value="3">深度體驗</option>
-                        <option value="4">在地美食</option>
-                        <option value="5">摘星米其林</option>
-                        <option value="6">時尚購物</option>
-                    </select>
-                </div>
-                <div class="mb-3">
                     <label for="photo" class="form-label">大頭貼照:</label>
                     <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
 
@@ -68,9 +56,6 @@
     <script>
         var baseAddress = "https://localhost:7280";
         $(document).ready(function () {
-            // 動態加載喜好分類
-            //loadFavorCategories();
-
             $("#showPassword").on("change", function () {
                 const passwordField = $("#password");
                 const type = this.checked ? "text" : "password";
@@ -90,17 +75,6 @@
                 const password = $("#password").val();
                 const passwordconfirm = $("#passwordconfirm").val();
                 const photo = $("#photo")[0].files[0];
-                const selectedFavors = [];
-                $('#favor option:selected').each(function () {
-                    selectedFavors.push(parseInt($(this).val()));
-                });
-                formData.append('photo', photo);
-                selectedFavors.forEach((favor, index) => {
-                    formData.append(`favors[${index}]`, favor); // 將favor作為陣列項傳遞
-                });
-
-                // 将多个值以逗号分隔的字符串形式设置给 favor 字段
-                //const favor = selectedFavors.join(',');
 
                 if (!validatePassword(password)) {
                     alert('密碼必須為8-16個字符，且包含英文及數字。');
@@ -124,7 +98,6 @@
                 formData.append('gender', gender);
                 formData.append('password', password);
                 formData.append('passwordconfirm', passwordconfirm);
-                //formData.append('favor', favor);
                 // if (photo) {
                 //     formData.append('photo', photo); // Append photo file to FormData
                 // }
@@ -168,39 +141,6 @@
             const file = this.files[0];
             reader.readAsDataURL(file);
         });
-
-        // async function loadFavorCategories() {
-        //     try {
-        //         const response = await fetch(`${baseAddress}/api/Auth/GetFavorCategories`);
-        //         if (!response.ok) {
-        //             throw new Error('連線錯誤' + response.statusText);
-        //         }
-        //         const data = await response.json();
-        //         const container = document.getElementById('favorCategoriesContainer');
-        //         container.innerHTML = ''
-
-        //         data.forEach(category => {
-        //             const checkbox = document.createElement('input');
-        //             checkbox.type = 'checkbox';
-        //             checkbox.id = 'category_' + category.id;
-        //             checkbox.value = category.id;
-        //             console.log('Created checkbox:', checkbox.id, checkbox.value);
-
-        //             const label = document.createElement('label');
-        //             label.htmlFor = 'category_' + category.id;
-        //             label.textContent = category.name;
-        //             console.log('Created label:', label.htmlFor, label.textContent);
-
-        //             container.appendChild(checkbox);
-        //             container.appendChild(label);
-        //             container.appendChild(document.createElement('br'));
-        //         });
-        //     } catch (error) {
-        //         console.error('Error fetching categories:', error);
-        //         alert("無法獲得喜好分類: " + error.message);
-        //     }
-        // }
-
         //壓縮圖檔
         async function compressAndConvertToBase64(file) {
             const maxLength = 255;  // Adjust this value based on your database column size
@@ -228,10 +168,6 @@
             return password.length >= minLength && password.length <= maxLength && hasLetter && hasNumber;
         }
 
-    </script>
-    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.0.1/dist/js/multi-select-tag.js"></script>
-    <script>
-        new MultiSelectTag('favor')  // id
     </script>
 
 }
