@@ -1,29 +1,35 @@
-using PinPinServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PinPinServer.Models;
+using PinPinServer.Services;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<PinPinContext>(options => {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("PinPinSQL"));
-});
+builder.Services.AddDbContext<PinPinContext>(options => { options.UseSqlServer(builder.Configuration.GetConnectionString("PinPinSQL")); });
+builder.Services.AddScoped<AuthGetuserId>();
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 
 var PinPinPolicy = "PinPinPolicy";
-builder.Services.AddCors(options => {
-    options.AddPolicy(name: PinPinPolicy, policy => {
-        policy.WithOrigins("https://localhost:7215").WithMethods("*").WithHeaders("*");
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: PinPinPolicy, policy =>
+    {
+        policy.WithOrigins("*").WithMethods("*").WithHeaders("*");
     });
 });
 
 //JWTÅçÃÒ¥Î
-builder.Services.AddSwaggerGen(options => {
+builder.Services.AddSwaggerGen(options =>
+{
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
@@ -51,10 +57,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<GetuserId>();
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 

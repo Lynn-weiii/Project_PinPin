@@ -19,7 +19,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[cost_currency_category]",
+         "Name": "[dbo].[CostCurrencyCategories]",
          "ObjectType": 0
       },
       {
@@ -47,7 +47,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[schedule_group]",
+         "Name": "[dbo].[ScheduleGroups]",
          "ObjectType": 0
       },
       {
@@ -59,7 +59,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[split_category]",
+         "Name": "[dbo].[SplitCategories]",
          "ObjectType": 0
       },
       {
