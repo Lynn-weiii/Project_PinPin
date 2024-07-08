@@ -68,11 +68,15 @@
                     document.getElementById('birthday').value = data.birthday ? data.birthday.split('T')[0] : '';
                     document.getElementById('gender').value = data.gender;
                     document.getElementById('photo').value = data.photo;
-                    // if ($("#birthday").val() == "1970-01-01") 
-                    // {
-                    //     $("#birthday").hide(); // 隱藏輸入框
-                    //     $("#birthdayDisplay").text("不公開"); // 顯示"不公開"
-                    // }
+                    if ($("#birthday").val() == "1970-01-01") 
+                    {
+                        $("#birthday").hide(); // 隱藏輸入框
+                        $("#birthdayDisplay").text("不公開"); // 顯示"不公開"
+                    }
+                    if ($("#birthday").val() == "1900-01-01") {
+                        $("#birthday").hide(); // 隱藏輸入框
+                        $("#birthdayDisplay").text("不公開"); // 顯示"不公開"
+                    }
                 } else {
                     alert('Failed to fetch user data');
                 }

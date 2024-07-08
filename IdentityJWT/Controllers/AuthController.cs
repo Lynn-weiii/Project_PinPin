@@ -31,8 +31,18 @@ namespace PinPinServer.Controllers
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        //POST:api/Auth/Register
+        //GET:api/Auth/GetFavorCategories
+        [HttpGet("GetFavorCategories")]
+        public async Task<IActionResult> GetFavorCategories()
+        {
+            var categories = await _context.FavorCategories
+                .Select(c => new { c.Id, c.Category }) // 假设Id和Name是你表中的列
+                .ToListAsync();
 
+            return Ok(categories);
+        }
+
+        //POST:api/Auth/Register
         [HttpPost("Register")]
         public async Task<string> Register([FromForm] UserDTO userDTO)
         {
@@ -81,8 +91,13 @@ namespace PinPinServer.Controllers
 
             using (var transaction = _context.Database.BeginTransaction())
             {
+
                 try
                 {
+                    if (userDTO == null)
+                    {
+                        throw new ArgumentException("Invalid user data.");
+                    }
                     // 創建User物件
                     User user = new User
                     {
@@ -98,6 +113,31 @@ namespace PinPinServer.Controllers
 
                     // 將User物件加入資料庫上下文中
                     _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                    if (userDTO.favor != null && userDTO.favor.Count > 0)
+                    {
+                        foreach (var favorId in userDTO.favor)
+                        {
+                            UserFavor favor = new UserFavor
+                            {
+                                FavorCategoryId = favorId,
+                                UserId = user.Id,
+                            };
+
+                            _context.UserFavors.Add(favor);
+                        }
+                    }
+                    //if (userDTO.favor != null)
+                    //{
+                    //    UserFavor favor = new UserFavor
+                    //    {
+                    //        FavorCategoryId = userDTO.favor,
+                    //        UserId = userDTO.Id,
+                    //    };
+
+                    //    _context.UserFavors.Add(favor);
+                    //};
+                    //旅遊喜好
 
                     // 執行資料庫儲存異動，將User實體寫入資料庫
                     await _context.SaveChangesAsync();

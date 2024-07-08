@@ -27,7 +27,7 @@ namespace PinPinServer.DTO
         [Required(ErrorMessage = "請再次確認密碼!")]
         public string PasswordConfirm { get; set; }
 
-        public int? favor { get; set; }
+        public List<int>? favor { get; set; }
 
     }
 }
