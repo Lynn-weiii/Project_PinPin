@@ -3,14 +3,6 @@
     <form class="form border border-dark rounded p-3 mb-3" id="main" novalidate>
         <legend>付款人</legend>
         <div class="form-group col-md-6">
-            <label for="userId">User ID</label>
-            <div class="input-group mb-3">
-                <span class="input-group-text">User ID</span>
-                <input type="text" class="form-control" id="userId" placeholder="輸入ID" required />
-                <button type="button" class="btn btn-secondary" id="btnGetSchedule">行程表搜尋</button>
-            </div>
-        </div>
-        <div class="form-group col-md-6">
             <div class="input-group mb-3">
                 <span class="input-group-text">名稱</span>
                 <Input type="text" class="form-control" id="expensName" placeholder="輸入費用的名稱" required />
@@ -22,7 +14,6 @@
                 <select class="form-control" id="scheduleSelect" required>
                     <option value="" disabled selected>請選擇一個行程表</option>
                 </select>
-                <button type="button" class="btn btn-secondary" id="btnGetUser">行程表相關使用者搜尋</button>
             </div>
         </div>
         <div class="form-group col-md-6">
@@ -60,7 +51,7 @@
     </form>
     <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" role="switch" id="switchAvg" checked>
-        <label class="form-check-label" for="switchAvg">平均所有人</label>
+        <label class="form-check-label" for="switchAvg">自動平均</label>
         <button type="button" class="btn btn-secondary" id="btnAvg">預設值</button>
     </div>
     <div id="participantBlock">
@@ -74,14 +65,125 @@
     var group_data;
 
     $(function () {
-        GetCurrency_category();
-        GetSplit_category();
+        init();
+        $('#scheduleSelect').on("change", GetGroupUser)
+
+        $('#payerSelect').on("change", payerSelectchange);
+
+        $('#btnAvg').on("click", () => {
+            const total = parseInt($('#totalAmount').val(), 10);
+            const memberCount = $('.amount').length;
+            const amounts = avgTotal(total, memberCount);
+            const members = $('.amount');
+            members.each(function (index, item) {
+                $(item).val(amounts[index]);
+            });
+        })
+
+        $('#totalAmount').on("input", totalAmount);
+
+        $('#btnSubmit').on("click", async function (event) {
+            event.preventDefault();
+
+            var isValid = true;
+            var mainform = $("#main");
+            var participants = $(".participant");
+
+            //判斷表單有無填入
+            if (!mainform[0].checkValidity()) {
+                isValid = false;
+                mainform.addClass('was-validated');
+            }
+
+            // 判斷參與者表單是否填入
+            participants.each(function () {
+                var participantForm = $(this);
+                if (!participantForm[0].checkValidity()) {
+                    isValid = false;
+                    participantForm.addClass('was-validated');
+                }
+            });
+
+            var Total = parseInt($('#totalAmount').val(), 10);
+            var checktotal = 0;
+            var members = $('.amount');
+
+            var avgAmount = Math.floor(Total / members.length);
+            var remainder = Total % members.length;
+
+            members.each(function (index, item) {
+                checktotal += parseInt($(item).val(), 10);
+            })
+
+            console.log(checktotal)
+            console.log(Total)
+
+            if (checktotal != Total) {
+                alert('金額與總金額不同');
+                return;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            //整理POST資料
+            var formData = {
+                scheduleId: $('#main #scheduleSelect').val(),
+                payerId: $('#main #payerSelect').val(),
+                splitCategoryId: $('#main #categorySelect').val(),
+                name: $('#main #expensName').val(),
+                currencyId: $('#main #currencySelect').val(),
+                amount: parseFloat($('#main #totalAmount').val()),
+                remark: $('#main #remark').val(),
+                participants: []
+            }
+
+            participants.each(function () {
+                var participantForm = $(this);
+                formData.participants.push({
+                    userId: 0,
+                    userName: participantForm.find('#name').val(),
+                    amount: parseFloat(participantForm.find('#amount').val()),
+                    isPaid: participantForm.find('#isPaid').is(':checked')
+                });
+            });
+
+            try {
+                var response = await axios.post(`${baseAddress}/api/SplitExpenses/CreateNewExpense`, formData);
+                console.log('成功提交:', response.data);
+                alert('成功提交');
+                $("#btnGetExpense").click();
+            } catch (error) {
+                console.error('提交時發生錯誤:', error);
+            }
+        })
+
+        $('#switchAvg').on("change",function (){
+            if (this.checked) {
+                $('#totalAmount').on("input", totalAmount).trigger('input')
+            }
+            else{
+                $('#totalAmount').off("input", totalAmount)
+            }
+        })
     });
 
-    $('#btnGetSchedule').on("click", async () => {
+    async function init() {
+        try {
+            await GetCurrency_category();
+            await GetSplit_category();
+            await GetUserSchedules();
+            await GetGroupUser();
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
+    }
+
+    async function GetUserSchedules() {
         try {
             console.log(token);
-            var response = await axios.get(`${baseAddress}/api/Schedules`, {
+            var response = await axios.get(`${baseAddress}/api/schedules/GetRelatedSchedules`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -95,10 +197,9 @@
             console.log(error);
             alert("獲取資料失敗");
         }
-    })
+    }
 
-    $('#btnGetUser').on("click", async () => {
-        btnGetUser
+    async function GetGroupUser() {
         try {
             var response = await axios.get(`${baseAddress}/api/ScheduleGroups`, {
                 params: {
@@ -114,103 +215,32 @@
             console.log(error);
             alert("獲取資料失敗");
         }
-    })
+    }
 
-    $('#payerSelect').on("change", payerSelectchange);
-
-    $('#btnAvg').on("click", () => {
-        var Total = parseInt($('#totalAmount').val(), 10);
-        var members = $('.amount');
-
-        var avgAmount = Math.floor(Total / members.length);
-        var remainder = Total % members.length;
-
+    function totalAmount() {
+        const total = parseInt($(this).val(), 10);
+        const memberCount = $('.amount').length;
+        const amounts = avgTotal(total, memberCount);
+        const members = $('.amount');
         members.each(function (index, item) {
+            $(item).val(amounts[index]);
+        });
+    }
+
+    function avgTotal(total, memberCount) {
+        const avgAmount = Math.floor(total / memberCount);
+        let remainder = total % memberCount;
+        const amounts = Array(memberCount).fill(avgAmount);
+
+        for (let i = 0; i < memberCount; i++) {
             if (remainder > 0) {
-                $(item).val(avgAmount + 1);
+                amounts[i]++;
                 remainder--;
-            } else {
-                $(item).val(avgAmount);
             }
-        })
-    })
-
-    $('#btnSubmit').on("click", async function (event) {
-        event.preventDefault();
-
-        var isValid = true;
-        var mainform = $("#main");
-        var participants = $(".participant");
-
-        //判斷表單有無填入
-        if (!mainform[0].checkValidity()) {
-            isValid = false;
-            mainform.addClass('was-validated');
         }
 
-        // 判斷參與者表單是否填入
-        participants.each(function () {
-            var participantForm = $(this);
-            if (!participantForm[0].checkValidity()) {
-                isValid = false;
-                participantForm.addClass('was-validated');
-            }
-        });
-
-        var Total = parseInt($('#totalAmount').val(), 10);
-        var checktotal = 0;
-        var members = $('.amount');
-
-        var avgAmount = Math.floor(Total / members.length);
-        var remainder = Total % members.length;
-
-        members.each(function (index, item) {
-            checktotal += parseInt($(item).val(), 10);
-        })
-
-        console.log(checktotal)
-        console.log(Total)
-
-        if (checktotal != Total) {
-            alert('金額與總金額不同');
-            return;
-        }
-
-        if (!isValid) {
-            return;
-        }
-
-        //整理POST資料
-        var formData = {
-            scheduleId: $('#main #scheduleSelect').val(),
-            payerId: $('#main #payerSelect').val(),
-            splitCategoryId: $('#main #categorySelect').val(),
-            name: $('#main #expensName').val(),
-            currencyId: $('#main #currencySelect').val(),
-            amount: parseFloat($('#main #totalAmount').val()),
-            remark: $('#main #remark').val(),
-            participants: []
-        }
-
-        participants.each(function () {
-            var participantForm = $(this);
-            formData.participants.push({
-                userId: 0,
-                userName: participantForm.find('#name').val(),
-                amount: parseFloat(participantForm.find('#amount').val()),
-                isPaid: participantForm.find('#isPaid').is(':checked')
-            });
-        });
-
-        try {
-            var response = await axios.post(`${baseAddress}/api/SplitExpenses/CreateNewExpense`, formData);
-            console.log('成功提交:', response.data);
-            alert('成功提交');
-            $("#btnGetExpense").click();
-        } catch (error) {
-            console.error('提交時發生錯誤:', error);
-        }
-    })
+        return amounts;
+    }
 
     function payerSelectchange() {
         var copydata = { ...group_data };

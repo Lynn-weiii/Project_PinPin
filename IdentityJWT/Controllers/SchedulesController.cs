@@ -191,7 +191,7 @@ namespace PinPinServer.Controllers
             return _context.Schedules.Any(e => e.Id == id);
         }
 
-        //GET:api/schedule/GetRelatedSchedules
+        //GET:api/schedules/GetRelatedSchedules
         //GET資料回傳為Dictionary<ScheduleId,ScheduleName>
         [HttpGet("GetRelatedSchedules")]
         public async Task<ActionResult<Dictionary<int, string>>> GetRelatedSchedules()
