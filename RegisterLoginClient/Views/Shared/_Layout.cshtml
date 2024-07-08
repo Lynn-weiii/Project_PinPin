@@ -22,28 +22,26 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="MemberInfo">修改會員資料</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Expense" asp-action="Index">PoleEast</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Schdules">Schdules</a> <!--bao-->
                         </li>
+
                     </ul>
                 </div>
-               <ul class="navbar-nav" style="float:right">
+                <ul class="navbar-nav" style="float:right">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Register">Register</a>
+                        <a id="register" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Register">註冊會員</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
+                        <a id="login" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">立即登入</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="MemberInfo" class="nav-link text-dark" style="display:none" asp-area="" asp-controller="Home" asp-action="MemberInfo">會員資料</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="logout" class="nav-link text-dark" style="display:none" asp-area="" asp-controller="" asp-action="">登出</a>
                     </li>
                 </ul>
             </div>
@@ -67,3 +65,30 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script>
+    $(document).ready(function () {
+        // 初始化導航欄狀態
+        updateNavbar();
+
+        // 登出按鈕點擊事件
+        $("#logout").on("click", function () {
+            localStorage.removeItem('token');
+            updateNavbar(); // 更新導航欄狀態
+        });
+
+        function updateNavbar() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                $("#register").show();
+                $("#login").show();
+                $("#logout").hide();
+                $("#MemberInfo").hide();
+            } else {
+                $("#register").hide();
+                $("#login").hide();
+                $("#logout").show();
+                $("#MemberInfo").show();
+            }
+        }
+    });
+</script>

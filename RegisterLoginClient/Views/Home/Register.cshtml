@@ -1,67 +1,127 @@
-﻿    <h1>註冊</h1>
-    <form id="registerForm">
-        <label for="name">暱稱:</label>
-        <input type="text" id="name" name="name" required><br>
+﻿<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h1>註冊</h1>
+            <form id="registerForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">暱稱:</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="請輸入暱稱，中英皆可" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="pinpin@com.tw" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">電話:</label>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="09xx-xxx-xxx">
+                </div>
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">生日:</label>
+                    <input type="date" class="form-control" id="birthday" name="birthday">
+                </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">性别:</label>
+                    <select id="gender" name="gender" class="form-select">
+                        <option value="0">不公開</option>
+                        <option value="1">生理男</option>
+                        <option value="2">生理女</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">密碼:</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="請輸入8-16碼英數字，英文需區分大小寫" required>
+                    <input type="checkbox" id="showPassword">顯示密碼</input>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+                </div>
+                <div class="mb-3">
+                    <label for="passwordconfirm" class="form-label">確認密碼:</label>
+                    <input type="password" class="form-control" id="passwordconfirm" name="passwordconfirm" placeholder="請再次輸入密碼" required>
+                </div>
+                <div class="mb-3">
+                    <label for="photo" class="form-label">大頭貼照:</label>
+                    <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
 
-        <label for="phone">電話:</label>
-        <input type="text" id="phone" name="phone"><br>
-
-        <label for="birthday">生日:</label>
-        <input type="date" id="birthday" name="birthday"><br>
-
-        <label for="gender">性别:</label>
-        <select id="gender" name="gender">
-            <option value="0">不公開</option>
-            <option value="1">生理男</option>
-            <option value="2">生理女</option>
-        </select><br>
-
-        <label for="password">密碼:</label>
-        <input type="password" id="password" name="password" required><br>
-
-        <label for="passwordconfirm">確認密碼:</label>
-        <input type="password" id="passwordconfirm" name="passwordconfirm" required><br>
-
-        <button type="submit">註冊</button>
-    </form>
-
+                </div>
+                <div class="mb-3">
+                    <img id="photoPreview" src="#" alt="頭像預覽" style="max-width: 200px; max-height: 200px; display: none;">
+                </div>
+                <button type="submit" class="btn btn-secondary w-100">註冊</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
     <script>
         var baseAddress = "https://localhost:7280";
-        //document.getElementById('registerForm').addEventListener('submit', async function (event) {
-        //event.preventDefault();
         $(document).ready(function () {
-            $("#registerForm").on("submit", async function () {
+            $("#showPassword").on("change", function () {
+                const passwordField = $("#password");
+                const type = this.checked ? "text" : "password";
+                passwordField.attr("type", type);
+            });
+
+            $("#registerForm").on("submit", async function (event) {
                 event.preventDefault();
+
+                const formData = new FormData();
+
                 const name = $("#name").val();
                 const email = $("#email").val();
                 const phone = $("#phone").val();
-                const birthday = $("#birthday").val();
+                var birthday = $("#birthday").val();
                 const gender = $("#gender").val();
                 const password = $("#password").val();
                 const passwordconfirm = $("#passwordconfirm").val();
+                const photo = $("#photo")[0].files[0];
+
+                if (!validatePassword(password)) {
+                    alert('密碼必須為8-16個字符，且包含英文及數字。');
+                    return;
+                }
+
 
                 if (password !== passwordconfirm) {
                     alert('請再次確認密碼!');
                     return;
                 }
 
+                //若未選擇生日，則預設為"1900-01-01"
+                if (!birthday) {
+                    birthday = "1900-01-01";
+                }
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('phone', phone);
+                formData.append('birthday', birthday);
+                formData.append('gender', gender);
+                formData.append('password', password);
+                formData.append('passwordconfirm', passwordconfirm);
+                // if (photo) {
+                //     formData.append('photo', photo); // Append photo file to FormData
+                // }
+
+                //壓縮圖檔
+                const photoFile = document.getElementById("photo").files[0];
+                if (photoFile) {
+                    const compressedBase64 = await compressAndConvertToBase64(photoFile);
+                    formData.append("photo", compressedBase64);
+                }
+
                 try {
                     const response = await fetch(`${baseAddress}/api/Auth/Register`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ name, email, phone, birthday, gender, password, passwordconfirm })
+                        //headers: {
+                        //     'Content-Type': 'application/json'
+                        // },
+                        //body: JSON.stringify({ name, email, phone, birthday, gender, password, passwordconfirm })
+                        body: formData // Send FormData instead of JSON.stringify
                     });
 
                     const result = await response.text();
                     alert(result);
+
                 } catch (error) {
                     console.error('Error:', error);
                     alert('註冊失敗，請稍後再試');
@@ -69,6 +129,44 @@
             });
         });
 
+        $("#photo").on("change", function () {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                $("#photoPreview").attr("src", e.target.result);
+                $("#photoPreview").css("display", "block"); // 顯示預覽圖片
+            };
+
+            // 讀取選擇的圖片檔案
+            const file = this.files[0];
+            reader.readAsDataURL(file);
+        });
+        //壓縮圖檔
+        async function compressAndConvertToBase64(file) {
+            const maxLength = 255;  // Adjust this value based on your database column size
+
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    let base64String = reader.result.split(',')[1];
+                    if (base64String.length > maxLength) {
+                        base64String = base64String.substring(0, maxLength);
+                    }
+                    resolve(base64String);
+                };
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function validatePassword(password) {
+            const minLength = 8;
+            const maxLength = 16;
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+
+            return password.length >= minLength && password.length <= maxLength && hasLetter && hasNumber;
+        }
 
     </script>
 

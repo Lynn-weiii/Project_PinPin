@@ -1,0 +1,29 @@
+1.string / string /string
+2.kim / aaa@gmail.com /iamsobeautiful
+3.AAA /CCC /CCC
+
+{
+  "id": 0,
+  "name": "Henry",
+  "birthday": "1999-08-26",
+  "photo": "string",
+  "gender": 0,
+  "email": "henry@com.tw",
+  "phone": "0911223223",
+  "password": "asd123456",
+  "passwordConfirm": "asd123456"
+}
+
+{
+  "id": 0,
+  "name": "lemon",
+  "birthday":"2005-02-01",
+  "photo": "string",
+  "gender": 0,
+  "email": "lemon@com.tw",
+  "phone": "0955888888",
+  "password": "lemonning",
+  "passwordConfirm": "lemonning"
+}
+
+tina@com.tw/tina1234
