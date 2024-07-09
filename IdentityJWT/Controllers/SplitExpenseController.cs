@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PinPinServer.DTO;
 using PinPinServer.Models;
@@ -6,7 +7,7 @@ using PinPinServer.Services;
 
 namespace PinPinServer.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SplitExpensesController : ControllerBase
@@ -87,13 +88,18 @@ namespace PinPinServer.Controllers
         [HttpPost("GetExpense_participant")]
         public async Task<ActionResult<IEnumerable<ExpenseParticipantDTO>>> GetExpense_participant([FromForm] int Id)
         {
+            int? userID = _getUserId.PinGetUserId(User).Value;
 
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+
+            //確認要查詢表的行程團是否有user
             List<int> userIds = await _context.SplitExpenses
                 .Where(se => se.Id == Id)
                 .Include(se => se.Schedule)
                 .ThenInclude(s => s.ScheduleGroups)
                 .SelectMany(se => se.Schedule.ScheduleGroups.Select(sg => sg.UserId))
                 .ToListAsync();
+            if (!userIds.Contains(userID.Value)) return Forbid("You can't search not your group");
 
             try
             {
@@ -121,6 +127,11 @@ namespace PinPinServer.Controllers
         [HttpPost("CreateNewExpense")]
         public async Task<ActionResult> CreateNewExpense([FromBody] CreateNewExpensedDTO dto)
         {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+
+            //驗證傳入模型是否正確
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.ToDictionary(
@@ -130,6 +141,14 @@ namespace PinPinServer.Controllers
 
                 return BadRequest(new { Error = errors });
             }
+
+            var groupUserList = await _context.ScheduleGroups
+                .Where(group => group.ScheduleId == dto.ScheduleId)
+                .Select(group => group.UserId)
+                .ToListAsync();
+
+            List<int> users = dto.Participants.Select(participant => participant.UserId).ToList();
+            users.Add(dto.PayerId);
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -222,10 +241,19 @@ namespace PinPinServer.Controllers
                 return NotFound("Not found this id");
             }
 
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors.Select(err => err.ErrorMessage).ToList()
+                );
+
+                return BadRequest(new { Error = errors });
+            }
+
             var groupUserList = await _context.ScheduleGroups
                 .Where(group => group.ScheduleId == splitExpense.ScheduleId)
-                .Include(group => group.User)
-                .Select(group => group.User.Id)
+                .Select(group => group.UserId)
                 .ToListAsync();
 
             List<int> users = dto.Participants.Select(participant => participant.UserId).ToList();
