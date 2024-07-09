@@ -14,12 +14,16 @@
 <div class="Container">
     <div class="row">
         <div class="col-12">
-            <img src="~/image/gif/網頁加載.gif" id="holdon" style="display:none" />
+            @* <img src="~/image/gif/網頁加載.gif" id="holdon" style="display:none" /> *@
         </div>
         <div class="col-12" id="userlogin">
         </div>
-        <div class="col-12" id="schlisttable"></div>
-        <div id="resultmessage"></div>
+        <div class="col-12" id="schlisttable">
+
+        </div>
+        <div id="resultmessage">
+            
+        </div>
     </div>
 </div>
 <!--Creat New Schedule Modal-->
@@ -42,39 +46,11 @@
             @section Scripts {
                 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" asp-fallback-src="~/lib/moment/min/moment.min.js" asp-append-version="true"></script>
                 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" asp-append-version="true"></script>
+                <script type="text/javascript" src="/js/DateRangePicker.js" asp-append-version="true"></script>
                 <script>
                     $(document).ready(async function () {
-
-                        $(function () {
-                            var today = new Date();
-                            var formattedToday = today.toISOString().split('T')[0].replace(/-/g, '/');  // 格式化為 "YYYY/MM/DD"
-                            $('input[name="StartTime"]').daterangepicker({
-                                "autoApply": true,
-                                "locale": {
-                                    "format": "YYYY/MM/DD",
-                                    "separator": " - ",
-                                    "applyLabel": "Apply",
-                                    "cancelLabel": "Cancel",
-                                    "fromLabel": "From",
-                                    "toLabel": "To",
-                                    "customRangeLabel": "Custom",
-                                    "weekLabel": "W",
-                                    "daysOfWeek": [
-                                        "Su", "Mo","Tu","We","Th","Fr","Sa"
-                                    ],
-                                    "monthNames": [
-                                        "Jan","Feb","Mar","Apr","May","June",
-                                        "July","Aug","Sep","Oct","Nov","Dec"
-                                    ],
-                                    "firstDay": 1
-                                },
-                                "minDate": formattedToday,
-                                "startDate": formattedToday,
-                                "endDate": formattedToday
-                            }, function (start, end, label) {
-                                console.log("New date range selected: " + start.format('YYYY-MM-DD') + " to " + end.format('YYYY-MM-DD') + " (predefined range: " + label + ")");
-                            });
-                        });
+                        //載入daterangepiker
+                        DateRangePicker('#StratDate');
 
                         try {
                             var baseaddress = "https://localhost:7280";
@@ -86,7 +62,7 @@
 
                             if (!token) {
                                 $('#holdon').hide();
-                                contentDiv.innerHTML = `<h3>快點<a href="/Home/Login">登入</a>PinPin，規劃美好的旅程吧</h3>`;
+                                window.location.href = 'Home/Login';
                                 return;
                             }
                             var result = await fetch(`${baseaddress}/api/Schedules`, {
@@ -97,7 +73,7 @@
                             });
                             if (result.status === 401) {
                                 $('#holdon').hide();
-                                contentDiv.innerHTML = `<h3>快點<a href="/Home/Login">登入</a>PinPin，規劃美好的旅程吧</h3>`;
+                                window.location.href = 'Home/Login';
                                 return;
                             }
                             var data = await result.json();

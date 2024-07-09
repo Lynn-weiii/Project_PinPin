@@ -8,12 +8,16 @@
 
   <ItemGroup>
     <Compile Remove="Views\Schdules\Partials\**" />
+    <Compile Remove="wwwroot\image\**" />
     <Compile Remove="wwwroot\lib\moment.js\**" />
     <Content Remove="Views\Schdules\Partials\**" />
+    <Content Remove="wwwroot\image\**" />
     <Content Remove="wwwroot\lib\moment.js\**" />
     <EmbeddedResource Remove="Views\Schdules\Partials\**" />
+    <EmbeddedResource Remove="wwwroot\image\**" />
     <EmbeddedResource Remove="wwwroot\lib\moment.js\**" />
     <None Remove="Views\Schdules\Partials\**" />
+    <None Remove="wwwroot\image\**" />
     <None Remove="wwwroot\lib\moment.js\**" />
   </ItemGroup>
 
@@ -24,7 +28,12 @@
   <ItemGroup>
     <Content Remove="Views\Home\Schedule.cshtml" />
     <Content Remove="Views\Schdules\CreateNewSchdule.cshtml" />
+    <Content Remove="wwwroot\js\DateRangePicker.js" />
     <Content Remove="wwwroot\js\newschdule.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\DateRangePicker.js" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,10 +10,6 @@ namespace PinPinClient.Controllers
             return View();
         }
 
-        public IActionResult _NewSchdule()
-        {
-            return PartialView("Partials/_NewSchdule");
-        }
 
     }
 }
