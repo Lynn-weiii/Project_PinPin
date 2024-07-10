@@ -150,6 +150,51 @@ namespace PinPinServer.Controllers
             List<int> users = dto.Participants.Select(participant => participant.UserId).ToList();
             users.Add(dto.PayerId);
 
+            //檢查所有傳入值是吼有問題
+            //檢查是否有重複的使用者
+            if (users.GroupBy(x => x).Any(g => g.Count() > 1))
+            {
+                return BadRequest("There are duplicate users.");
+            }
+            //檢查是否全部都有在群組裡
+            if (!users.All(user => groupUserList.Contains(user)))
+            {
+                return BadRequest("Some users are not in the group.");
+            }
+            //檢查費用表種類
+            bool splitCategoryExists = await _context.SplitCategories.AnyAsync(category => category.Id == dto.SplitCategoryId);
+            if (!splitCategoryExists)
+            {
+                return BadRequest("Invalid SplitCategory.");
+            }
+            //檢查幣別
+            bool currencyCategoryExists = await _context.CostCurrencyCategories.AnyAsync(category => category.Id == dto.CurrencyId);
+            if (!currencyCategoryExists)
+            {
+                return BadRequest("Invalid CostCurrencyCategory.");
+            }
+            //檢查費表是否有名稱
+            if (string.IsNullOrEmpty(dto.Name))
+            {
+                return BadRequest("Name cannot be empty.");
+            }
+            //檢查金額是否為正
+            if (dto.Amount <= 0)
+            {
+                return BadRequest("Main amount must be greater than zero.");
+            }
+            //檢查費用表明細金額
+            if (dto.Participants.Any(participant => participant.Amount <= 0))
+            {
+                return BadRequest("Each participant's amount must be greater than zero.");
+            }
+
+            //檢查明細金額相加是否等於總金額
+            decimal total = dto.Participants.Sum(participant => participant.Amount);
+            if (dto.Amount != total)
+            {
+                return BadRequest("The total amount of participants does not match the main amount.");
+            }
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -260,43 +305,50 @@ namespace PinPinServer.Controllers
             users.Add(dto.PayerId);
 
             //檢查所有傳入值是吼有問題
+            //檢查是否有重複的使用者
             if (users.GroupBy(x => x).Any(g => g.Count() > 1))
             {
                 return BadRequest("There are duplicate users.");
             }
-
-            if (!users.All(payerId => groupUserList.Contains(payerId)))
+            //檢查是否全部都有在群組裡
+            if (!users.All(user => groupUserList.Contains(user)))
             {
                 return BadRequest("Some users are not in the group.");
             }
 
+            //檢查費用表種類
             bool splitCategoryExists = await _context.SplitCategories.AnyAsync(category => category.Id == dto.SplitCategoryId);
             if (!splitCategoryExists)
             {
                 return BadRequest("Invalid SplitCategory.");
             }
 
+            //檢查幣別
             bool currencyCategoryExists = await _context.CostCurrencyCategories.AnyAsync(category => category.Id == dto.CurrencyId);
             if (!currencyCategoryExists)
             {
                 return BadRequest("Invalid CostCurrencyCategory.");
             }
 
+            //檢查費表是否有名稱
             if (string.IsNullOrEmpty(dto.Name))
             {
                 return BadRequest("Name cannot be empty.");
             }
 
+            //檢查金額是否為正
             if (dto.Amount <= 0)
             {
                 return BadRequest("Main amount must be greater than zero.");
             }
 
+            //檢查費用表明細金額
             if (dto.Participants.Any(participant => participant.Amount <= 0))
             {
                 return BadRequest("Each participant's amount must be greater than zero.");
             }
 
+            //檢查明細金額相加是否等於總金額
             decimal total = dto.Participants.Sum(participant => participant.Amount);
             if (dto.Amount != total)
             {
@@ -309,6 +361,7 @@ namespace PinPinServer.Controllers
 
             List<ExpenseParticipantDTO> participantDTOs = dto.Participants.ToList();
 
+            //檢查更改前後的明細數量是否正確
             if (participantDTOs.Count != participants.Count)
                 return BadRequest("The number of participants does not match.");
 

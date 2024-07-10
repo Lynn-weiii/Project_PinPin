@@ -30,6 +30,7 @@ namespace PinPinTest.Controllers
             {
                 Dictionary<int, string> groupUsers = await _context.ScheduleGroups
                    .Where(group => group.ScheduleId == schedule_id)
+                   .Include(group => group.User)
                    .ToDictionaryAsync(
                        user => user.UserId,
                        user => user.User.Name

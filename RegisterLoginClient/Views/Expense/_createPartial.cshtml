@@ -159,11 +159,11 @@
             }
         })
 
-        $('#switchAvg').on("change",function (){
+        $('#switchAvg').on("change", function () {
             if (this.checked) {
                 $('#totalAmount').on("input", totalAmount).trigger('input')
             }
-            else{
+            else {
                 $('#totalAmount').off("input", totalAmount)
             }
         })
@@ -204,6 +204,9 @@
             var response = await axios.get(`${baseAddress}/api/ScheduleGroups`, {
                 params: {
                     schedule_id: $('#scheduleSelect').val(),
+                }, 
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
             })
             group_data = response.data
