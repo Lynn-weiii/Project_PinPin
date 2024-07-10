@@ -46,7 +46,7 @@
 
         async function getUserData(email) {
             //取出token
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 alert('No token found. Please log in.');
                 return;
@@ -84,7 +84,7 @@
         $(document).ready(function () {
             // 從隱藏輸入框中獲取 email
             //const email = $("#userEmail").val();
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
 
             $("#btnUpdate").on("click", async function () {
 

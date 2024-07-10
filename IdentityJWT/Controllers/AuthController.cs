@@ -71,6 +71,12 @@ namespace PinPinServer.Controllers
             string photoBase64 = null;
             if (userDTO.Photo != null && userDTO.Photo.Length > 0)
             {
+
+                if (userDTO.Photo.Length > 2 * 1024 * 1024)
+                {
+                    return "圖片大小不能超過2MB。";
+                }
+
                 using (var ms = new MemoryStream())
                 {
                     await userDTO.Photo.CopyToAsync(ms);
@@ -243,12 +249,5 @@ namespace PinPinServer.Controllers
 
             return "修改成功!";
         }
-
-        //[Authorize]
-        //[HttpPost("Logout")]
-        //public IActionResult Logout()
-        //{   
-        //    return Ok("登出成功");
-        //}
     }
 }

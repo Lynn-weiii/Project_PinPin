@@ -87,6 +87,13 @@
                     return;
                 }
 
+                // Validate photo file size (e.g., max 5MB)
+                const maxFileSize = 2 * 1024 * 1024; // 5MB in bytes
+                if (photo && photo.size > maxFileSize) {
+                    alert('圖片大小不能超過2MB。');
+                    return;
+                }
+
                 //若未選擇生日，則預設為"1900-01-01"
                 if (!birthday) {
                     birthday = "1900-01-01";
@@ -98,15 +105,8 @@
                 formData.append('gender', gender);
                 formData.append('password', password);
                 formData.append('passwordconfirm', passwordconfirm);
-                // if (photo) {
-                //     formData.append('photo', photo); // Append photo file to FormData
-                // }
-
-                //壓縮圖檔
-                const photoFile = document.getElementById("photo").files[0];
-                if (photoFile) {
-                    const compressedBase64 = await compressAndConvertToBase64(photoFile);
-                    formData.append("photo", compressedBase64);
+                if (photo) {
+                    formData.append('photo', photo); // Append photo file to FormData
                 }
 
                 try {
@@ -119,9 +119,13 @@
                         body: formData // Send FormData instead of JSON.stringify
                     });
 
+                    const photosize = $("photo").val();
                     const result = await response.text();
                     alert(result);
-
+                    if (response.ok) {
+                        window.location.href='/Home/Index';
+                    }
+                    
                 } catch (error) {
                     console.error('Error:', error);
                     alert('註冊失敗，請稍後再試');
@@ -141,24 +145,8 @@
             const file = this.files[0];
             reader.readAsDataURL(file);
         });
-        //壓縮圖檔
-        async function compressAndConvertToBase64(file) {
-            const maxLength = 255;  // Adjust this value based on your database column size
-
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    let base64String = reader.result.split(',')[1];
-                    if (base64String.length > maxLength) {
-                        base64String = base64String.substring(0, maxLength);
-                    }
-                    resolve(base64String);
-                };
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
+        
+        
         function validatePassword(password) {
             const minLength = 8;
             const maxLength = 16;
