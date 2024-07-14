@@ -154,7 +154,7 @@ namespace PinPinServer.Controllers
             return password.Length >= minLength && password.Length <= maxLength && hasLetter && hasNumber;
         }
 
-        
+
         //取得喜好項目
         //GET:api/Auth/GetFavorCategories
         [HttpGet("GetFavorCategories")]
@@ -202,6 +202,14 @@ namespace PinPinServer.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email,user.Email)
             };
+
+            string roleName = user.Role switch
+            {
+                0 => "Admin",
+                1 => "User",
+                _ => throw new ArgumentException("Invalid role")
+            };
+            claims.Add(new Claim(ClaimTypes.Role, roleName));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
 
