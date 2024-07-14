@@ -1,4 +1,16 @@
-﻿<div class="container">
+﻿<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet" />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+      rel="stylesheet" />
+<!-- MDB -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+      rel="stylesheet" />
+<!-- MDB -->
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"></script>
+<div class="container">
     <div class="row">
         <div class="col-md-4">
             <h1>註冊</h1>
@@ -38,6 +50,12 @@
                     <input type="password" class="form-control" id="passwordconfirm" name="passwordconfirm" placeholder="請再次輸入密碼" required>
                 </div>
                 <div class="mb-3">
+                    <label>旅遊喜好:</label>
+                    <select id="favor" v-model="optionSelected" v-on:change="changeOption" multiple>
+                        <option v-for="option in options" v-bind:value="option.id">{{option.category}}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label for="photo" class="form-label">大頭貼照:</label>
                     <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
 
@@ -53,6 +71,11 @@
 
 @section Scripts
 {
+    <!-- <script src="https://unpkg.com/vue@latest"></script> -->
+    <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
+            integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         var baseAddress = "https://localhost:7280";
         $(document).ready(function () {
@@ -75,6 +98,7 @@
                 const password = $("#password").val();
                 const passwordconfirm = $("#passwordconfirm").val();
                 const photo = $("#photo")[0].files[0];
+                const favor = $("#favor").val();
 
                 if (!validatePassword(password)) {
                     alert('密碼必須為8-16個字符，且包含英文及數字。');
@@ -105,6 +129,7 @@
                 formData.append('gender', gender);
                 formData.append('password', password);
                 formData.append('passwordconfirm', passwordconfirm);
+                formData.append('favor', favor);
                 if (photo) {
                     formData.append('photo', photo); // Append photo file to FormData
                 }
@@ -123,9 +148,9 @@
                     const result = await response.text();
                     alert(result);
                     if (response.ok) {
-                        window.location.href='/Home/Index';
+                        //window.location.href = '/Home/Index';
                     }
-                    
+
                 } catch (error) {
                     console.error('Error:', error);
                     alert('註冊失敗，請稍後再試');
@@ -156,6 +181,31 @@
             return password.length >= minLength && password.length <= maxLength && hasLetter && hasNumber;
         }
 
+        var vuefavor = {
+            // 以下data為Model
+            //第一種屬性寫法
+            data() {
+                return {
+                    optionSelected:[],//預設是649
+                    options: []
+                };
+            },
+            methods: {
+                changeOption: function () {
+                    alert(this.optionSelected);
+                }
+            },
+            mounted: function () {
+                var uri = `${baseAddress}/api/Auth/GetFavorCategories`;
+                axios.get(uri).then(response => {
+                    this.options = response.data;
+                }).catch(error => {
+                    alert(err);
+                });
+
+            }
+        };
+        var favor = Vue.createApp(vuefavor).mount("#favor");
     </script>
 
 }

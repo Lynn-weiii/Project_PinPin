@@ -38,7 +38,7 @@
             if (response.ok) {
                 const token = await response.text(); // 這裡直接獲取文本響應
                 const data = { Token: token }; // 將文本響應轉換為 JSON 格式
-                sessionStorage.setItem('token', data.Token);
+                localStorage.setItem('token', data.Token);
                 window.location.href = '/Home/Index';
                 //alert(data);
                 //alert('登入成功');

@@ -99,7 +99,8 @@ namespace PinPinServer.Controllers
                         Birthday = userDTO.Birthday,
                         Gender = userDTO.Gender,
                         Photo = photoBase64,
-                        CreatedAt = DateTime.Now
+                        CreatedAt = DateTime.Now,
+                        Role = 1
                     };
 
                     // 將User物件加入資料庫上下文中
@@ -107,6 +108,19 @@ namespace PinPinServer.Controllers
 
                     // 執行資料庫儲存異動，將User實體寫入資料庫
                     await _context.SaveChangesAsync();
+
+                    //
+                    if (userDTO.favor.HasValue)
+                    {
+                        UserFavor userFavor = new UserFavor
+                        {
+                            UserId = user.Id,
+                            FavorCategoryId = userDTO.favor.Value
+                        };
+
+                        _context.UserFavors.Add(userFavor);
+                        await _context.SaveChangesAsync();
+                    }
 
                     // 提交事務
                     transaction.Commit();
@@ -119,7 +133,10 @@ namespace PinPinServer.Controllers
                     // 如果發生異常，回滾事務
                     transaction.Rollback();
                     // 返回錯誤訊息或適當的異常處理
-                    return $"註冊失敗: {ex.Message}";
+                    //return $"註冊失敗: {ex.Message}";
+                    Console.WriteLine(ex.ToString());
+                    throw;
+
                 }
             }
         }
@@ -133,6 +150,19 @@ namespace PinPinServer.Controllers
 
             return password.Length >= minLength && password.Length <= maxLength && hasLetter && hasNumber;
         }
+
+        
+        //取得喜好項目
+        //GET:api/Auth/GetFavorCategories
+        [HttpGet("GetFavorCategories")]
+        public async Task<IActionResult> GetFavorCategories()
+        {
+            var categories = await _context.FavorCategories
+                .Select(c => new { c.Id, c.Category }).ToListAsync(); // 假设Id和Name是你表中的列
+
+            return Ok(categories);
+        }
+
 
         //POST:api/Auth/Login
         [HttpPost("Login")]

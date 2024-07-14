@@ -72,12 +72,12 @@
 
         // 登出按鈕點擊事件
         $("#logout").on("click", function () {
-            sessionStorage.removeItem('token');
+            localStorage.removeItem('token');
             updateNavbar(); // 更新導航欄狀態
         });
 
         function updateNavbar() {
-            const token = sessionStorage.getItem('token');
+            const token = localStorage.getItem('token');
             if (!token) {
                 $("#register").show();
                 $("#login").show();
