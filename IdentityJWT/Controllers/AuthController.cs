@@ -110,15 +110,18 @@ namespace PinPinServer.Controllers
                     await _context.SaveChangesAsync();
 
                     //
-                    if (userDTO.favor.HasValue)
+                    if (userDTO.favor != null && userDTO.favor.Length > 0)
                     {
-                        UserFavor userFavor = new UserFavor
+                        foreach (var favorCategoryId in userDTO.favor)
                         {
-                            UserId = user.Id,
-                            FavorCategoryId = userDTO.favor.Value
-                        };
+                            UserFavor userFavor = new UserFavor
+                            {
+                                UserId = user.Id,
+                                FavorCategoryId = favorCategoryId
+                            };
 
-                        _context.UserFavors.Add(userFavor);
+                            _context.UserFavors.Add(userFavor);
+                        }
                         await _context.SaveChangesAsync();
                     }
 
