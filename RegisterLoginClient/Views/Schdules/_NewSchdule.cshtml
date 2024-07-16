@@ -1,21 +1,80 @@
-﻿<!-- form start -->
+﻿<link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" rel="stylesheet" />
+
+<style>
+    .air-datepicker {
+        z-index: 1500; /* 你可以根據實際情況調整這個值 */
+    }
+</style>
+
+<!-- form start -->
 <form action="" id="CreateSchdule" class="needs-validation" method="post" novalidate autocomplete="off">
-    <!-- 行程名稱 -->
-    <div class="mb-3">
-        <label for="Name" class="form-label mb-2">行程名稱</label>
-        <input type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
+    <!-- 行程 -->
+    <div class="mb-3 container">
+            <label for="Name" class="form-label mb-2">行程名稱</label>
+            <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
     </div>
-    <div class="mb-3">
-        <label for="StratDate" class="form-label mb-1">旅遊日期</label>
-        <input type="text" name="StartTime" id="StratDate" class="form-control mb-1 datepicker" value="01/01/2024 - 12/31/2999" required />
-    </div>
-    <div class="mb-3">
-    邀請成員    
+    <div class="mb-3 container">
+        <div class="row">
+            <div class="col-5">
+                <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" />
+            </div>
+            <div class="col-2 text-center align-center pt-1 pb-1">
+                <i class="fa-solid fa-arrow-right fa-xl"></i>
+            </div>
+            <div class="col-5">
+                <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" />
+            </div>
+        </div>
     </div>
 </form>
 <!-- form end -->
-<div class="modal-footer">
-<button type="button" class="btn btn-primary" id="createbtn">完成</button>
-</div>
 
+
+
+<!--session script -->
+<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js"></script>
+<script>   
+    //daterangepicker start
+    const today = new Date();
+    let dpMin, dpMax;
+    dpMin = new AirDatepicker('#el1', {
+        locale: window.airdatepickerEn,
+        minDate: today,
+        dateFormat(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        },
+        autoClose: true,
+        onSelect({ date }) {
+            dpMax.update({
+                minDate: date
+            })
+        }
+    });
+
+    dpMax = new AirDatepicker('#el2', {
+        locale: window.airdatepickerEn,
+        dateFormat(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        },
+        autoClose: true,
+        onSelect({ date }) {
+            dpMin.update({
+                maxDate: date
+            })
+        }
+    });
+    //daterangepicker end
+
+    
+
+</script>
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using PinPinServer.DTO;
 using PinPinServer.Models;
 using PinPinServer.Services;
@@ -30,18 +31,35 @@ namespace PinPinServer.Controllers
             {
                 int userID = _getUserId.PinGetUserId(User).Value;
                 schedules = await _context.Schedules
-                            .Where(s => s.UserId == userID)
-                            .Include(s => s.User)
-                            .Select(s => new ScheduleDTO
-                            {
-                                Id = s.Id,
-                                UserId = s.UserId,
-                                Name = s.Name,
-                                StartTime = s.StartTime,
-                                EndTime = s.EndTime,
-                                CreatedAt = s.CreatedAt,
-                                UserName = s.User.Name,
-                            }).ToListAsync();
+                .Where(s => s.UserId == userID || s.ScheduleGroups.Any(sg => sg.UserId == userID))
+                .Include(s => s.User)
+                .Include(s => s.ScheduleGroups)
+                .ThenInclude(sg => sg.User)
+                .Select(s => new ScheduleDTO
+                {
+                    Id = s.Id,
+                    UserId = s.UserId,
+                    Name = s.Name,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    CreatedAt = s.CreatedAt,
+                    UserName = s.User.Name,
+                    SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList()
+                }).ToListAsync();
+
+                // 确保创建者的 UserId 不重复添加
+                //foreach (var schedule in schedules)
+                //{
+                //    if (!schedule.SharedUserIds.Contains(schedule.UserId))
+                //    {
+                //        schedule.SharedUserIds.Add(schedule.UserId);
+                //        var creatorName = _context.Users.FirstOrDefault(u => u.Id == schedule.UserId)?.Name;
+                //        if (!string.IsNullOrEmpty(creatorName))
+                //        {
+                //            schedule.SharedUserNames.Add(creatorName);
+                //        }
+                //    }
+                //}
 
                 if (schedules == null || !schedules.Any())
                 {
@@ -80,9 +98,9 @@ namespace PinPinServer.Controllers
                             StartTime = sch.StartTime,
                             EndTime = sch.EndTime,
                             CreatedAt = sch.CreatedAt,
-                            UserName = usr.Name
-                        })
-                    .ToListAsync();
+                            UserName = usr.Name,
+                            SharedUserNames = sch.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList()
+                        }).ToListAsync();
 
                 if (schedules == null || !schedules.Any())
                 {
@@ -140,10 +158,17 @@ namespace PinPinServer.Controllers
         // POST: api/Schedules
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<EditScheduleDTO>> PostSchedule([FromBody] EditScheduleDTO editschDTO)
+        public async Task<IActionResult> PostSchedule([FromBody] EditScheduleDTO editschDTO)
         {
+            if (editschDTO == null)
+            {
+                return NotFound();
+            }
+
+            // 打印收到的DTO数据以进行调试
+            Console.WriteLine($"Received data: {JsonConvert.SerializeObject(editschDTO)}");
             int userID = _getUserId.PinGetUserId(User).Value;
-            Schedule newschDTO = new Schedule
+            var schedule = new Schedule
             {
                 Id = 0,
                 Name = editschDTO.Name,
@@ -152,12 +177,10 @@ namespace PinPinServer.Controllers
                 CreatedAt = DateTime.Now,
                 UserId = userID
             };
-
-
-            _context.Schedules.Add(newschDTO);
+            _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("新增行程", new { id = newschDTO }, editschDTO);
+            return Ok();
         }
 
         // DELETE: api/Schedules/5

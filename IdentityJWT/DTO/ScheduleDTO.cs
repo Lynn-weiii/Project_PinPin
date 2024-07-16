@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PinPinServer.DTO
 {
@@ -15,11 +16,17 @@ namespace PinPinServer.DTO
         [Display(Name = "結束日期")]
         public DateOnly EndTime { get; set; }
 
+        [Column("user_id")]
         public int UserId { get; set; }
 
         [Display(Name = "編輯者")]
-        public string? UserName { get; set; }
+        public string UserName { get; set; }
+
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
+
+       public List<string?> SharedUserNames { get; set; } = new List<string?>();
+
+
     }
 }

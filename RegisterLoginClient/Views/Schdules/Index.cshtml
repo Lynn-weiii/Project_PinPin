@@ -1,6 +1,6 @@
 ﻿@*Header*@
 @section Styles {
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 }
 
 @*Body*@
@@ -16,13 +16,9 @@
         <div class="col-12">
             @* <img src="~/image/gif/網頁加載.gif" id="holdon" style="display:none" /> *@
         </div>
-        <div class="col-12" id="userlogin">
-        </div>
-        <div class="col-12" id="schlisttable">
-
-        </div>
+        <div class="col-12" id="userlogin"></div>
+        <div class="col-12" id="schlisttable"></div>
         <div id="resultmessage">
-            
         </div>
     </div>
 </div>
@@ -37,25 +33,22 @@
             <div class="container-fluid modal-body">
                 <partial name="_NewSchdule" />
             </div>
-
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id="createbtn">完成</button>
+            </div>
             @*-Footer-*@
             <footer></footer>
 
 
             @*-JS-*@
             @section Scripts {
-                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" asp-fallback-src="~/lib/moment/min/moment.min.js" asp-append-version="true"></script>
-                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" asp-append-version="true"></script>
-                <script type="text/javascript" src="/js/DateRangePicker.js" asp-append-version="true"></script>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
                 <script>
                     $(document).ready(async function () {
-                        //載入daterangepiker
-                        DateRangePicker('#StratDate');
-
                         try {
                             var baseaddress = "https://localhost:7280";
                             $('#holdon').show();
-                            // Check for JWT token
                             const token = localStorage.getItem('token');
                             const contentDiv = document.getElementById('userlogin');
                             const scheduleDiv = document.getElementById('schlisttable');
@@ -70,58 +63,91 @@
                                 headers: {
                                     'Authorization': `bearer ${token}`
                                 }
-                            });
+                            })
+
                             if (result.status === 401) {
                                 $('#holdon').hide();
                                 window.location.href = 'Home/Login';
                                 return;
                             }
-                            var data = await result.json();
-                            $('#holdon').hide();
-                            if (data == null) {
-                                alert('目前尚無行程~快點新增行程吧!');
-                                return;
-                            }
+
                             $("#sch_alldetails").empty();
-                            scheduleDiv.innerHTML =
-                                `<table id="sch_list" class="table table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th id="sch_name" scope="col">行程名稱</th>
-                                                            <th id="sch_startdate" scope="col">出發日期</th>
-                                                            <th id="sch_enddate" scope="col">結束日期</th>
-                                                            <th id="sch_creatdate" scope="col">建立日期</th>
-                                                            <th id="sch_username" scope="col">編輯者</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="sch_alldetails">
-                                                    </tbody>
-                                                </table>`
-                                                
+
+                            scheduleDiv.innerHTML = `<table id="sch_list" class="table table-striped">
+                                                <thead>
+                                                     <tr>
+                                                         <th id="sch_name"> 行程名稱 </th>
+                                                         <th id="sch_startdate"> 出發日期</th>
+                                                         <th id="sch_enddate"> 結束日期 </th>
+                                                         <th id="sch_creatdate">建立日期</th>
+                                                         <th id="sch_username">編輯者</th>
+                                                         <th id="sch_sharedUserNames">成員</th>
+                                                     </tr>
+                                                 </thead>
+                                                <tbody id="sch_alldetails"></tbody>
+                                            </table>`
+                            const data = await result.json();
                             data.forEach(item => {
                                 const createdAtFormatted = new Date(item.createdAt).toLocaleDateString();
                                 var row = `<tr>
-                                                <td><a href="api/Schedules/${item.id}">${item.name}</a></td>
-                                                <td>${item.startTime}</td>
-                                                <td>${item.endTime}</td>
-                                                <td>${createdAtFormatted}</td>
-                                                <td>${item.userName}</td>
-                                          </tr>`;
+                                             <td><a href="api/Schedules/${item.id}">${item.name}</a></td>
+                                             <td>${item.startTime}</td>
+                                             <td>${item.endTime}</td>
+                                             <td>${createdAtFormatted}</td>
+                                             <td>${item.userName}</td>
+                                             <td>${item.sharedUserNames}</td>
+                                        </tr>`;
                                 $("#sch_alldetails").append(row);
-
-                                $("#createbtn").on('click', function () {
-                                    //alert('收');
-                                });
-
                             });
-                            contentDiv.innerHTML = `<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newschdule"  />新增行程</button>`;
-                            //air-datepiker setting
-
+                            contentDiv.innerHTML = `<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newschdule" /> 新增行程 </button>`;
                         }
                         catch (error) {
                             console.error("Error fetching data:", error);
-                        }
-                        /*document end*/
+                        };
+
+                        $('#createbtn').on('click', async function () {
+                            
+                            try {
+                                const token = localStorage.getItem('token'); // 获取 token
+                                const name = $('#Name').val();
+                                const startTime = $('#el1').val(); 
+                                const endTime = $('#el2').val(); 
+                                const formatDate = (dateString) => {
+                                    const date = new Date(dateString);
+                                    return date.toISOString().split('T')[0]; // 格式化为 yyyy-MM-dd
+                                };
+
+                                const formattedStartTime = formatDate(startTime);
+                                const formattedEndTime = formatDate(endTime);
+
+                                const data = {
+                                        name: name,
+                                        startTime: formattedStartTime,
+                                        endTime: formattedEndTime,
+                                };
+                                var result = await fetch(`${baseaddress}/api/Schedules`, {
+                                    method: "POST",
+                                    headers: {
+                                        'Authorization': `bearer ${token}`,
+                                        'Content-Type': 'application/json'                                        
+                                    },
+                                    body: JSON.stringify(data) // 确保将 data 转换为 JSON 字符串
+                                });
+
+                                console.log(data);
+
+                                if (result.ok) {
+                                    alert('已新增行程');
+                                } 
+                                else {
+                                    alert("行程新增失敗");
+                                }
+                            } catch (error) {
+                                alert("行程新增失敗");
+                                console.error('Network error:', error);
+                                
+                            }
+                        });
                     });
                 </script>
             }
