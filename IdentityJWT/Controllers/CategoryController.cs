@@ -10,13 +10,14 @@ namespace PinPinTest.Controllers
 {
     /// <summary>
     /// 這邊會處理使用者無法自訂的類別，包含SplitCategories、CurrencyCategory、FavorCategory
+    /// 目前還沒有設修改權限
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class categoryController : ControllerBase
     {
-        private PinPinContext _context;
-        private AuthGetuserId _getUserId;
+        private readonly PinPinContext _context;
+        private readonly AuthGetuserId _getUserId;
 
         public categoryController(PinPinContext context, AuthGetuserId getuserId)
         {
@@ -89,6 +90,10 @@ namespace PinPinTest.Controllers
         //-------------------------------CREATE----------------------------------------
 
         //Post:api/category/PostSplitCategories
+        /// <summary>
+        /// 創建新的SplitCategories
+        /// </summary>
+        /// <returns>寫入成功會回傳Id,Category,Color，如果為復原刪除過的項目會多回傳Message</returns>
         [Authorize]
         [HttpPost("PostSplitCategories")]
         public async Task<ActionResult> PostSplitCategories([FromForm] string category, [FromForm] string color)
@@ -155,6 +160,10 @@ namespace PinPinTest.Controllers
         }
 
         //Post:api/category/PostCurrencyCategory
+        /// <summary>
+        /// 創建新的CurrencyCategory
+        /// </summary>
+        /// <returns>寫入成功會回傳Id,Code,Name，如果為復原刪除過的項目會多回傳Message</returns>
         [Authorize]
         [HttpPost("PostCurrencyCategory")]
         public async Task<ActionResult> PostCurrencyCategory([FromForm] string code, [FromForm] string name)
@@ -221,6 +230,10 @@ namespace PinPinTest.Controllers
         }
 
         //Post:api/category/PostFavorCategory
+        /// <summary>
+        /// 創建新的FavorCategory
+        /// </summary>
+        /// <returns>寫入成功會回傳Id,Category，如果為復原刪除過的項目會多回傳Message</returns>
         [Authorize]
         [HttpPost("PostFavorCategory")]
         public async Task<ActionResult> PostFavorCategory([FromForm] string category)
@@ -283,6 +296,10 @@ namespace PinPinTest.Controllers
         //-------------------------------UPDATE----------------------------------------
 
         //Put:api/category/PutSplitCategories
+        /// <summary>
+        /// 修改SplitCategories，依據dto中的ID去尋找需要修改的值
+        /// </summary>
+        /// <returns>修改成功會回傳Category,Color</returns>
         [Authorize]
         [HttpPut("PutSplitCategories")]
         public async Task<ActionResult> PutSplitCategories([FromBody] SplitCategoriesDTO dto)
@@ -329,6 +346,10 @@ namespace PinPinTest.Controllers
         }
 
         //Put:api/category/PutCurrencyCategory
+        /// <summary>
+        /// 修改CurrencyCategory，依據dto中的ID去尋找需要修改的值
+        /// </summary>
+        /// <returns>修改成功會回傳Code,Name</returns>
         [Authorize]
         [HttpPut("PutCurrencyCategory")]
         public async Task<ActionResult> PutCurrencyCategory([FromBody] CostCategoryDTO dto)
@@ -373,6 +394,10 @@ namespace PinPinTest.Controllers
         }
 
         //Put:api/category/PutFavorCategory
+        /// <summary>
+        /// 修改PutFavorCategory，依據dto中的ID去尋找需要修改的值
+        /// </summary>
+        /// <returns>修改成功會回傳Category</returns>
         [Authorize]
         [HttpPut("PutFavorCategory")]
         public async Task<ActionResult> PutFavorCategory([FromForm] int id, [FromForm] string category)
@@ -410,7 +435,7 @@ namespace PinPinTest.Controllers
 
         //-------------------------------DELETED----------------------------------------
 
-        //Delete:api/category/DeleteSplitCategories
+        //Delete:api/category/DeleteSplitCategories/{id}
         [Authorize]
         [HttpDelete("DeleteSplitCategories")]
         public async Task<ActionResult<string>> DeleteSplitCategories(int id)
@@ -434,7 +459,7 @@ namespace PinPinTest.Controllers
             }
         }
 
-        //Delete:api/category/DeleteCurrencyCategory
+        //Delete:api/category/DeleteCurrencyCategory/{id}
         [Authorize]
         [HttpDelete("DeleteCurrencyCategory")]
         public async Task<ActionResult<string>> DeleteCurrencyCategory(int id)
@@ -458,7 +483,7 @@ namespace PinPinTest.Controllers
             }
         }
 
-        //Delete:api/category/DeleteFavorCategory
+        //Delete:api/category/DeleteFavorCategory/{id}
         [Authorize]
         [HttpDelete("DeleteFavorCategory")]
         public async Task<ActionResult<string>> DeleteFavorCategory(int id)
