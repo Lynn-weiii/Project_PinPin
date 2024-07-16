@@ -111,6 +111,9 @@ public partial class PinPinContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasColumnName("name");
+            entity.Property(e => e.IsDeleted)
+                .HasColumnName("is_deleted")
+                .HasDefaultValue(false);
         });
 
         modelBuilder.Entity<FavorCategory>(entity =>
@@ -126,6 +129,9 @@ public partial class PinPinContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasColumnName("category");
+            entity.Property(e => e.IsDeleted)
+                .HasColumnName("is_deleted")
+                .HasDefaultValue(false);
         });
 
         modelBuilder.Entity<LocationCategory>(entity =>
@@ -361,6 +367,9 @@ public partial class PinPinContext : DbContext
                 .HasMaxLength(7)
                 .HasDefaultValue("#000000")
                 .HasColumnName("color");
+            entity.Property(e => e.IsDeleted)
+                .HasColumnName("is_deleted")
+                .HasDefaultValue(false);
         });
 
         modelBuilder.Entity<SplitExpense>(entity =>
