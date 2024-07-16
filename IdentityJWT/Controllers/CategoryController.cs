@@ -33,16 +33,16 @@ namespace PinPinTest.Controllers
             try
             {
                 var results = await _context.SplitCategories
-                     .Select(category => category)
+                     .Where(sc => sc.IsDeleted == false)
                      .ToDictionaryAsync(category => category.Id, category => category.Category);
 
                 if (results.Count == 0) return NotFound("category not found");
 
                 return Ok(results);
             }
-            catch (Exception ex)
+            catch
             {
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -53,16 +53,16 @@ namespace PinPinTest.Controllers
             try
             {
                 var results = await _context.CostCurrencyCategories
-                    .Select(category => category)
+                    .Where(ccc => ccc.IsDeleted == false)
                     .ToDictionaryAsync(category => category.Id, category => category.Code);
 
                 if (results.Count == 0) return NotFound("category not found");
 
                 return Ok(results);
             }
-            catch (Exception ex)
+            catch
             {
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -73,16 +73,16 @@ namespace PinPinTest.Controllers
             try
             {
                 var results = await _context.FavorCategories
-                    .Select(category => category)
+                    .Where(fc => fc.IsDeleted == false)
                     .ToDictionaryAsync(category => category.Id, category => category.Category);
 
                 if (results.Count == 0) return NotFound("category not found");
 
                 return Ok(results);
             }
-            catch (Exception ex)
+            catch
             {
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -101,12 +101,32 @@ namespace PinPinTest.Controllers
             if (string.IsNullOrEmpty(category) || string.IsNullOrEmpty(color))
                 return BadRequest("Category or color is required.");
 
-            //檢查有無重複值
-            bool isDuplicated = await _context.SplitCategories.AnyAsync(sc => sc.Category == category);
-            if (isDuplicated) return BadRequest("Category is Duplicated");
-
             //檢查色碼格式
             if (!Validator.IsValidHexColor(color)) return BadRequest("Color format error");
+
+            //檢查有無重複值，如果是刪除過的將它復原
+            SplitCategory? DuplicatedSC = await _context.SplitCategories.FirstOrDefaultAsync(sc => sc.Category == category);
+            if (DuplicatedSC != null)
+            {
+                if (DuplicatedSC.IsDeleted == false) return BadRequest("Category is Duplicated");
+
+                try
+                {
+                    DuplicatedSC.IsDeleted = false;
+                    DuplicatedSC.Color = color;
+
+                    _context.Update(DuplicatedSC);
+                    await _context.SaveChangesAsync();
+                    return Ok(new
+                    {
+                        DuplicatedSC.Id,
+                        DuplicatedSC.Category,
+                        DuplicatedSC.Color,
+                        Message = "Category reactivated and updated"
+                    });
+                }
+                catch { return StatusCode(500, "A Database error."); }
+            }
 
             SplitCategory splitCategory = new SplitCategory
             {
@@ -130,7 +150,7 @@ namespace PinPinTest.Controllers
             }
             catch
             {
-                return StatusCode(500, new { Error = "An error occurred while creating the CreateNewExpense." });
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -147,12 +167,32 @@ namespace PinPinTest.Controllers
             if (string.IsNullOrEmpty(code) || string.IsNullOrEmpty(name))
                 return BadRequest("code or name is required.");
 
-            //檢查有無重複值
-            bool isDuplicated = await _context.CostCurrencyCategories.AnyAsync(ccc => ccc.Code == code);
-            if (isDuplicated) return BadRequest("Code is Duplicated");
-
             //檢查幣別格式
             if (!Validator.IsValidCurrency(code)) return BadRequest("Code format error");
+
+            //檢查有無重複值，如果是刪除過的將它復原
+            CostCurrencyCategory? DuplicatedCC = await _context.CostCurrencyCategories.FirstOrDefaultAsync(cc => cc.Code == code);
+            if (DuplicatedCC != null)
+            {
+                if (DuplicatedCC.IsDeleted == false) return BadRequest("Category is Duplicated");
+
+                DuplicatedCC.IsDeleted = false;
+                DuplicatedCC.Name = name;
+
+                try
+                {
+                    _context.Update(DuplicatedCC);
+                    await _context.SaveChangesAsync();
+                    return Ok(new
+                    {
+                        DuplicatedCC.Id,
+                        DuplicatedCC.Code,
+                        DuplicatedCC.Name,
+                        Message = "Category reactivated and updated"
+                    });
+                }
+                catch { return StatusCode(500, "A Database error."); }
+            }
 
             CostCurrencyCategory costCurrencyCategory = new CostCurrencyCategory
             {
@@ -176,7 +216,7 @@ namespace PinPinTest.Controllers
             }
             catch
             {
-                return StatusCode(500, new { Error = "An error occurred while creating the CreateNewExpense." });
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -193,9 +233,28 @@ namespace PinPinTest.Controllers
             if (string.IsNullOrEmpty(category))
                 return BadRequest("Category is required.");
 
-            //檢查有無重複值
-            bool isDuplicated = await _context.FavorCategories.AnyAsync(fc => fc.Category == category);
-            if (isDuplicated) return BadRequest("Code is Duplicated");
+            //檢查有無重複值，如果是刪除過的將它復原
+            FavorCategory? DuplicatedFC = await _context.FavorCategories.FirstOrDefaultAsync(fc => fc.Category == category);
+            if (DuplicatedFC != null)
+            {
+                if (DuplicatedFC.IsDeleted == false) return BadRequest("Category is Duplicated");
+
+                DuplicatedFC.IsDeleted = false;
+                DuplicatedFC.Category = category;
+
+                try
+                {
+                    _context.Update(DuplicatedFC);
+                    await _context.SaveChangesAsync();
+                    return Ok(new
+                    {
+                        DuplicatedFC.Id,
+                        DuplicatedFC.Category,
+                        Message = "Category reactivated and updated"
+                    });
+                }
+                catch { return StatusCode(500, "A Database error."); }
+            }
 
             FavorCategory favorCategory = new FavorCategory
             {
@@ -217,7 +276,7 @@ namespace PinPinTest.Controllers
             }
             catch
             {
-                return StatusCode(500, new { Error = "An error occurred while creating the CreateNewExpense." });
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -240,12 +299,12 @@ namespace PinPinTest.Controllers
             if (string.IsNullOrEmpty(dto.Category))
                 return BadRequest("Category is required.");
 
-            //檢查有無重複值
+            //檢查有無重複值或已經刪除
             bool isDuplicated = await _context.SplitCategories.AnyAsync(sc => sc.Category == dto.Category);
-            if (isDuplicated) return BadRequest("Category is Duplicated");
+            if (isDuplicated) return BadRequest("Category is Duplicated or Delete");
 
             SplitCategory? splitCategory = await _context.SplitCategories.FirstOrDefaultAsync(sc => sc.Id == dto.Id);
-            if (splitCategory == null || splitCategory.Id == 0) return BadRequest("Not found SplitCategory");
+            if (splitCategory == null || splitCategory.Id == 0) return BadRequest("Not found Category");
 
             try
             {
@@ -265,7 +324,7 @@ namespace PinPinTest.Controllers
             }
             catch
             {
-                return StatusCode(500, new { Error = "An error occurred while creating the CreateNewExpense." });
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -288,10 +347,10 @@ namespace PinPinTest.Controllers
 
             //檢查有無重複值
             bool isDuplicated = await _context.CostCurrencyCategories.AnyAsync(ccc => ccc.Code == dto.Code);
-            if (isDuplicated) return BadRequest("Code is Duplicated");
+            if (isDuplicated) return BadRequest("Code is Duplicated or Delete");
 
             CostCurrencyCategory? costCurrency = await _context.CostCurrencyCategories.FirstOrDefaultAsync(ccc => ccc.Id == dto.Id);
-            if (costCurrency == null || costCurrency.Id == 0) return BadRequest("Not found SplitCategory");
+            if (costCurrency == null || costCurrency.Id == 0) return BadRequest("Not found Category");
 
             try
             {
@@ -309,7 +368,7 @@ namespace PinPinTest.Controllers
             }
             catch
             {
-                return StatusCode(500, new { Error = "An error occurred while creating the CreateNewExpense." });
+                return StatusCode(500, "A Database error.");
             }
         }
 
@@ -321,7 +380,7 @@ namespace PinPinTest.Controllers
             int? userID = _getUserId.PinGetUserId(User).Value;
 
             FavorCategory? favorCategory = await _context.FavorCategories.FirstOrDefaultAsync(fc => fc.Id == id);
-            if (favorCategory == null || favorCategory.Id == 0) return BadRequest("Not found SplitCategory");
+            if (favorCategory == null || favorCategory.Id == 0) return BadRequest("Not found Category");
 
             //檢查輸入值是否為空
             if (string.IsNullOrEmpty(category))
@@ -329,7 +388,7 @@ namespace PinPinTest.Controllers
 
             //檢查有無重複值
             bool isDuplicated = await _context.FavorCategories.AnyAsync(fc => fc.Category == category);
-            if (isDuplicated) return BadRequest("Code is Duplicated");
+            if (isDuplicated) return BadRequest("Code is Duplicated or Delete");
 
             try
             {
@@ -345,7 +404,81 @@ namespace PinPinTest.Controllers
             }
             catch
             {
-                return StatusCode(500, new { Error = "An error occurred while creating the CreateNewExpense." });
+                return StatusCode(500, "A Database error.");
+            }
+        }
+
+        //-------------------------------DELETED----------------------------------------
+
+        //Delete:api/category/DeleteSplitCategories
+        [Authorize]
+        [HttpDelete("DeleteSplitCategories")]
+        public async Task<ActionResult<string>> DeleteSplitCategories(int id)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+
+            SplitCategory? splitCategory = await _context.SplitCategories.FirstOrDefaultAsync(sc => sc.Id == id);
+            if (splitCategory == null || splitCategory.Id == 0) return BadRequest("Not found Category");
+            try
+            {
+                splitCategory.IsDeleted = true;
+
+                _context.Update(splitCategory);
+                await _context.SaveChangesAsync();
+
+                return Ok($"Category {splitCategory.Category} successfully deleted");
+            }
+            catch
+            {
+                return StatusCode(500, new { Error = "A Database error." });
+            }
+        }
+
+        //Delete:api/category/DeleteCurrencyCategory
+        [Authorize]
+        [HttpDelete("DeleteCurrencyCategory")]
+        public async Task<ActionResult<string>> DeleteCurrencyCategory(int id)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+
+            CostCurrencyCategory? costCurrencyCategory = await _context.CostCurrencyCategories.FirstOrDefaultAsync(ccc => ccc.Id == id);
+            if (costCurrencyCategory == null || costCurrencyCategory.Id == 0) return BadRequest("Not found Category");
+            try
+            {
+                costCurrencyCategory.IsDeleted = true;
+
+                _context.Update(costCurrencyCategory);
+                await _context.SaveChangesAsync();
+
+                return Ok($"Category {costCurrencyCategory.Name} successfully deleted");
+            }
+            catch
+            {
+                return StatusCode(500, new { Error = "A Database error." });
+            }
+        }
+
+        //Delete:api/category/DeleteFavorCategory
+        [Authorize]
+        [HttpDelete("DeleteFavorCategory")]
+        public async Task<ActionResult<string>> DeleteFavorCategory(int id)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+
+            FavorCategory? favorCategory = await _context.FavorCategories.FirstOrDefaultAsync(ccc => ccc.Id == id);
+            if (favorCategory == null || favorCategory.Id == 0) return BadRequest("Not found Category");
+            try
+            {
+                favorCategory.IsDeleted = true;
+
+                _context.Update(favorCategory);
+                await _context.SaveChangesAsync();
+
+                return Ok($"Category {favorCategory.Category} successfully deleted");
+            }
+            catch
+            {
+                return StatusCode(500, new { Error = "A Database error." });
             }
         }
     }
