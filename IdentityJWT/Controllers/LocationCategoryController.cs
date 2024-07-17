@@ -14,11 +14,35 @@ namespace PinPinServer.Controllers
     {
         private readonly PinPinContext _context;
         private readonly AuthGetuserId _getUserId;
+        private readonly Lazy<List<LocationCategory>> _defaultCategories;
+        private readonly LocationCategory? _unselectedCategory;
 
         public LocationCategoryController(PinPinContext context, AuthGetuserId getUserId)
         {
             _context = context;
             _getUserId = getUserId;
+            _defaultCategories = new Lazy<List<LocationCategory>>(() => GetDefaultCategory(1));
+            _unselectedCategory = GetUnselectedCategory(_defaultCategories.Value, "未選擇");
+        }
+
+        private List<LocationCategory> GetDefaultCategory(int userId)
+        {
+            List<LocationCategory> categories = _context.LocationCategories.AsNoTracking().Where(lc => lc.UserId == userId).ToList();
+            if (categories.Count == 0)
+            {
+                throw new Exception("Default category not found");
+            }
+            return categories;
+        }
+
+        private LocationCategory GetUnselectedCategory(List<LocationCategory> categories, string name)
+        {
+            LocationCategory? locationCategory = categories.FirstOrDefault(lc => lc.Name == name);
+            if (locationCategory == null)
+            {
+                throw new Exception("Unselect category not found");
+            }
+            return locationCategory;
         }
 
         //GET:api/LocationCategoryController
@@ -30,13 +54,23 @@ namespace PinPinServer.Controllers
 
             try
             {
-                List<LocationCategoryDTO> categories = await _context.LocationCategories.Where(lc => lc.UserId == userID)
-                                                                .Select(lc => new LocationCategoryDTO
-                                                                {
-                                                                    Id = lc.Id,
-                                                                    Color = lc.Color,
-                                                                    Name = lc.Name,
-                                                                }).ToListAsync();
+                List<LocationCategoryDTO> categories =
+                    await _context.LocationCategories
+                           .Where(lc => lc.UserId == userID)
+                           .Select(lc => new LocationCategoryDTO
+                           {
+                               Id = lc.Id,
+                               Color = lc.Color,
+                               Name = lc.Name,
+                           }).ToListAsync();
+
+                categories.AddRange(_defaultCategories.Value.Select(dc => new LocationCategoryDTO
+                {
+                    Id = dc.Id,
+                    Color = dc.Color,
+                    Name = dc.Name,
+                }));
+
                 return Ok(categories);
             }
             catch
@@ -130,6 +164,13 @@ namespace PinPinServer.Controllers
             {
                 return StatusCode(500, "A Database error.");
             }
+        }
+
+        //Delete:api/LocationCategoryController/Delete
+        [HttpDelete("Delete")]
+        public async Task<ActionResult<int>> Delete(int id)
+        {
+
         }
     }
 }
