@@ -4,7 +4,7 @@
             <h1 class="mb-4">會員資料</h1>
             <form id="userForm">
                 <div class="mb-3">
-                    <label for="name" class="form-label">Name:</label>
+                    <label for="name" class="form-label">暱稱:</label>
                     <input type="text" class="form-control" id="name" name="name">
                 </div>
                 <div class="mb-3">
@@ -12,24 +12,37 @@
                     <input type="text" class="form-control" id="email" name="email" disabled>
                 </div>
                 <div class="mb-3">
-                    <label for="phone" class="form-label">Phone:</label>
+                    <label for="phone" class="form-label">電話:</label>
                     <input type="text" class="form-control" id="phone" name="phone">
                 </div>
+                <span id="private"></span>
                 <div class="mb-3">
-                    <label for="birthday" class="form-label">Birthday:</label>
+                    <label for="birthday" class="form-label">生日:</label>
+                    <div class="d-flex align-items-center">
+                        <label id="private" style="display:none; margin-right:10px;">不公開</label>
+                        <button type="button" class="btn btn-warning" id="btnModifyBirthday" style="display:none;">修改</button>
+                    </div>
                     <input type="date" class="form-control" id="birthday" name="birthday">
                     <span id="birthdayDisplay"></span>
                 </div>
+
                 <div class="mb-3">
-                    <label for="gender" class="form-label">Gender:</label>
+                    <label for="gender" class="form-label">性別:</label>
                     <select class="form-control" id="gender" name="gender">
                         <option value="0">不公開</option>
                         <option value="1">生理男</option>
                         <option value="2">生理女</option>
                     </select>
                 </div>
+                <div class="mb-3">
+                    <label for="photo" class="form-label">大頭貼照:
+                        <button class="btn btn-warning" id="btnModifyPhoto">修改</button>
+                    </label>
+                    <img id="userPhoto" alt="User Photo" width="150">
+                    <input type="file" class="form-control" style="display: none" id="photo" name="photo" accept="image/*">
+                </div>
                 <div class="mb-3 text-center">
-                    <button id="btnUpdate" type="button" class="btn btn-danger w-100"><i class="fa-solid fa-pen"></i> Update</button>
+                    <button id="btnUpdate" type="button" class="btn btn-danger w-100"><i class="fa-solid fa-pen"></i> 確認修改</button>
                 </div>
             </form>
         </div>
@@ -44,11 +57,22 @@
         //var baseAddress = "https://localhost:xx";       //Staging Server(Testing Server)
         //var baseAddress = "https://localhost:yy";       //Production Server(上線營運Server)
 
+
+        document.getElementById("btnModifyPhoto").addEventListener("click", function (event) {
+            event.preventDefault(); // 阻止默認行為，例如表單提交
+            document.getElementById("photo").style.display = "block";
+        });
+
+        document.getElementById("btnModifyBirthday").addEventListener("click", function (event) {
+            event.preventDefault(); // 阻止默認行為，例如表單提交
+            document.getElementById("birthday").style.display = "block";
+        });
+
         async function getUserData(email) {
             //取出token
             const token = localStorage.getItem('token');
             if (!token) {
-                alert('No token found. Please log in.');
+                alert('無此權限，請先登入會員');
                 return;
             }
 
@@ -67,12 +91,28 @@
                     document.getElementById('phone').value = data.phone;
                     document.getElementById('birthday').value = data.birthday ? data.birthday.split('T')[0] : '';
                     document.getElementById('gender').value = data.gender;
-                    document.getElementById('photo').value = data.photo;
-                    // if ($("#birthday").val() == "1970-01-01") 
-                    // {
-                    //     $("#birthday").hide(); // 隱藏輸入框
-                    //     $("#birthdayDisplay").text("不公開"); // 顯示"不公開"
-                    // }
+
+                    if (data.phone === null) {
+                        document.getElementById('private').textContent = "未提供";
+                    } else {
+                        document.getElementById('phone').value = data.phone;
+                    }
+
+                    if (data.birthday === '1900-01-01') {
+                        document.getElementById('private').style.display = 'block';
+                        document.getElementById('btnModifyBirthday').style.display = 'block';
+                        document.getElementById('birthday').style.display = 'none';
+                    } else {
+                        document.getElementById('birthdayDisplay').textContent = data.birthday ? data.birthday.split('T')[0] : '';
+                        document.getElementById('birthday').readOnly = true; //生日不可修改
+                    }
+
+                    if (data.photoBase64) {
+                        document.getElementById('userPhoto').src = 'data:image/png;base64,' + data.photoBase64;
+                    } else {
+                        document.getElementById('userPhoto').src = '/images/NoImg.png';
+                    }
+
                 } else {
                     alert('Failed to fetch user data');
                 }

@@ -14,7 +14,7 @@ using System.Text;
 
 namespace PinPinServer.Controllers
 {
-
+    //[Authorize(Roles = "Admin")]
     [EnableCors("PinPinPolicy")]
     [Route("api/[controller]")]
     [ApiController]
@@ -203,6 +203,7 @@ namespace PinPinServer.Controllers
                 new Claim(ClaimTypes.Email,user.Email)
             };
 
+            //新增角色 0_管理員 1_一般用戶
             string roleName = user.Role switch
             {
                 0 => "Admin",
@@ -226,8 +227,6 @@ namespace PinPinServer.Controllers
             return jwt;
         }
 
-
-
         //GET:api/Auth/SearchMemberInfo
         [Authorize]
         [HttpGet("SearchMemberInfo")]
@@ -242,6 +241,13 @@ namespace PinPinServer.Controllers
                 return NotFound();
             }
 
+            // 將圖檔轉換為Base64編碼
+            string photoBase64 = null;
+            if (user.Photo != null)
+            {
+                photoBase64 = user.Photo;
+            }
+
 
             UserDTO userDto = new UserDTO
             {
@@ -251,7 +257,7 @@ namespace PinPinServer.Controllers
                 Phone = user.Phone,
                 Birthday = user.Birthday,
                 Gender = user.Gender,
-                //Photo = user.Photo
+                PhotoBase64 = photoBase64
             };
             // 回傳 UserDTO
             return Ok(userDto);
