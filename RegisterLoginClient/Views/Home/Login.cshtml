@@ -18,10 +18,10 @@
     </div>
 </div>
 
-@section Scripts{
-
-<script>
-
+@section Scripts
+{
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
         var baseAddress = "https://localhost:7280"; // 注意結尾沒有斜線!
         $("#Login").on("click", async function () {
             const email = $("#email").val();
@@ -39,13 +39,22 @@
                 const token = await response.text(); // 這裡直接獲取文本響應
                 const data = { Token: token }; // 將文本響應轉換為 JSON 格式
                 localStorage.setItem('token', data.Token);
-                window.location.href = '/Home/Index';
                 //alert(data);
-                alert('登入成功');
+                //alert('登入成功');
+                Swal.fire({
+                    title: "登入成功!",
+                    //text: "You clicked the button!",
+                    icon: "success"
+                }).then(c => { 
+                
+                window.location.href = '/Home/Index';
+                });
                 //alert(JSON.stringify(data));///
             } else {
                 alert('登入失敗');
             }
         });
+    
     </script>
+   
 }
