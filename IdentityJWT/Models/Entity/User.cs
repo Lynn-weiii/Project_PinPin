@@ -27,6 +27,8 @@ public partial class User
 
     public string PasswordHash { get; set; }
 
+    public int? Role { get; set; }
+
     public virtual ICollection<ChatroomChat> ChatroomChats { get; set; } = new List<ChatroomChat>();
 
     public virtual ICollection<LocationCategory> LocationCategories { get; set; } = new List<LocationCategory>();

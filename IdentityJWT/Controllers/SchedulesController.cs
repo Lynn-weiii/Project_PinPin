@@ -47,20 +47,6 @@ namespace PinPinServer.Controllers
                     SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList()
                 }).ToListAsync();
 
-                // 确保创建者的 UserId 不重复添加
-                //foreach (var schedule in schedules)
-                //{
-                //    if (!schedule.SharedUserIds.Contains(schedule.UserId))
-                //    {
-                //        schedule.SharedUserIds.Add(schedule.UserId);
-                //        var creatorName = _context.Users.FirstOrDefault(u => u.Id == schedule.UserId)?.Name;
-                //        if (!string.IsNullOrEmpty(creatorName))
-                //        {
-                //            schedule.SharedUserNames.Add(creatorName);
-                //        }
-                //    }
-                //}
-
                 if (schedules == null || !schedules.Any())
                 {
                     Console.WriteLine("查無使用者相關紀錄");
