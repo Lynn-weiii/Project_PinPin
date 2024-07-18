@@ -190,5 +190,28 @@ namespace PinPinServer.Controllers
         {
             return _context.Schedules.Any(e => e.Id == id);
         }
+
+        //GET:api/schedules/GetRelatedSchedules
+        //GET資料回傳為Dictionary<ScheduleId,ScheduleName>
+        [HttpGet("GetRelatedSchedules")]
+        public async Task<ActionResult<Dictionary<int, string>>> GetRelatedSchedules()
+        {
+            int userID = _getUserId.PinGetUserId(User).Value;
+            try
+            {
+                Dictionary<int, string> scheduleDictionary = await _context.ScheduleGroups
+                    .Where(group => group.UserId == userID)
+                    .Include(group => group.Schedule)
+                    .ToDictionaryAsync(group => group.ScheduleId, group => group.Schedule.Name);
+
+                if (scheduleDictionary.Count == 0) return NotFound("Not found about your schedles");
+
+                return Ok(scheduleDictionary);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
     }
 }

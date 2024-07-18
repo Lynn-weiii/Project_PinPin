@@ -18,6 +18,7 @@
     <script src="~/js/datapopulator.js" asp-append-version="true"></script>
     <script>
         const baseAddress = "https://localhost:7280";
+        const token = localStorage.getItem('token');
         var partialtable = $("#partialtable");
 
         function resetPage(partialresponse) {
@@ -32,7 +33,11 @@
 
                 resetPage(partialresponse)
 
-                var response = await axios.post(`${baseAddress}/api/SplitExpenses/GetAllExpense`)
+                var response = await axios.post(`${baseAddress}/api/SplitExpenses/GetAllExpense`, {}, {
+                    headers: {
+                        'Authorization': `bearer ${token}`
+                    }
+                })
                 var expense = response.data;
                 PopulatorExpense(expense);
 
@@ -80,7 +85,11 @@
             var response = await axios.post(`${baseAddress}/api/SplitExpenses/GetExpense_participant`, new URLSearchParams(
                 {
                     id: `${id}`,
-                }));
+                }), {
+                headers: {
+                    'Authorization': `bearer ${token}`
+                }
+            });
             var data = response.data;
             var keys = Object.keys(data[0]);
 
@@ -92,7 +101,7 @@
                 var keys = Object.keys(participant);
                 var formGroup = $('<div class="form-group border border-2 border-dark mb-3 p-2 rounded"></div>');
                 keys.forEach((key, index) => {
-                    
+
                     if (key == 'isPaid') {
                         console.log(key)
                         var formcheck = $('<div class="form-check"></div>');
