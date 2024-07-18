@@ -63,7 +63,7 @@ public partial class PinPinContext : DbContext
     {
         modelBuilder.Entity<ChatroomChat>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__chatroom__3213E83F76B7CD60");
+            entity.HasKey(e => e.Id).HasName("PK__chatroom__3213E83F2DCC6686");
 
             entity.ToTable("chatroom_chat");
 
@@ -94,11 +94,11 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<CostCurrencyCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__cost_cur__3213E83FB357C01C");
+            entity.HasKey(e => e.Id).HasName("PK__cost_cur__3213E83F584B3C3C");
 
             entity.ToTable("cost_currency_category");
 
-            entity.HasIndex(e => e.Code, "UQ__cost_cur__357D4CF907C88D67").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__cost_cur__357D4CF90A8562F3").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Code)
@@ -107,6 +107,9 @@ public partial class PinPinContext : DbContext
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("code");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50)
@@ -115,22 +118,25 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<FavorCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__favor_ca__3213E83FAAF3742A");
+            entity.HasKey(e => e.Id).HasName("PK__favor_ca__3213E83FBBB1F40A");
 
             entity.ToTable("favor_category");
 
-            entity.HasIndex(e => e.Category, "UQ__favor_ca__F7F53CC200AF8A5A").IsUnique();
+            entity.HasIndex(e => e.Category, "UQ__favor_ca__F7F53CC2C77244E3").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Category)
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasColumnName("category");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<LocationCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__location__3213E83F5E8DCD7D");
+            entity.HasKey(e => e.Id).HasName("PK__location__3213E83F421D8171");
 
             entity.ToTable("location_category");
 
@@ -153,7 +159,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<Schedule>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F39C23377");
+            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F4DA8B7C4");
 
             entity.ToTable("schedule");
 
@@ -178,7 +184,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<ScheduleAuthority>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F6D48C1B2");
+            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F809295C1");
 
             entity.ToTable("schedule_authority");
 
@@ -207,11 +213,11 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<ScheduleAuthorityCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F8D52FE1B");
+            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F79AF215B");
 
             entity.ToTable("schedule_authority_category");
 
-            entity.HasIndex(e => e.Category, "UQ__schedule__F7F53CC2087BEA96").IsUnique();
+            entity.HasIndex(e => e.Category, "UQ__schedule__F7F53CC2D1D561F1").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Category)
@@ -222,7 +228,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<ScheduleDetail>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83FE1E56CD5");
+            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F85278EDD");
 
             entity.ToTable("schedule_details");
 
@@ -273,7 +279,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<ScheduleGroup>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F23F1FF41");
+            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F0409D170");
 
             entity.ToTable("schedule_group");
 
@@ -303,7 +309,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<SchedulePreview>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83F85DD2E79");
+            entity.HasKey(e => e.Id).HasName("PK__schedule__3213E83FD4A0B65F");
 
             entity.ToTable("schedule_preview");
 
@@ -323,7 +329,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<SearchHistory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__search_h__3213E83FBED47469");
+            entity.HasKey(e => e.Id).HasName("PK__search_h__3213E83F4FF88F34");
 
             entity.ToTable("search_history");
 
@@ -346,11 +352,11 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<SplitCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__split_ca__3213E83F44480DB5");
+            entity.HasKey(e => e.Id).HasName("PK__split_ca__3213E83FA75D8A0D");
 
             entity.ToTable("split_category");
 
-            entity.HasIndex(e => e.Category, "UQ__split_ca__F7F53CC22933BD9E").IsUnique();
+            entity.HasIndex(e => e.Category, "UQ__split_ca__F7F53CC2E22D93E6").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Category)
@@ -361,11 +367,14 @@ public partial class PinPinContext : DbContext
                 .HasMaxLength(7)
                 .HasDefaultValue("#000000")
                 .HasColumnName("color");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<SplitExpense>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__split_ex__3213E83F4C4407CF");
+            entity.HasKey(e => e.Id).HasName("PK__split_ex__3213E83F9925C87B");
 
             entity.ToTable("split_expense");
 
@@ -410,7 +419,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<SplitExpenseParticipant>(entity =>
         {
-            entity.HasKey(e => new { e.SplitExpenseId, e.UserId }).HasName("PK__split_ex__3DAFFE6294E7D9E2");
+            entity.HasKey(e => new { e.SplitExpenseId, e.UserId }).HasName("PK__split_ex__3DAFFE625F558ED1");
 
             entity.ToTable("split_expense_participant");
 
@@ -436,7 +445,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<Transportation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__transpor__3213E83F8E1CF75E");
+            entity.HasKey(e => e.Id).HasName("PK__transpor__3213E83FB347271F");
 
             entity.ToTable("transportation");
 
@@ -472,7 +481,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<TransportationCategory>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__transpor__3213E83FF5D9FDAC");
+            entity.HasKey(e => e.Id).HasName("PK__transpor__3213E83FE37C9E3E");
 
             entity.ToTable("transportation_category");
 
@@ -495,7 +504,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__user__3213E83F347306C6");
+            entity.HasKey(e => e.Id).HasName("PK__user__3213E83FCBC59D9C");
 
             entity.ToTable("user");
 
@@ -503,7 +512,7 @@ public partial class PinPinContext : DbContext
                 .IsUnique()
                 .HasFilter("([phone] IS NOT NULL)");
 
-            entity.HasIndex(e => e.Email, "UQ__user__AB6E6164F2DA280B").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__user__AB6E616496B523E9").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Birthday).HasColumnName("birthday");
@@ -542,7 +551,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<UserFavor>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__user_fav__3213E83F3F576B8C");
+            entity.HasKey(e => e.Id).HasName("PK__user_fav__3213E83F193ED105");
 
             entity.ToTable("user_favor");
 
@@ -563,7 +572,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<Vote>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__votes__3213E83FCA63D815");
+            entity.HasKey(e => e.Id).HasName("PK__votes__3213E83F2AA1DDD3");
 
             entity.ToTable("votes");
 
@@ -595,7 +604,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<VoteOption>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vote_opt__3213E83F485D7D91");
+            entity.HasKey(e => e.Id).HasName("PK__vote_opt__3213E83F34165B20");
 
             entity.ToTable("vote_options");
 
@@ -619,7 +628,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<VoteResult>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vote_res__3213E83F20C691D0");
+            entity.HasKey(e => e.Id).HasName("PK__vote_res__3213E83F763BD0CE");
 
             entity.ToTable("vote_result");
 
@@ -652,7 +661,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<Wishlist>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__wishlist__3213E83F1891E387");
+            entity.HasKey(e => e.Id).HasName("PK__wishlist__3213E83F334B614F");
 
             entity.ToTable("wishlist");
 
@@ -671,7 +680,7 @@ public partial class PinPinContext : DbContext
 
         modelBuilder.Entity<WishlistDetail>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__wishlist__3213E83F645E1C4F");
+            entity.HasKey(e => e.Id).HasName("PK__wishlist__3213E83F6518F5CE");
 
             entity.ToTable("wishlist_detail");
 

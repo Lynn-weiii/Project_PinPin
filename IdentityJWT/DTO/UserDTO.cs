@@ -31,7 +31,7 @@ namespace PinPinServer.DTO
         [ModelBinder(BinderType = typeof(CommaSeparatedArrayBinder))]
         public int[]? favor { get; set; }
 
-        public string PhotoBase64 { get; set; }
+        public string? PhotoBase64 { get; set; }
 
     }
 }
