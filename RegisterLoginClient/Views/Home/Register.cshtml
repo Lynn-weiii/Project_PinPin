@@ -130,7 +130,7 @@
                 }
 
                 try {
-                    const response = await fetch(`${baseAddress}/api/Auth/Register`, {
+                    const response = await fetch(`${baseAddress}/api/Register`, {
                         method: 'POST',
                         body: formData // Send FormData instead of JSON.stringify
                     });
@@ -183,7 +183,7 @@
                 }
             },
             mounted() {
-                const uri = `${baseAddress}/api/Auth/GetFavorCategories`;
+                const uri = `${baseAddress}/api/category/GetFavorCategories`;
                 axios.get(uri).then(response => {
                     this.options = response.data;
                     // 在選項加載完畢後初始化 multi-select-tag

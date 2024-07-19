@@ -1,0 +1,101 @@
+﻿@section Styles {
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 8px;
+            width: 200px;
+        }
+    </style>
+}
+
+<title>搜尋景點</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<body>
+    <input id="search-input" type="text" placeholder="想去哪裡玩?" style="width: 300px;" />
+    <button onclick="searchPlaces()">搜尋</button>
+    <div id="map"></div>
+    <div class="card-container" id="card-container"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</body>
+
+@section Scripts {
+
+        <script>
+                var map = L.map('map').setView([51.505, -0.09], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        async function searchPlaces() {
+            var query = document.getElementById('search-input').value;
+            var url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&addressdetails=1`;
+
+            const response = await fetch(url);
+            const places = await response.json();
+
+            // 清除之前的標記和卡片
+            clearMarkersAndCards();
+
+            var bounds = L.latLngBounds();
+            places.forEach(place => {
+                // 在地圖上添加標記
+                var marker = L.marker([place.lat, place.lon]).addTo(map)
+                    .bindPopup(place.display_name);
+
+                bounds.extend(marker.getLatLng());
+
+                // 創建卡片
+                createCard(place);
+            });
+
+            if (places.length > 0) {
+                map.fitBounds(bounds);
+            }
+        }
+
+        function clearMarkersAndCards() {
+            // 清除地圖上的標記
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            // 清除卡片容器
+            var cardContainer = document.getElementById('card-container');
+            while (cardContainer.firstChild) {
+                cardContainer.removeChild(cardContainer.firstChild);
+            }
+        }
+
+        function createCard(place) {
+            var cardContainer = document.getElementById('card-container');
+            var card = document.createElement('div');
+            card.className = 'card';
+
+            var title = document.createElement('h3');
+            title.innerText = place.display_name;
+            card.appendChild(title);
+
+            var coordinates = document.createElement('p');
+            coordinates.innerText = `Latitude: ${place.lat}, Longitude: ${place.lon}`;
+            card.appendChild(coordinates);
+
+            cardContainer.appendChild(card);
+        }
+    </script>
+
+}
