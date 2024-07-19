@@ -14,15 +14,17 @@ namespace PinPinServer.Controllers
     {
         private readonly PinPinContext _context;
         private readonly AuthGetuserId _getUserId;
+        //未選擇的項目不包括在裡面
         private readonly Lazy<List<LocationCategory>> _defaultCategories;
-        private readonly LocationCategory? _unselectedCategory;
+        private readonly LocationCategory _unselectedCategory;
+        private readonly static string _unselectStr = "未選擇";
 
         public LocationCategoryController(PinPinContext context, AuthGetuserId getUserId)
         {
             _context = context;
             _getUserId = getUserId;
             _defaultCategories = new Lazy<List<LocationCategory>>(() => GetDefaultCategory(1));
-            _unselectedCategory = GetUnselectedCategory(_defaultCategories.Value, "未選擇");
+            _unselectedCategory = GetUnselectedCategory(_defaultCategories.Value, _unselectStr);
         }
 
         private List<LocationCategory> GetDefaultCategory(int userId)
@@ -42,10 +44,12 @@ namespace PinPinServer.Controllers
             {
                 throw new Exception("Unselect category not found");
             }
+            categories.Remove(locationCategory);
             return locationCategory;
         }
 
         //GET:api/LocationCategoryController
+        [Authorize(Roles = "User")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LocationCategoryDTO>>> Get()
         {
@@ -75,6 +79,20 @@ namespace PinPinServer.Controllers
             }
             catch
             { return StatusCode(500, "A Database error."); }
+        }
+
+        //GET:api/LocationCategoryController/Admin
+        [Authorize(Roles = "Admin")]
+        [HttpGet("Admin")]
+        public ActionResult<IEnumerable<LocationCategoryDTO>> GetAdmin()
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+
+            List<LocationCategory> locationCategories = [.. _defaultCategories.Value];
+            locationCategories.Add(_unselectedCategory);
+
+            return Ok(locationCategories);
         }
 
         //POST:api/LocationCategoryController/Post
@@ -166,11 +184,11 @@ namespace PinPinServer.Controllers
             }
         }
 
-        //Delete:api/LocationCategoryController/Delete
-        [HttpDelete("Delete")]
-        public async Task<ActionResult<int>> Delete(int id)
-        {
+        ////Delete:api/LocationCategoryController/Delete
+        //[HttpDelete("Delete")]
+        //public async Task<ActionResult<int>> Delete(int id)
+        //{
 
-        }
+        //}
     }
 }
