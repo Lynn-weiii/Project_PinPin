@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace PinPinServer.DTO
 {
@@ -27,7 +28,10 @@ namespace PinPinServer.DTO
         [Required(ErrorMessage = "請再次確認密碼!")]
         public string PasswordConfirm { get; set; }
 
-        public int? favor { get; set; }
+        [ModelBinder(BinderType = typeof(CommaSeparatedArrayBinder))]
+        public int[]? favor { get; set; }
+
+        public string? PhotoBase64 { get; set; }
 
     }
 }
