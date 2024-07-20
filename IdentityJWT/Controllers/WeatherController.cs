@@ -3,6 +3,9 @@ using PinPinServer.Services;
 
 namespace PinPinServer.Controllers
 {
+
+    //回傳白天+早上的
+    //dto=>temp,date,rain%
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize]
@@ -10,7 +13,7 @@ namespace PinPinServer.Controllers
     {
         private readonly AuthGetuserId _getUserId;
         private static readonly HttpClient _httpClient = new HttpClient();
-        private readonly string API_key = "c07f09ae7a595c84cdcc594120edf88e";
+        private readonly string API_key = "";
         private readonly string units = "metric";
         private readonly string lang = "zh_tw";
 
@@ -19,6 +22,7 @@ namespace PinPinServer.Controllers
             _getUserId = getuserId;
         }
 
+        //傳城市id，選擇測量單位
         [HttpGet]
         public async Task<ActionResult> Get(decimal lat, decimal lon)
         {

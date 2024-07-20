@@ -48,7 +48,7 @@ namespace PinPinServer.Controllers
             return locationCategory;
         }
 
-        //GET:api/LocationCategoryController
+        //GET:api/LocationCategory
         [Authorize(Roles = "User")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LocationCategoryDTO>>> Get()
@@ -81,7 +81,7 @@ namespace PinPinServer.Controllers
             { return StatusCode(500, "A Database error."); }
         }
 
-        //GET:api/LocationCategoryController/Admin
+        //GET:api/LocationCategory/Admin
         [Authorize(Roles = "Admin")]
         [HttpGet("Admin")]
         public ActionResult<IEnumerable<LocationCategoryDTO>> GetAdmin()
@@ -107,7 +107,7 @@ namespace PinPinServer.Controllers
             return Ok(locationCategoryDTOs);
         }
 
-        //POST:api/LocationCategoryController/Post
+        //POST:api/LocationCategory/Post
         /// <summary>
         /// dto中的id可以不用船
         /// </summary>
@@ -149,7 +149,7 @@ namespace PinPinServer.Controllers
             }
         }
 
-        //PUT:api/LocationCategoryController/Put
+        //PUT:api/LocationCategory/Put
         [HttpPut("Put")]
         public async Task<ActionResult<LocationCategoryDTO>> Put([FromBody] LocationCategoryDTO dto)
         {
@@ -196,7 +196,7 @@ namespace PinPinServer.Controllers
             }
         }
 
-        //Delete:api/LocationCategoryController/Delete
+        //Delete:api/LocationCategory/Delete
         [HttpDelete("Delete")]
         public async Task<ActionResult<int>> Delete(int id)
         {
