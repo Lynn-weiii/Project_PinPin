@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PinPinServer.DTO
+namespace PinPinServer.Models.DTO
 {
-    public class EditScheduleDTO
+    public class ScheduleDTO
     {
+        public int Id { get; set; }
 
         [Display(Name = "行程名稱")]
-        [Required]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
 
         [Display(Name = "出發日期")]
         public DateOnly StartTime { get; set; }
@@ -17,12 +17,8 @@ namespace PinPinServer.DTO
 
         public int UserId { get; set; }
 
-
-
-        //允許空值
-
-        public int? Id { get; set; }
-
+        [Display(Name = "編輯者")]
+        public string? UserName { get; set; }
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
     }

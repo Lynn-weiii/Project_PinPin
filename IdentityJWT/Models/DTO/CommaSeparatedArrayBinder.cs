@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace PinPinServer.DTO
+namespace PinPinServer.Models.DTO
 {
     public class CommaSeparatedArrayBinder : IModelBinder
     {

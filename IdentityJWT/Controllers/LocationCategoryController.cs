@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PinPinServer.DTO;
 using PinPinServer.Models;
+using PinPinServer.Models.DTO;
 using PinPinServer.Services;
 
 namespace PinPinServer.Controllers
@@ -14,7 +14,7 @@ namespace PinPinServer.Controllers
     {
         private readonly PinPinContext _context;
         private readonly AuthGetuserId _getUserId;
-        //未選擇的項目不包括在裡面
+        //未選擇的項目不包括在預設項目裡面
         private readonly Lazy<List<LocationCategory>> _defaultCategories;
         private readonly LocationCategory _unselectedCategory;
         private readonly static string _unselectStr = "未選擇";
@@ -89,10 +89,22 @@ namespace PinPinServer.Controllers
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 
+            if (_defaultCategories.Value == null || _unselectedCategory == null)
+            {
+                return StatusCode(500, "Default categories or unselected category not found.");
+            }
+
             List<LocationCategory> locationCategories = [.. _defaultCategories.Value];
             locationCategories.Add(_unselectedCategory);
 
-            return Ok(locationCategories);
+            List<LocationCategoryDTO> locationCategoryDTOs = locationCategories.Select(lc => new LocationCategoryDTO
+            {
+                Id = lc.Id,
+                Color = lc.Color,
+                Name = lc.Name,
+            }).ToList();
+
+            return Ok(locationCategoryDTOs);
         }
 
         //POST:api/LocationCategoryController/Post
@@ -184,11 +196,43 @@ namespace PinPinServer.Controllers
             }
         }
 
-        ////Delete:api/LocationCategoryController/Delete
-        //[HttpDelete("Delete")]
-        //public async Task<ActionResult<int>> Delete(int id)
-        //{
+        //Delete:api/LocationCategoryController/Delete
+        [HttpDelete("Delete")]
+        public async Task<ActionResult<int>> Delete(int id)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 
-        //}
+            //檢查有無此筆資料
+            LocationCategory? locationCategory = await _context.LocationCategories.FirstOrDefaultAsync(_lc => _lc.Id == id);
+            if (locationCategory == null) return BadRequest("Not found Category");
+
+            //檢查是否有權限更改
+            if (locationCategory.UserId != userID) return BadRequest("Don't have permission to change");
+
+            List<WishlistDetail> wishlistDetails = locationCategory.WishlistDetails.ToList();
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                foreach (var wish in wishlistDetails)
+                {
+                    wish.LocationCategoryId = _unselectedCategory.Id;
+                    _context.Update(wish);
+                }
+
+                _context.Remove(locationCategory);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok("Delete Success");
+            }
+            catch
+            {
+                transaction.Rollback();
+                return StatusCode(500, "A Database error.");
+            }
+        }
     }
 }

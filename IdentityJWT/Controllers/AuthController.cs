@@ -3,16 +3,15 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using PinPinServer.DTO;
 using PinPinServer.Models;
+using PinPinServer.Models.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace PinPinServer.Controllers
 {
-    //僅有admin權限可使用 [Authorize(Roles = "Admin")]
-    //僅有User權限可使用 [Authorize(Roles = "User")]
+
     [EnableCors("PinPinPolicy")]
     [Route("api/[controller]")]
     [ApiController]
@@ -69,12 +68,6 @@ namespace PinPinServer.Controllers
             string photoBase64 = null;
             if (userDTO.Photo != null && userDTO.Photo.Length > 0)
             {
-
-                if (userDTO.Photo.Length > 2 * 1024 * 1024)
-                {
-                    return "圖片大小不能超過2MB。";
-                }
-
                 using (var ms = new MemoryStream())
                 {
                     await userDTO.Photo.CopyToAsync(ms);
@@ -97,8 +90,7 @@ namespace PinPinServer.Controllers
                         Birthday = userDTO.Birthday,
                         Gender = userDTO.Gender,
                         Photo = photoBase64,
-                        CreatedAt = DateTime.Now,
-                        Role = 1
+                        CreatedAt = DateTime.Now
                     };
 
                     // 將User物件加入資料庫上下文中
@@ -106,22 +98,6 @@ namespace PinPinServer.Controllers
 
                     // 執行資料庫儲存異動，將User實體寫入資料庫
                     await _context.SaveChangesAsync();
-
-                    //
-                    if (userDTO.favor != null && userDTO.favor.Length > 0)
-                    {
-                        foreach (var favorCategoryId in userDTO.favor)
-                        {
-                            UserFavor userFavor = new UserFavor
-                            {
-                                UserId = user.Id,
-                                FavorCategoryId = favorCategoryId
-                            };
-
-                            _context.UserFavors.Add(userFavor);
-                        }
-                        await _context.SaveChangesAsync();
-                    }
 
                     // 提交事務
                     transaction.Commit();
@@ -134,10 +110,7 @@ namespace PinPinServer.Controllers
                     // 如果發生異常，回滾事務
                     transaction.Rollback();
                     // 返回錯誤訊息或適當的異常處理
-                    //return $"註冊失敗: {ex.Message}";
-                    Console.WriteLine(ex.ToString());
-                    throw;
-
+                    return $"註冊失敗: {ex.Message}";
                 }
             }
         }
@@ -151,19 +124,6 @@ namespace PinPinServer.Controllers
 
             return password.Length >= minLength && password.Length <= maxLength && hasLetter && hasNumber;
         }
-
-
-        //取得喜好項目
-        //GET:api/Auth/GetFavorCategories
-        [HttpGet("GetFavorCategories")]
-        public async Task<IActionResult> GetFavorCategories()
-        {
-            var categories = await _context.FavorCategories
-                .Select(c => new { c.Id, c.Category }).ToListAsync(); // 假设Id和Name是你表中的列
-
-            return Ok(categories);
-        }
-
 
         //POST:api/Auth/Login
         [HttpPost("Login")]
@@ -201,15 +161,6 @@ namespace PinPinServer.Controllers
                 new Claim(ClaimTypes.Email,user.Email)
             };
 
-            //新增角色 0_管理員 1_一般用戶
-            string roleName = user.Role switch
-            {
-                0 => "Admin",
-                1 => "User",
-                _ => throw new ArgumentException("Invalid role")
-            };
-            claims.Add(new Claim(ClaimTypes.Role, roleName));
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
@@ -225,6 +176,8 @@ namespace PinPinServer.Controllers
             return jwt;
         }
 
+
+
         //GET:api/Auth/SearchMemberInfo
         [Authorize]
         [HttpGet("SearchMemberInfo")]
@@ -239,13 +192,6 @@ namespace PinPinServer.Controllers
                 return NotFound();
             }
 
-            // 將圖檔轉換為Base64編碼
-            string photoBase64 = null;
-            if (user.Photo != null)
-            {
-                photoBase64 = user.Photo;
-            }
-
 
             UserDTO userDto = new UserDTO
             {
@@ -255,7 +201,7 @@ namespace PinPinServer.Controllers
                 Phone = user.Phone,
                 Birthday = user.Birthday,
                 Gender = user.Gender,
-                PhotoBase64 = photoBase64
+                //Photo = user.Photo
             };
             // 回傳 UserDTO
             return Ok(userDto);
@@ -294,5 +240,12 @@ namespace PinPinServer.Controllers
 
             return "修改成功!";
         }
+
+        //[Authorize]
+        //[HttpPost("Logout")]
+        //public IActionResult Logout()
+        //{   
+        //    return Ok("登出成功");
+        //}
     }
 }
