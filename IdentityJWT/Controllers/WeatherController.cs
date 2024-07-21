@@ -12,14 +12,12 @@ namespace PinPinServer.Controllers
     public class WeatherController : ControllerBase
     {
         private readonly AuthGetuserId _getUserId;
-        private static readonly HttpClient _httpClient = new HttpClient();
-        private readonly string API_key = "";
-        private readonly string units = "metric";
-        private readonly string lang = "zh_tw";
+        private readonly WeatherService _weatherService;
 
-        public WeatherController(AuthGetuserId getuserId)
+        public WeatherController(AuthGetuserId getuserId, WeatherService weatherService)
         {
             _getUserId = getuserId;
+            _weatherService = weatherService;
         }
 
         //傳城市id，選擇測量單位
