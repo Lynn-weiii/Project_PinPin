@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json.Linq;
 using PinPinServer.Models;
 using System.Net.Http;
 
@@ -13,42 +15,25 @@ namespace PinPinServer.Controllers
     {
         private readonly PinPinContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<SearchSpotsController> _logger;
+        private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _cache;
 
-        public SearchSpotsController(PinPinContext context,IHttpClientFactory httpClientFactory, ILogger<SearchSpotsController> logger)
+        public SearchSpotsController(PinPinContext context,IHttpClientFactory httpClientFactory, IConfiguration configuration,IMemoryCache cache)
         {
             _context = context;
             _httpClientFactory = httpClientFactory;
-            _logger = logger;
+            _configuration = configuration;
+            _cache = cache;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Get([FromQuery] string q)
-        //{
-        //    if (string.IsNullOrEmpty(q))
-        //    {
-        //        return BadRequest(new { error = "Query parameter is required" });
-        //    }
 
-        //    try
-        //    {
-        //        var url = $"https://nominatim.openstreetmap.org/search?q={System.Net.WebUtility.UrlEncode(q)}&format=json&addressdetails=1";
-        //        var response = await _httpClient.GetStringAsync(url);
-        //        return Ok(response);
-        //    }
-        //    catch (HttpRequestException ex)
-        //    {
-        //        _logger.LogError("Error fetching data from Nominatim API: {0}", ex);
-        //        return StatusCode(500, new { error = "Failed to fetch data" });
-        //    }
-        //}
-
-
+        //GET:api/SearchSpots/search
         [HttpGet("search")]
         public async Task<IActionResult> Search(string query)
         {
+            var apiKey = _configuration["GoogleMaps:ApiKey"];
             var client = _httpClientFactory.CreateClient();
-            var url = $"https://nominatim.openstreetmap.org/search?q={query}&format=json&addressdetails=1";
+            var url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={query}&key={apiKey}";
             var response = await client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
@@ -60,27 +45,14 @@ namespace PinPinServer.Controllers
             return Ok(result);
         }
 
-      
+        //GET:api/SearchSpots/GetPhoto
+        [HttpGet("GetPhoto")]
+        public IActionResult GetPhotoUrl(string photoReference)
+        {
+            var apiKey = _configuration["GoogleMaps:ApiKey"];
+            var photoUrl = $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference={photoReference}&key={apiKey}";
 
-
-        //老師課堂上的篩選關鍵字功能，pinpin只會有篩選景點名稱、地點描述(open street做得到嗎?)
-        //POST:api/Categories/Filter
-        //[HttpPost("Filter")]
-        //public async Task<IEnumerable<Category>> FilterCategory([FromBody] Category category)
-        //{
-
-        //    return _context.Categories.Where(c =>
-
-        //    c.CategoryId == category.CategoryId ||
-        //    c.CategoryName.Contains(category.CategoryName) ||
-        //    c.Description.Contains(category.Description)).
-        //    Select(c => new Category
-        //    {
-        //        CategoryId = c.CategoryId,
-        //        CategoryName = c.CategoryName,
-        //        Description = c.Description,
-        //        Picture = null
-        //    });
-        //}
+            return Ok(new { url = photoUrl });
+        }
     }
 }
