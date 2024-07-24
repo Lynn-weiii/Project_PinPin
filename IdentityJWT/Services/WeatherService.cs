@@ -5,44 +5,74 @@ namespace PinPinServer.Services
 {
     public class WeatherService
     {
-        private readonly string _apiKey = string.Empty;
+        private readonly string _apiKey;
         private readonly HttpClient _httpClient;
 
         public WeatherService(string? apiKey, HttpClient httpClient)
         {
-            if (apiKey == null) throw new ArgumentNullException(nameof(apiKey));
-            _apiKey = apiKey;
-            _httpClient = httpClient;
+            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        //傳城市id，選擇測量單位
-        //回傳白天+早上的
-        //dto=>temp,date,rain%
-        public async Task<string> GetWeatherData(string units, int cityid)
+        //呼叫獲取天氣資料的API
+        public async Task<string> GetWeatherData(string units, double lat, double lon)
         {
-            string weatherAPI = $"/data/2.5/forecast?id={cityid}appid={_apiKey}&units={units}";
+            string baseaddress = $"BaseAddress: {_httpClient.BaseAddress}";
+            string weatherAPI = $"data/2.5/forecast?lat={lat}&lon={lon}&appid={_apiKey}&units={units}";
             HttpResponseMessage response = await _httpClient.GetAsync(weatherAPI);
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var data = await response.Content.ReadAsStringAsync();
-                return data;
-            }
-            else
-            {
+                Console.WriteLine("獲取資料失敗");
                 return string.Empty;
             }
+            return ProcessWeatherData(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<List<WeatherDataDTO>> ProcessWeatherData(string data)
+        //處理獲取的資料
+        private string ProcessWeatherData(string data)
         {
-            List<WeatherDataDTO> weatherDataDTOs = new List<WeatherDataDTO>();
-            JsonDocument jd = JsonDocument.Parse(data);
-            JsonElement root = jd.RootElement;
+            List<WeatherDataDTO> weatherDataList = new List<WeatherDataDTO>();
+            JsonDocument document = JsonDocument.Parse(data);
+            JsonElement root = document.RootElement;
 
-            foreach (JsonElement element in root.GetProperty("list").EnumerateArray())
+            //提取每個時間段的資料
+            foreach (JsonElement jsonElement in root.GetProperty("list").EnumerateArray())
             {
-                int element.GetProperty("dt").GetInt32();
+                int unixTime = jsonElement.GetProperty("dt").GetInt32();
+                double chanceOfRain = jsonElement.GetProperty("pop").GetDouble();
+                double temp = jsonElement.GetProperty("main").GetProperty("temp").GetDouble();
+
+                DateTime date = DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime;
+
+                weatherDataList.Add(new WeatherDataDTO
+                {
+                    DateTime = date,
+                    ChanceOfRain = chanceOfRain,
+                    Temp = temp,
+                    IsMorning = date.Hour < 12
+                });
             }
+
+            //計算每天上下午的平均降雨機率和氣溫
+            var groupedData = weatherDataList
+                .GroupBy(data => new { data.DateTime.Date, data.IsMorning })
+                .Select(g => new WeatherDataDTO
+                {
+                    DateTime = g.Key.Date,
+                    IsMorning = g.Key.IsMorning,
+                    Temp = g.Average(data => data.Temp),
+                    ChanceOfRain = g.Average(data => data.ChanceOfRain)
+                })
+                .GroupBy(data => data.DateTime)
+                .Select(day => new
+                {
+                    Day = day.ToList()
+                })
+                .ToList();
+
+            //轉成JSON格式
+            string jsonString = JsonSerializer.Serialize(groupedData);
+            return jsonString;
         }
     }
 }

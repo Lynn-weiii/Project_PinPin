@@ -2,13 +2,13 @@
 {
     public class WeatherDataDTO
     {
-        public float Temp { get; set; }
+        public double Temp { get; set; }
 
         public DateTime DateTime { get; set; }
 
-        public float ChanceOfRain { get; set; }
+        public double ChanceOfRain { get; set; }
 
-        public bool timePeriod { get; set; }
-
+        //true為上午fales為下午
+        public bool IsMorning { get; set; }
     }
 }
