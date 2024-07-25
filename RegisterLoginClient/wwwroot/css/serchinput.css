@@ -1,0 +1,102 @@
+﻿:root {
+    --white: #fff;
+    --primary_text: #242730;
+    --secondary_text: #757575;
+    --secondary_light_text: #9799a6;
+    --secondary_background: #f1f1f2;
+    --body_text: #4a4e70;
+    --body_text_2: #585f97;
+    --divider: #e8ecf6;
+    --border: #d9dbf7;
+    --primary_color: #5965d4;
+    --primary_color_light: #6c83e1;
+    --primary_grad_end: #4450bc;
+    --primary_light: #aeb9e9;
+    --primary_dark: #38429c;
+    --accent_1: #f3ec9e;
+    --accent_2: #ff8796;
+    --accent_3: #ffd383;
+    --font1: 'Inter', sans-serif;
+    --grad_light_start: #e8ecf6;
+    --grad_light_end: #c7cff1;
+    --grad_mid_start: #6c83e1;
+    --grad_mid_end: #7892fa;
+    --border_rad_l: 12px;
+    --border_rad_s: 8px;
+}
+
+
+.header_search_container {
+    min-width: 200px; /* 调整最小宽度 */
+    max-width: 300px; /* 调整最大宽度 */
+    margin-left: 36px;
+    margin-right: 24px;
+    flex: 1 1 auto;
+    display: block;
+    position: relative;
+    box-sizing: border-box;
+}
+}
+
+.header_search_form {
+    display: flex;
+    width: 100%;
+    unicode-bidi: isolate;
+    position: relative;
+}
+
+.search_input {
+    width: 100%;
+    height: 52px;
+    border-radius: 26px;
+    padding: 1px 25px; /* 上下1px，左右25px */
+    padding-right: 50px; /* 为按钮留出空间 */
+    color: fieldtext;
+    outline: none;
+    font-size: 16px;
+    text-rendering: auto;
+    display: inline-block;
+    text-align: start;
+    appearance: auto;
+    cursor: text;
+    background-color: field;
+    margin: 0;
+    line-height: inherit;
+    font-family: inherit;
+}
+
+    .search_input:focus, .search_input:hover {
+        border: solid 1px var(--primary_light);
+    }
+
+.header_search_btn {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    transform: translateY(-50%);
+    outline: none;
+    border: none;
+    background-color: transparent;
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+    .header_search_btn img {
+        transition: transform 0.3s; /* 平滑过渡效果 */
+    }
+
+    .header_search_btn:hover img {
+        transform: scale(1.2); /* 鼠标悬停时放大图片10% */
+    }
+
+.btn-primary {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

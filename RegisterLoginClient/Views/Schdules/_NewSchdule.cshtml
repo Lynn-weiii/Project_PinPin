@@ -1,6 +1,9 @@
 ﻿<link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" rel="stylesheet" />
-
-<style>
+<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js"></script>
+<style setup>
     .air-datepicker {
         z-index: 1500; /* 你可以根據實際情況調整這個值 */
     }
@@ -32,11 +35,7 @@
 
 
 <!--session script -->
-<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
-<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js"></script>
-<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js"></script>
-<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js"></script>
-<script>   
+<script setup>   
     //daterangepicker start
     const today = new Date();
     let dpMin, dpMax;
@@ -73,8 +72,5 @@
         }
     });
     //daterangepicker end
-
-    
-
 </script>
 

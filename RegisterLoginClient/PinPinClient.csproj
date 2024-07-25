@@ -28,8 +28,16 @@
   <ItemGroup>
     <Content Remove="Views\Home\Schedule.cshtml" />
     <Content Remove="Views\Schdules\CreateNewSchdule.cshtml" />
+    <Content Remove="wwwroot\css\main_styles2.css" />
     <Content Remove="wwwroot\js\DateRangePicker.js" />
+    <Content Remove="wwwroot\js\loadGoogleMapsApi.js" />
+    <Content Remove="wwwroot\js\main.js" />
     <Content Remove="wwwroot\js\newschdule.js" />
+    <Content Remove="wwwroot\js\site.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\loadGoogleMapsApi.js" />
   </ItemGroup>
 
   <ItemGroup>

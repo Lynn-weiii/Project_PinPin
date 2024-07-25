@@ -71,6 +71,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(PinPinPolicy);
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

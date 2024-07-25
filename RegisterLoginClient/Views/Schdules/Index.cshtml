@@ -1,76 +1,180 @@
-﻿@*Header*@
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+﻿<link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/serchinput.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true">
+<link href="~/css/owl.carousel.css" rel="stylesheet" />
+<link href="~/css/owl.theme.default.css" rel="stylesheet" />
+<link href="~/css/popular_courses_slider.css" rel="stylesheet" />
+<link href="~/css/serchinput.css" rel="stylesheet" />
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
+<script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
+<script src="~/js/owl.carousel.js" type="text/javascript"></script>
+<script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
+<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
+@section Styles{
 <style>
-        #serachrow {
-            width:45%;
-            margin-left: 0;
-            margin-right: auto;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-font-smoothing: antialiased;
+        -o-font-smoothing: antialiased;
+        -webkit-text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+        -moz-text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+        -o-text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+        text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+    }
 
-        a:hover{
-            border:1px solid navy;
-        }
+    div {
+        display: block;
+        position: relative;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    #serachrow {
+        width: 45%;
+        margin-left: 0;
+        margin-right: auto;
+    }
+
+    .card:hover {
+        border: 1px solid navy;
+        text-decoration: none;
+    }
+
+    .air-datepicker {
+        z-index: 9999; /* 你可以根據實際情況調整這個值 */
+    }
+
+        #errmsg {
+        color: red;
+        display: none; /* 默认隐藏 */
+    }
 </style>
-
+}
 @*Header End*@
 
 @*Body*@
-<div id="app" class="container">
-    <div class="row mb-3" id="serachrow">
-        <div class="col-md-5 d-flex justify-content-between">
-            <input type="text" class="form-control" v-model="name" placeholder="請輸入您要查找的行程" />
-        </div>
-        <div class="col-md-5 d-flex justify-content-between">
-            <button class="btn btn-primary btn-sm mx-1" v-on:click="findSchdule(name)">搜尋行程</button>
-        </div>
-    </div>
-    @*-BoostrapCard*@
-    <div class="mb-3" id="resultcard">
+<!--Google API KEY:AIzaSyAx-94ufnrePmM7nBHbLnfKrZ2KMGumf2Q-->
+<div id="app">
+    <div class="search_container mb-3">
         <div class="row">
-            <div class="col-md-4" v-for="schedule in schedules">
-                @*--更新--*@
-                <template v-if="schedule.Edit == true && !errorMessage">
-                    <div class="card mb-2">
-                        <div class="mt-2 d-flex justify-content-center">
-                            @* <img class="card-img-top mb-1" /> *@
-                        </div>
-                        <div class="card-body mb-3 align-content-center">
-                            <h3 class="card-title">{{ schedule.name }}</h3>
-                            <span class="card-text">{{ schedule. startTime }}</span>
-                            <span> → </span>
-                            <span class="card-text">{{ schedule.endTime }}</span>
-                        </div>
-                        <a href="#" class="stretched-link"></a>
-                    </div>
-                </template>
-                @*-- 搜尋結果-- *@
-                <template v-else>
-                    <div class="card mb-2">
-                            <div class="mt-2 d-flex justify-content-center">
-                                @* <img class="card-img-top mb-1" /> *@
-                            </div>
-                            <div class="card-body mb-3 align-content-center">
-                                <h3 class="card-title">{{ schedule.name }}</h3>
-                                <span class="card-text">{{ schedule. startTime }}</span>
-                                <span> → </span>
-                                <span class="card-text">{{ schedule.endTime }}</span>                           
-                            </div>
-                            <a href="#" class="stretched-link"></a>
-                        </div>
-                </template>
+            <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
+                <div class="header_search_container position-relative">
+                    <form class="header_search_form d-flex align-items-center" action="#">
+                        <input id="header_search_input" class="search_input" type="text" v-model="name" placeholder="搜尋?">
+                        <button class="header_search_btn position-absolute" v-on:click="findSchedule(name)" type="button">
+                            <img src="/images/icon_search.png" alt="">
+                        </button>
+                    </form>
+                </div>
+                <button type="button" class="btn btn-primary text-white p-2 text-decoration-none ms-2"
+                        data-bs-toggle="modal" data-bs-target="#newschdule">
+                    新增行程
+                </button>
             </div>
         </div>
     </div>
-    <div v-if="errorMessage" class="unvailed">{{ errorMessage }}</div>
+    @*-BoostrapCard*@
+    <div class="popular">
+        <div class="container">
+            <div class="row course_cards_container section_content_row">
+                <div class="col">
+                    <div class="popular_courses_slider_container">
+                        <div class="owl-carousel owl-theme popular_courses_slider">
+                            <!-- Course Card (v-for)-->
+                            <div class="item course_card_owl_item" v-for="schedule in schedules">
+                                <div class="course_card">
+                                    <div class="course_card_container">
+                                        <div class="course_card_top">
+                                            <div class="course_card_category trans_200">
+                                                <a href="#"><span>編輯</span></a>
+                                            </div>
+                                            <div class="course_card_pic">
+                                                <img src="~/images/caourse/course_03.jpg" />
+                                            </div>
+                                            <div class="course_card_content">
+                                                <div class="course_card_meta d-flex flex-row align-items-center">
+                                                </div>
+                                                <div class="course_card_title">
+                                                    <h3>{{schedule.name}}</h3>
+                                                </div>
+                                                <div class="course_card_author">
+                                                    <span>{{ schedule.startTime }}</span>
+                                                    <span><i class="fa-solid fa-arrow-right" style="color: #044e37; padding:5px;"></i></span>
+                                                    <span>{{ schedule.endTime }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Courses Slider Nav Button (Prev) -->
+                            <div class="slider_nav_btn slider_nav_btn_prev disabled courses_slider_prev d-flex flex-row align-items-center justify-content-center trans_200">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 -960 960 960" class="trans_200">
+                                    <path d="M576-253.85 349.85-480 576-706.15 613.15-669l-189 189 189 189L576-253.85Z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <!-- Courses Slider Nav Button (Next) -->
+                            <div class="slider_nav_btn slider_nav_btn_next courses_slider_next d-flex flex-row align-items-center justify-content-center trans_200">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 -960 960 960" class="trans_200">
+                                    <path d="m535.85-480-189-189L384-706.15 610.15-480 384-253.85 346.85-291l189-189Z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div v-if="showError" id="errmsg">{{ errorMessage }}</div>
+    @*-新增行程Modal-*@
+    <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="container-fluid modal-body">
+                    <form id="newschdule" class="needs-validation" method="post" novalidate autocomplete="off">
+                        <!-- 行程 -->
+                        <div class="mb-3">
+                            <label for="Name" class="form-label mb-2">行程名稱</label>
+                            <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" v-model="newSchedule.name" required>
+                            <label for="asearch_input" class="form-label mb-2">目的地</label>
+                            <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col-5">
+                                    <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" v-model="newSchedule.startTime" />
+                                </div>
+                                <div class="col-2 text-center align-center pt-1 pb-1">
+                                    <i class="fa-solid fa-arrow-right fa-xl"></i>
+                                </div>
+                                <div class="col-5">
+                                    <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" v-model="newSchedule.endTime" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="createbtn" v-on:click="createSchedule">完成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*-token即將失效通知modal-*@
+    
+    @*-token失效，user重登入modal-*@
 </div>
-
-@*-Scripts-*@
- 
-    <script src="https://unpkg.com/vue@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
-            integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
+@section Scripts {
     <script>
         try {
             var vueApp = {
@@ -82,15 +186,30 @@
                         startTime: "",
                         endTime: "",
                         schedules: [],
-                        errorMessage:""
-                    };
+                        errorMessage: "",
+                        showError: false,
+                        newSchedule: {
+                            name: "",
+                            startTime: "",
+                            endTime: "",
+                        }
+                    }
                 },
                 mounted() {
-                    this.getSchedule();
+                    let _this = this;
+                    _this.getSchedule();
+                    _this.datePicker();
+                    _this.$nextTick(() => {
+                        if (typeof initPopularCoursesSlider === 'function') {
+                            initPopularCoursesSlider();
+                        } else {
+                            console.error('initPopularCoursesSlider function is not defined');
+                        }
+                    });
                 },
                 methods: {
-                    getSchedule: function () {
-                        let _this = this;
+                    getSchedule() {
+                         let _this = this;
                         var request = {
                             name: _this.name,
                             startTime: _this.startTime,
@@ -99,23 +218,26 @@
                         axios.get(`${_this.baseAddress}/api/Schedules`, {
                             headers: {
                                 'Authorization': `Bearer ${_this.token}`
-                            },request
+                            },
+                            params: request
                         }).then((response) => {
-                            console.log(response);
                             _this.schedules = response.data;
-                            _this.errorMessage = ""; 
+                            _this.errorMessage = "";
                             for (var i = 0; i < _this.schedules.length; i++) {
-                                _this.schedules.Edit = false;
+                                _this.schedules[i].Edit = false;
                             }
+                            _this.showError = false;
                             $('#resultcard').show();
+
                         }).catch((error) => {
-                            console.error(err);
+                            _this.showError = true;
+                            $('#errmsg').show();
+                            _this.errorMessage = '查無相關行程';
+                            $('#resultcard').hide();
+                            console.log(error);
                         });
                     },
-                    showModal: function () {
-                        alert("Addsch");
-                    },
-                    findSchdule: function () {
+                    findSchedule() {
                         let _this = this;
                         var request = {
                             name: _this.name,
@@ -125,34 +247,68 @@
                         axios.get(`${_this.baseAddress}/api/Schedules/${_this.name}`, {
                             headers: {
                                 'Authorization': `Bearer ${_this.token}`
-                            }, request
+                            },
+                            params: request
                         }).then((response) => {
                             _this.schedules = response.data;
-                            _this.errorMessage = ""; // 清空错误信息
-                            $('#resultcard').show(); // 显示结果卡片
+                            _this.errorMessage = "";
+                            _this.showError = false;
+                            $('#resultcard').show();
                         }).catch((error) => {
                             if (error.response && error.response.status === 404) {
-                                //alert('查無相關行程');
-                                try {
-                                    $('#resultcard').hide();
-                                    _this.errorMessage = '查無相關行程';
-                                }
-                                catch (err) { 
-                                console.log(`400:${err}`)
-                                }
-                                    
+                                _this.errorMessage = '查無相關行程'; 
+                                $('#errmsg').show();
+                                _this.showError = true; 
+                                $('#resultcard').hide();
                             } else {
-                                console.error(error);
+                                console.log(error);
                             }
                         });
-                    }
+                    },
+                    createSchedule() {alert('createSch') },
+                    datePicker() {
+                        var today = new Date();
+                        let dpMin, dpMax;
+                        dpMin = new AirDatepicker('#el1', {
+                            locale: window.airdatepickerEn,
+                            minDate: today,
+                            dateFormat(date) {
+                                const year = date.getFullYear();
+                                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                                const day = date.getDate().toString().padStart(2, '0');
+                                return `${year}/${month}/${day}`;
+                            },
+                            autoClose: true,
+                            onSelect({ date }) {
+                                dpMax.update({
+                                    minDate: date
+                                });
+                            }
+                        });
+
+                        dpMax = new AirDatepicker('#el2', {
+                            locale: window.airdatepickerEn,
+                            dateFormat(date) {
+                                const year = date.getFullYear();
+                                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                                const day = date.getDate().toString().padStart(2, '0');
+                                return `${year}/${month}/${day}`;
+                            },
+                            autoClose: true,
+                            onSelect({ date }) {
+                                dpMin.update({
+                                    maxDate: date
+                                });
+                            }
+                        });
+                    },
                 }
             };
+
             var app = Vue.createApp(vueApp).mount('#app');
-        } catch (e) { 
-            console.log(e);
+        }
+        catch (error) {
+            console.log(`warning: ${error}`);
         }
     </script>
-
-@*Body End*@
-
+}

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using PinPinServer.DTO;
 using PinPinServer.Models;
+using PinPinServer.Models.DTO;
 using PinPinServer.Services;
 
 
@@ -90,16 +89,14 @@ namespace PinPinServer.Controllers
 
                 if (schedules == null || !schedules.Any())
                 {
-                    return NotFound(new { message = "未找到匹配的行程" });
+                    return NotFound();
                 }
-
                 return Ok(schedules);
             }
             catch (Exception ex)
             {
-                // 可以记录异常日志，以便后续排查
                 Console.WriteLine($"處理請求時發生錯誤: {ex.Message}");
-                return StatusCode(500, new { message = "處理請求時發生錯誤，請稍後再試。" });
+                return BadRequest();
             }
         }
 
@@ -150,9 +147,6 @@ namespace PinPinServer.Controllers
             {
                 return NotFound();
             }
-
-            // 打印收到的DTO数据以进行调试
-            Console.WriteLine($"Received data: {JsonConvert.SerializeObject(editschDTO)}");
             int userID = _getUserId.PinGetUserId(User).Value;
             var schedule = new Schedule
             {
@@ -166,7 +160,17 @@ namespace PinPinServer.Controllers
             _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            int newScheduleId = schedule.Id;
+            var schedulegroup = new ScheduleGroup
+            {
+                Id = 0,
+                ScheduleId = newScheduleId,
+                UserId = userID,
+            };
+            _context.ScheduleGroups.Add(schedulegroup);
+            await _context.SaveChangesAsync();
+
+            return Ok("已新增行程");
         }
 
         // DELETE: api/Schedules/5
@@ -177,17 +181,17 @@ namespace PinPinServer.Controllers
 
             if (schedule == null)
             {
-                return NotFound(); // 404 Not Found if schedule with the given id is not found
+                return NotFound();
             }
             try
             {
                 _context.Schedules.Remove(schedule);
                 await _context.SaveChangesAsync();
-                return Ok("行程刪除"); // 200 OK if deletion is successful
+                return Ok("行程刪除");
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging purposes
+
                 Console.WriteLine($"Exception occurred: {ex.Message}");
                 return StatusCode(500, "刪除失敗!"); // 500 Internal Server Error if deletion fails
             }
