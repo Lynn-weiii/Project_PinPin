@@ -1,314 +1,298 @@
-﻿<link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+﻿
+<link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
-<link href="~/css/serchinput.css" type="text/css" rel="stylesheet" asp-append-version="true" />
-<link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true">
-<link href="~/css/owl.carousel.css" rel="stylesheet" />
-<link href="~/css/owl.theme.default.css" rel="stylesheet" />
+<link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+@* <link href="~/css/schedule_styles.css" rel="stylesheet" /> *@
 <link href="~/css/popular_courses_slider.css" rel="stylesheet" />
-<link href="~/css/serchinput.css" rel="stylesheet" />
+<link href="~/css/serchinput.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/tabs_style.css" type="text/css" rel="stylesheet" />
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
-<script src="~/js/owl.carousel.js" type="text/javascript"></script>
-<script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
 <script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
+<script src="~/js/owl.carousel.js" type="text/javascript"></script>
+<script src="~/js/coursescard.js" type="text/javascript"></script>
+<script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCV7zooAQnROJE-aQusJjkCln2GZGsHrcg&loading=async&callback=initMap">
+</script>
+
 @section Styles{
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        -webkit-font-smoothing: antialiased;
-        -moz-font-smoothing: antialiased;
-        -o-font-smoothing: antialiased;
-        -webkit-text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
-        -moz-text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
-        -o-text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
-        text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
-    }
-
-    div {
-        display: block;
-        position: relative;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-
+    <style>
     #serachrow {
         width: 45%;
         margin-left: 0;
         margin-right: auto;
     }
 
-    .card:hover {
-        border: 1px solid navy;
-        text-decoration: none;
-    }
-
     .air-datepicker {
         z-index: 9999; /* 你可以根據實際情況調整這個值 */
     }
-
-        #errmsg {
+    
+    #errmsg {
         color: red;
         display: none; /* 默认隐藏 */
     }
+
+    course_card{
+        background: #D8D8D8;
+    }
+
+    #createbtn, #newschbtn {
+    background:#006030;
+        color: #F0F0F0;
+}
+
+    #newschbtn:hover, #createbtn:hover {
+    background: #F0F0F0;
+    color:#006030;
+        border-bottom: 1px solid #7B7B7B;
+    }
+
+    .pac-container {
+        z-index: 9999 !important;
+    }
+
+    #addnewcard {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        transition: box-shadow 0.3s ease-in-out;
+        border-radius:6px
+    }
+
+    #addnewcard img {
+        width: 150px;
+        height: 255px;
+        object-fit: cover;
+    }
+
+    #addnewcard:hover{
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .header_search_container input{
+        margin-right:-3px;
+    }
+
+    .item course_card_owl_item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit_btn{
+            text-decoration: none;
+    }
+
+    .course_card_link {
+    display: block;
+    text-decoration: none; /* 移除下划线 */
+    color: inherit; /* 继承父元素的文字颜色 */
+    transition: all 0.3s ease; /* 平滑过渡效果 */
+    }
+
+    /* 悬停效果 */
+    .course_card_link:hover {
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2); /* 悬停时阴影效果 */
+    border-radius:14px;
+    }
+
+
+
+    
+
 </style>
 }
+
 @*Header End*@
 
 @*Body*@
-<!--Google API KEY:AIzaSyAx-94ufnrePmM7nBHbLnfKrZ2KMGumf2Q-->
-<div id="app">
-    <div class="search_container mb-3">
+    @*-搜尋-*@
+    @* <div class="container search_container pb-1">
         <div class="row">
             <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
                 <div class="header_search_container position-relative">
                     <form class="header_search_form d-flex align-items-center" action="#">
                         <input id="header_search_input" class="search_input" type="text" v-model="name" placeholder="搜尋?">
-                        <button class="header_search_btn position-absolute" v-on:click="findSchedule(name)" type="button">
+                        <button class="header_search_btn position-absolute" type="button">
                             <img src="/images/icon_search.png" alt="">
                         </button>
                     </form>
                 </div>
-                <button type="button" class="btn btn-primary text-white p-2 text-decoration-none ms-2"
-                        data-bs-toggle="modal" data-bs-target="#newschdule">
-                    新增行程
-                </button>
+
             </div>
         </div>
-    </div>
-    @*-BoostrapCard*@
-    <div class="popular">
-        <div class="container">
-            <div class="row course_cards_container section_content_row">
-                <div class="col">
-                    <div class="popular_courses_slider_container">
-                        <div class="owl-carousel owl-theme popular_courses_slider">
-                            <!-- Course Card (v-for)-->
-                            <div class="item course_card_owl_item" v-for="schedule in schedules">
-                                <div class="course_card">
-                                    <div class="course_card_container">
-                                        <div class="course_card_top">
-                                            <div class="course_card_category trans_200">
-                                                <a href="#"><span>編輯</span></a>
-                                            </div>
-                                            <div class="course_card_pic">
-                                                <img src="~/images/caourse/course_03.jpg" />
-                                            </div>
-                                            <div class="course_card_content">
-                                                <div class="course_card_meta d-flex flex-row align-items-center">
-                                                </div>
-                                                <div class="course_card_title">
-                                                    <h3>{{schedule.name}}</h3>
-                                                </div>
-                                                <div class="course_card_author">
-                                                    <span>{{ schedule.startTime }}</span>
-                                                    <span><i class="fa-solid fa-arrow-right" style="color: #044e37; padding:5px;"></i></span>
-                                                    <span>{{ schedule.endTime }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
+    </div> *@
+    @*-顯示schedule-*@
+    <div class="container-fluid">
+        <div class="row">        
+            <div class="tab-wrap">                
+            <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
+            <label for="tab1"><img src="~/images/subtitle_icon_1.png" />我的行程</label>
+            <input type="radio" id="tab2" name="tabGroup1" class="tab">
+            <label for="tab2">旅遊群組</label>
+                @*--tabGroup1:我的行程--*@
+                <div class="tab__content">
+                    @*--ERROR MESSAGE，未來再用SWEETALERT--*@
+                    <div id="errmsg"></div>
+                    <div class="popular" id="result_container">
+                        <div class="row" style="margin-top:1px;margin-bottom:2px">
+                            <div class="section_title_container mb-3">
+                                    <div class="d-flex flex-row align-items-center">
+                                        <button id="newschbtn" type="button" class="btn" data-bs-toggle="modal" data-bs-target="#newschdule">
+                                            新增行程
+                                        </button>
                                     </div>
+                            </div>
+                        </div>
+                        <div class="row course_cards_container section_content_row">
+                            <div class="col">
+                                <div class="popular_courses_slider_container">
+                                    <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
+                                        <!--Add New Course Card-->
+                                        <!--foreach schedule Course Card -->
+                                        </div>
                                 </div>
-                            </div>
-                            <!-- Courses Slider Nav Button (Prev) -->
-                            <div class="slider_nav_btn slider_nav_btn_prev disabled courses_slider_prev d-flex flex-row align-items-center justify-content-center trans_200">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 -960 960 960" class="trans_200">
-                                    <path d="M576-253.85 349.85-480 576-706.15 613.15-669l-189 189 189 189L576-253.85Z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <!-- Courses Slider Nav Button (Next) -->
-                            <div class="slider_nav_btn slider_nav_btn_next courses_slider_next d-flex flex-row align-items-center justify-content-center trans_200">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 -960 960 960" class="trans_200">
-                                    <path d="m535.85-480-189-189L384-706.15 610.15-480 384-253.85 346.85-291l189-189Z">
-                                    </path>
-                                </svg>
                             </div>
                         </div>
                     </div>
                 </div>
+                @*--tabGroup2:旅遊群組--*@
+                <div class="tab__content">
+                    <h3>旅遊群組</h3>
+                    <p>Praesent nonummy mi in odio. Nullam accumsan lorem in dui. Vestibulum turpis sem, aliquet eget, lobortis pellentesque, rutrum eu, nisl. Nullam accumsan lorem in dui. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.</p>
+
+                    <p>In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Morbi mattis ullamcorper velit. Pellentesque posuere. Etiam ut purus mattis mauris sodales aliquam. Praesent nec nisl a purus blandit viverra.</p>
+                </div>
             </div>
+            
+            
         </div>
-    <div v-if="showError" id="errmsg">{{ errorMessage }}</div>
+    </div>
     @*-新增行程Modal-*@
     <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="container-fluid modal-body">
-                    <form id="newschdule" class="needs-validation" method="post" novalidate autocomplete="off">
-                        <!-- 行程 -->
-                        <div class="mb-3">
-                            <label for="Name" class="form-label mb-2">行程名稱</label>
-                            <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" v-model="newSchedule.name" required>
-                            <label for="asearch_input" class="form-label mb-2">目的地</label>
-                            <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
-                        </div>
-                        <div class="mb-3">
-                            <div class="row">
-                                <div class="col-5">
-                                    <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" v-model="newSchedule.startTime" />
-                                </div>
-                                <div class="col-2 text-center align-center pt-1 pb-1">
-                                    <i class="fa-solid fa-arrow-right fa-xl"></i>
-                                </div>
-                                <div class="col-5">
-                                    <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" v-model="newSchedule.endTime" />
-                                </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="container-fluid modal-body">
+                <form id="newschdule" class="needs-validation" method="post" novalidate autocomplete="off">
+                    <!-- 行程 -->
+                    <div class="mb-3">
+                        <label for="Name" class="form-label mb-2">行程名稱</label>
+                        <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" v-model="newSchedule.name" required>
+                        <label for="search_input" class="form-label mb-2">目的地</label>
+                        <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-5">
+                                <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" v-model="newSchedule.startTime" />
+                            </div>
+                            <div class="col-2 text-center align-center pt-1 pb-1">
+                                <i class="fa-solid fa-arrow-right fa-xl"></i>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" v-model="newSchedule.endTime" />
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="createbtn" v-on:click="createSchedule">完成</button>
-                </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="createbtn" v-on:click="createSchedule">完成</button>
             </div>
         </div>
     </div>
+</div>
     @*-token即將失效通知modal-*@
     
     @*-token失效，user重登入modal-*@
 </div>
+
 @section Scripts {
-    <script>
-        try {
-            var vueApp = {
-                data() {
-                    return {
-                        token: localStorage.getItem('token'),
-                        baseAddress: "https://localhost:7280",
-                        name: "",
-                        startTime: "",
-                        endTime: "",
-                        schedules: [],
-                        errorMessage: "",
-                        showError: false,
-                        newSchedule: {
-                            name: "",
-                            startTime: "",
-                            endTime: "",
+        <script>
+            $(document).ready(async function () {
+                 @*-載入行程-*@
+                    var baseAddress = "https://localhost:7280";
+                    var token = localStorage.getItem('token');
+                    $('#errmsg').hide();
+
+           
+                    try {
+                        var response = await fetch(`${baseAddress}/api/Schedules`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (!response.ok) {
+                            $('#result_container').hide();
+                            alert('導向login畫面');
+                            return;
                         }
-                    }
-                },
-                mounted() {
-                    let _this = this;
-                    _this.getSchedule();
-                    _this.datePicker();
-                    _this.$nextTick(() => {
-                        if (typeof initPopularCoursesSlider === 'function') {
-                            initPopularCoursesSlider();
-                        } else {
-                            console.error('initPopularCoursesSlider function is not defined');
-                        }
+                        var data = await response.json();
+                        renderCourses(data);
+                    } 
+                    catch (error) {
+                        console.log(error);
+                        $('#result_container').hide();
+                        $('#errmsg').show();
+                        $('#errmsg').text('Error: ' + error.message);
+                    };
+
+                @*-進入行程編輯頁面-*@
+                    $('.edit_btn').on('click', function () {
+                        alert('entrydetail page');
                     });
-                },
-                methods: {
-                    getSchedule() {
-                         let _this = this;
-                        var request = {
-                            name: _this.name,
-                            startTime: _this.startTime,
-                            endTime: _this.endTime
-                        };
-                        axios.get(`${_this.baseAddress}/api/Schedules`, {
-                            headers: {
-                                'Authorization': `Bearer ${_this.token}`
-                            },
-                            params: request
-                        }).then((response) => {
-                            _this.schedules = response.data;
-                            _this.errorMessage = "";
-                            for (var i = 0; i < _this.schedules.length; i++) {
-                                _this.schedules[i].Edit = false;
-                            }
-                            _this.showError = false;
-                            $('#resultcard').show();
 
-                        }).catch((error) => {
-                            _this.showError = true;
-                            $('#errmsg').show();
-                            _this.errorMessage = '查無相關行程';
-                            $('#resultcard').hide();
-                            console.log(error);
-                        });
-                    },
-                    findSchedule() {
-                        let _this = this;
-                        var request = {
-                            name: _this.name,
-                            startTime: _this.startTime,
-                            endTime: _this.endTime
-                        };
-                        axios.get(`${_this.baseAddress}/api/Schedules/${_this.name}`, {
-                            headers: {
-                                'Authorization': `Bearer ${_this.token}`
-                            },
-                            params: request
-                        }).then((response) => {
-                            _this.schedules = response.data;
-                            _this.errorMessage = "";
-                            _this.showError = false;
-                            $('#resultcard').show();
-                        }).catch((error) => {
-                            if (error.response && error.response.status === 404) {
-                                _this.errorMessage = '查無相關行程'; 
-                                $('#errmsg').show();
-                                _this.showError = true; 
-                                $('#resultcard').hide();
-                            } else {
-                                console.log(error);
-                            }
-                        });
-                    },
-                    createSchedule() {alert('createSch') },
-                    datePicker() {
-                        var today = new Date();
-                        let dpMin, dpMax;
-                        dpMin = new AirDatepicker('#el1', {
-                            locale: window.airdatepickerEn,
-                            minDate: today,
-                            dateFormat(date) {
-                                const year = date.getFullYear();
-                                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                                const day = date.getDate().toString().padStart(2, '0');
-                                return `${year}/${month}/${day}`;
-                            },
-                            autoClose: true,
-                            onSelect({ date }) {
-                                dpMax.update({
-                                    minDate: date
-                                });
-                            }
+               
+
+                @*-新增行程視窗-*@
+                    $('#newschdule').on('shown.bs.modal', function () {
+                        initMap();
+                    });
+        
+                    
+                @*-function area-*@
+                    @*--Google Autocomplete--*@
+                    function initMap() {
+                        let search_input = document.getElementById('search_input');
+                        if (!search_input) {
+                            console.error("Input element not found");
+                            return;
+                        }
+
+                        let autocomplete = new google.maps.places.Autocomplete(search_input, {
+                            types: ['geocode']
                         });
 
-                        dpMax = new AirDatepicker('#el2', {
-                            locale: window.airdatepickerEn,
-                            dateFormat(date) {
-                                const year = date.getFullYear();
-                                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                                const day = date.getDate().toString().padStart(2, '0');
-                                return `${year}/${month}/${day}`;
-                            },
-                            autoClose: true,
-                            onSelect({ date }) {
-                                dpMin.update({
-                                    maxDate: date
-                                });
+                        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                            let place = autocomplete.getPlace();
+                            if (!place.geometry) {
+                                console.error("No details available for input: '" + place.name + "'");
+                                return;
                             }
-                        });
-                    },
-                }
-            };
+                            let latitude = place.geometry.location.lat();
+                            let longitude = place.geometry.location.lng();
 
-            var app = Vue.createApp(vueApp).mount('#app');
-        }
-        catch (error) {
-            console.log(`warning: ${error}`);
-        }
+                            console.log('Selected place details:', place);
+                            console.log('Latitude:', latitude);
+                            console.log('Longitude:', longitude);
+                        });
+                    }
+
+
+                   
+                       
+            });
     </script>
 }
