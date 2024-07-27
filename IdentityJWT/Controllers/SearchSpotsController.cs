@@ -31,6 +31,18 @@ namespace PinPinServer.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search(string query)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                return BadRequest("Query parameter is required.");
+            }
+
+            string cacheKey = $"search_{query}";
+            if (_cache.TryGetValue(cacheKey, out string cachedResult))
+            {
+                return Ok(cachedResult);
+            }
+
+
             var apiKey = _configuration["GoogleMaps:ApiKey"];
             var client = _httpClientFactory.CreateClient();
             var url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={query}&key={apiKey}";
@@ -42,6 +54,10 @@ namespace PinPinServer.Controllers
             }
 
             var result = await response.Content.ReadAsStringAsync();
+
+            // 緩存結果
+            _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // 設定 10 分鐘的緩存時間
+
             return Ok(result);
         }
 
