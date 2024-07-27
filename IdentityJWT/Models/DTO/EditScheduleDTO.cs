@@ -6,8 +6,8 @@ namespace PinPinServer.Models.DTO
     {
 
         [Display(Name = "行程名稱")]
-        [Required(ErrorMessage = "請輸入行程名稱!")]
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
 
         [Display(Name = "出發日期")]
         [Required(ErrorMessage = "請選擇出發日期!")]
@@ -19,7 +19,10 @@ namespace PinPinServer.Models.DTO
 
         public int UserId { get; set; }
 
+
+
         //允許空值
+
         public int? Id { get; set; }
 
         [Display(Name = "創建日期")]

@@ -12,6 +12,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<PinPinContext>(options => { options.UseSqlServer(builder.Configuration.GetConnectionString("PinPinSQL")); });
 builder.Services.AddScoped<AuthGetuserId>();
+
+//註冊天氣服務    
+builder.Services.AddHttpClient<WeatherService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.openweathermap.org");
+});
+
+builder.Services.AddSingleton<WeatherService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(WeatherService));
+    return new WeatherService(builder.Configuration["AppSettings:WeatherApiKey"], httpClient);
+});
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
