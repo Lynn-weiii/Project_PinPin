@@ -19,18 +19,19 @@ namespace PinPinServer.Controllers
         {
             _context = context;
             _getUserId = getuserId;
+
         }
 
-        // GET: api/Schedules
-        [HttpGet]
-        public async Task<IActionResult> GetUserAllSchedule()
+        // GET: api/Schedules/MainSchedules
+        [HttpGet("MainSchedules")]
+        public async Task<IActionResult> GetUserMainSchedule()
         {
             IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
             {
                 int userID = _getUserId.PinGetUserId(User).Value;
                 schedules = await _context.Schedules
-                .Where(s => s.UserId == userID || s.ScheduleGroups.Any(sg => sg.UserId == userID))
+                .Where(s => s.UserId == userID)
                 .Include(s => s.User)
                 .Include(s => s.ScheduleGroups)
                 .ThenInclude(sg => sg.User)
@@ -43,11 +44,15 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
-                    SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList()
+                    SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
+                    SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList(),
+                    lng = s.Lng,
+                    lat = s.Lat,
                 }).ToListAsync();
 
                 if (schedules == null || !schedules.Any())
                 {
+
                     Console.WriteLine("查無使用者相關紀錄");
                     return NotFound(new { message = "未找到匹配的行程" });
                 }
@@ -59,7 +64,66 @@ namespace PinPinServer.Controllers
                 Console.WriteLine($"Exception: {ex}");
                 throw new Exception("伺服器發生錯誤，請稍後再試");
             }
+
         }
+
+
+        // GET: api/Schedules/SchedulesGroup
+        [HttpGet("SchedulesGroup")]
+        public async Task<IActionResult> GetUserSchedulesGroup()
+        {
+            List<int> scheduleIds = new List<int>();
+            List<ScheduleDTO> gschedules = new List<ScheduleDTO>();
+            try
+            {
+                int userID = _getUserId.PinGetUserId(User).Value;
+
+                scheduleIds = await _context.ScheduleGroups
+                    .Where(sg => sg.UserId == userID && sg.IsHoster == false)
+                    .Select(sg => sg.ScheduleId)
+                    .Distinct()
+                    .ToListAsync();
+
+                gschedules = await _context.Schedules
+                .Where(s => scheduleIds.Contains(s.Id))
+                .Include(s => s.User)
+                .Include(s => s.ScheduleGroups)
+                .ThenInclude(sg => sg.User)
+                .Select(s => new ScheduleDTO
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    CreatedAt = s.CreatedAt,
+                    UserName = s.User.Name,
+                    SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
+                    SharedUserNames = s.ScheduleGroups
+                        .Where(sg => sg.UserId != userID)
+                        .Select(sg => (string?)sg.User.Name)
+                        .Distinct()
+                        .ToList(),
+                    lng = s.Lng,
+                    lat = s.Lat,
+                })
+                .ToListAsync();
+
+                if (gschedules == null || !gschedules.Any())
+                {
+                    Console.WriteLine("查無使用者相關紀錄");
+                    return NotFound(new { message = "未找到匹配的行程" });
+                }
+
+                return Ok(gschedules);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return StatusCode(500, "伺服器發生錯誤，請稍後再試");
+            }
+        }
+
+
 
         //Get:api/Schedules/{name}
         [HttpGet("{name}")]
@@ -84,7 +148,9 @@ namespace PinPinServer.Controllers
                             EndTime = sch.EndTime,
                             CreatedAt = sch.CreatedAt,
                             UserName = usr.Name,
-                            SharedUserNames = sch.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList()
+                            SharedUserNames = sch.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList(),
+                            lng = sch.Lng,
+                            lat = sch.Lat,
                         }).ToListAsync();
 
                 if (schedules == null || !schedules.Any())
@@ -99,6 +165,8 @@ namespace PinPinServer.Controllers
                 return BadRequest();
             }
         }
+
+
 
         // PUT: api/Schedules/{id}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -139,7 +207,6 @@ namespace PinPinServer.Controllers
         }
 
         // POST: api/Schedules
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<IActionResult> PostSchedule([FromBody] EditScheduleDTO editschDTO)
         {
@@ -155,7 +222,9 @@ namespace PinPinServer.Controllers
                 StartTime = editschDTO.StartTime,
                 EndTime = editschDTO.EndTime,
                 CreatedAt = DateTime.Now,
-                UserId = userID
+                UserId = userID,
+                Lng = editschDTO.lng,
+                Lat = editschDTO.lat,
             };
             _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
@@ -166,11 +235,12 @@ namespace PinPinServer.Controllers
                 Id = 0,
                 ScheduleId = newScheduleId,
                 UserId = userID,
+                IsHoster = true,
             };
             _context.ScheduleGroups.Add(schedulegroup);
             await _context.SaveChangesAsync();
 
-            return Ok("已新增行程");
+            return Ok();
         }
 
         // DELETE: api/Schedules/5

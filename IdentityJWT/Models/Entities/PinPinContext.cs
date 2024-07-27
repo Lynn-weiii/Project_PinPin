@@ -169,6 +169,12 @@ public partial class PinPinContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
+            entity.Property(e => e.Lat)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("lat");
+            entity.Property(e => e.Lng)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("lng");
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100)
@@ -286,6 +292,7 @@ public partial class PinPinContext : DbContext
             entity.HasIndex(e => new { e.ScheduleId, e.UserId }, "unique_schedule_i_user_id").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IsHoster).HasColumnName("is_hoster");
             entity.Property(e => e.JoinedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")

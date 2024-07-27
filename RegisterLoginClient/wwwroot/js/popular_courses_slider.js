@@ -88,5 +88,17 @@ function initPopularCoursesSlider() {
                 }
             }
         });
+
+        let stageElement = slider[0];
+
+        stageElement.addEventListener('touchstart', function (event) {
+            // 处理 touchstart 事件
+        }, { passive: true });
+
+        stageElement.addEventListener('touchend', function (event) {
+            // 处理 touchend 事件
+        }, { passive: true });
+
     }
+
 }

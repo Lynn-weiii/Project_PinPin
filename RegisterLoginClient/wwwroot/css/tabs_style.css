@@ -6,58 +6,18 @@
     flex-wrap: wrap;
     position: relative;
     list-style: none;
-    background-color: #fff;
+    background-color: #FCF8F3;
     margin: 15px 0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
-
-
 
 .tab {
     display: none;
 }
 
-    .tab:checked:nth-of-type(1) ~ .tab__content:nth-of-type(1) {
-        opacity: 1;
-        transition: 0.5s opacity ease-in, 0.8s transform ease;
-        position: relative;
-        top: 0;
-        z-index: 100;
-        transform: translateY(0px);
-        text-shadow: 0 0 0;
-    }
-
-    .tab:checked:nth-of-type(2) ~ .tab__content:nth-of-type(2) {
-        opacity: 1;
-        transition: 0.5s opacity ease-in, 0.8s transform ease;
-        position: relative;
-        top: 0;
-        z-index: 100;
-        transform: translateY(0px);
-        text-shadow: 0 0 0;
-    }
-
-    .tab:checked:nth-of-type(3) ~ .tab__content:nth-of-type(3) {
-        opacity: 1;
-        transition: 0.5s opacity ease-in, 0.8s transform ease;
-        position: relative;
-        top: 0;
-        z-index: 100;
-        transform: translateY(0px);
-        text-shadow: 0 0 0;
-    }
-
-    .tab:checked:nth-of-type(4) ~ .tab__content:nth-of-type(4) {
-        opacity: 1;
-        transition: 0.5s opacity ease-in, 0.8s transform ease;
-        position: relative;
-        top: 0;
-        z-index: 100;
-        transform: translateY(0px);
-        text-shadow: 0 0 0;
-    }
-
-    .tab:checked:nth-of-type(5) ~ .tab__content:nth-of-type(5) {
+    .tab:checked:nth-of-type(1) ~ .tab__content:nth-of-type(1),
+    .tab:checked:nth-of-type(2) ~ .tab__content:nth-of-type(2)
+     {
         opacity: 1;
         transition: 0.5s opacity ease-in, 0.8s transform ease;
         position: relative;
@@ -81,46 +41,47 @@
         border-bottom-left-radius: 0;
     }
 
+    
+    /*目前所在頁籤*/
     .tab:checked + label {
-        background-color: #fff;
-        box-shadow: 0 -1px 0 #fff inset;
-        cursor: default;
+        background-color: #D6BD98;
+        color: #1A3636;
+        text-shadow: #FCF8F3 0.1em 0.1em 0.1em;
     }
 
-        .tab:checked + label:hover {
-            box-shadow: 0 -1px 0 #fff inset;
-            background-color: #fff;
-        }
+    /*目前所在頁籤:hover*/
+    /*未選中頁籤:hover*/
+    .tab + label:hover, .tab:checked + label:hover {
+        background-color: #FCF8F3;
+        color: #698474;
+        text-shadow: #FCF8F3 0.1em 0.1em 0.1em;
+    }    
 
+    /*未選中頁籤*/
     .tab + label {
         box-shadow: 0 -1px 0 #eee inset;
         border-radius: 6px 6px 0 0;
         cursor: pointer;
         display: block;
         text-decoration: none;
-        color: #333;
+        color: #A3AEAE;
         flex-grow: 3;
         text-align: center;
-        background-color: #f2f2f2;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
+        background-color: #FCF8F3;
         user-select: none;
-        text-align: center;
         transition: 0.3s background-color ease, 0.3s box-shadow ease;
         height: 50px;
         box-sizing: border-box;
         padding: 15px;
+        font-size: 16px;
+        font-weight: bold;
     }
 
-        .tab + label:hover {
-            background-color: #f9f9f9;
-            box-shadow: 0 1px 0 #f4f4f4 inset;
-        }
+
 
 .tab__content {
-    padding: 10px 25px;
-    background-color: transparent;
+    padding: 10px 12px;
+    background-color: #FCF8F3;
     position: absolute;
     width: 100%;
     z-index: -1;
@@ -130,27 +91,18 @@
     border-radius: 6px;
 }
 
-/* boring stuff */
 
 
-h1,
-h2 {
-    margin: 0;
-    color: #444;
-    text-align: center;
-    font-weight: 400;
+.tab-wrap {
+    transition: 0.3s box-shadow ease;
+    border-radius: 6px;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    list-style: none;
+    background-color: #FCF8F3;
+    margin: 15px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-h2 {
-    font-size: 1em;
-    margin-bottom: 30px;
-}
-
-h3 {
-    font-weight: 400;
-}
-
-p {
-    line-height: 1.6;
-    margin-bottom: 20px;
-}

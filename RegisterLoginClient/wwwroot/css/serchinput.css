@@ -36,7 +36,6 @@
     position: relative;
     box-sizing: border-box;
 }
-}
 
 .header_search_form {
     display: flex;
@@ -65,9 +64,9 @@
     font-family: inherit;
 }
 
-    .search_input:focus, .search_input:hover {
-        border: solid 1px var(--primary_light);
-    }
+.search_input:focus, .search_input:hover {
+    border: solid 1px var(--primary_light);
+}
 
 .header_search_btn {
     position: absolute;
@@ -86,13 +85,13 @@
     padding: 0;
 }
 
-    .header_search_btn img {
-        transition: transform 0.3s; /* 平滑过渡效果 */
-    }
+.header_search_btn img {
+    transition: transform 0.3s; /* 平滑过渡效果 */
+}
 
-    .header_search_btn:hover img {
-        transform: scale(1.2); /* 鼠标悬停时放大图片10% */
-    }
+.header_search_btn:hover img {
+    transform: scale(1.2); /* 鼠标悬停时放大图片10% */
+}
 
 .btn-primary {
     height: 52px;

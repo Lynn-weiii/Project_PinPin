@@ -24,5 +24,12 @@ namespace PinPinServer.Models.DTO
 
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
+
+        public int isHoster { get; set; }
+
+        public Decimal? lng { get; set; }
+
+        public Decimal? lat { get; set; }
+
     }
 }

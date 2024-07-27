@@ -19,14 +19,19 @@ namespace PinPinServer.Models.DTO
         [Column("user_id")]
         public int UserId { get; set; }
 
-        [Display(Name = "編輯者")]
+        [Display(Name = "主辦人")]
         public string UserName { get; set; }
 
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
 
-        public List<string?> SharedUserNames { get; set; } = new List<string?>();
+        public Decimal? lng { get; set; }
 
+        public Decimal? lat { get; set; }
+
+        public List<int?> SharedUserIDs { get; set; } = new List<int?>();
+        [Display(Name = "群組成員")]
+        public List<string?> SharedUserNames { get; set; } = new List<string?>();
 
     }
 }
