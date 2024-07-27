@@ -13,7 +13,6 @@ namespace PinPinTest.Controllers
     /// 目前還沒有設修改權限
     /// </summary>
     [Route("api/[controller]")]
-    [ApiController]
     public class categoryController : ControllerBase
     {
         private readonly PinPinContext _context;
