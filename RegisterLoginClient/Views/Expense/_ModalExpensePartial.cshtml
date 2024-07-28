@@ -1,0 +1,79 @@
+﻿@* Views/Shared/_ModalContent.cshtml *@
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div v-if="schedules.length > 0">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>項目</th>
+                                <th>金額</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="schedule in schedules" :key="schedule.id">
+                                <td>{{ a }}</td>
+                                <td>{{ b }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div v-else>
+                    <p>目前沒有行程。</p>
+                </div>
+            </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var a = 123;
+    var b = 456;
+    $(function () {
+        init();
+    })
+    function init() {
+        getRelatedSchedules();
+    }
+    async function getRelatedSchedules() {
+        try {
+            let response = await axios.get(`${baseAddress}/api/schedules/GetRelatedSchedules`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            let data = response.data;
+            console.log(data);
+        } catch (error) {
+            if (error.response) {
+                
+            }
+        }
+    }
+    async function getExpense(scheduleId) {
+        try {
+            let response = await axios.get(`${baseAddress}/api/SplitExpenses/GetExpense`, new URLSearchParams(
+                {
+                    scheduleId: `${scheduleId}`,
+                }), {
+                headers: {
+                    'Authorization': `bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            alert("獲取資料失敗");
+        }
+    }
+</script>

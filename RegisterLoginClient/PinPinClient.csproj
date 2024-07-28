@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <Content Remove="Views\Home\Schedule.cshtml" />
+    <Content Remove="wwwroot\js\ExpenseMain.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +25,10 @@
 
   <ItemGroup>
     <Folder Include="Views\Schdules\Partials\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
 
 </Project>

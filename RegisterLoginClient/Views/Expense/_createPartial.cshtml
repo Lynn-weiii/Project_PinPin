@@ -61,8 +61,8 @@
 
 <script src="~/js/datapopulator.js" asp-append-version="true"></script>
 <script>
-    var user_id = $('#userId');
-    var group_data;
+    let user_id = $('#userId');
+    let group_data;
 
     $(function () {
         init();
@@ -85,9 +85,9 @@
         $('#btnSubmit').on("click", async function (event) {
             event.preventDefault();
 
-            var isValid = true;
-            var mainform = $("#main");
-            var participants = $(".participant");
+            let isValid = true;
+            let mainform = $("#main");
+            let participants = $(".participant");
 
             //判斷表單有無填入
             if (!mainform[0].checkValidity()) {
@@ -97,19 +97,19 @@
 
             // 判斷參與者表單是否填入
             participants.each(function () {
-                var participantForm = $(this);
+                let participantForm = $(this);
                 if (!participantForm[0].checkValidity()) {
                     isValid = false;
                     participantForm.addClass('was-validated');
                 }
             });
 
-            var Total = parseInt($('#totalAmount').val(), 10);
-            var checktotal = 0;
-            var members = $('.amount');
+            let Total = parseInt($('#totalAmount').val(), 10);
+            let checktotal = 0;
+            let members = $('.amount');
 
-            var avgAmount = Math.floor(Total / members.length);
-            var remainder = Total % members.length;
+            let avgAmount = Math.floor(Total / members.length);
+            let remainder = Total % members.length;
 
             members.each(function (index, item) {
                 checktotal += parseInt($(item).val(), 10);
@@ -128,7 +128,7 @@
             }
 
             //整理POST資料
-            var formData = {
+            let formData = {
                 scheduleId: $('#main #scheduleSelect').val(),
                 payerId: $('#main #payerSelect').val(),
                 splitCategoryId: $('#main #categorySelect').val(),
@@ -140,7 +140,7 @@
             }
 
             participants.each(function () {
-                var participantForm = $(this);
+                let participantForm = $(this);
                 formData.participants.push({
                     userId: 0,
                     userName: participantForm.find('#name').val(),
@@ -150,7 +150,7 @@
             });
 
             try {
-                var response = await axios.post(`${baseAddress}/api/SplitExpenses/CreateNewExpense`, formData);
+                let response = await axios.post(`${baseAddress}/api/SplitExpenses/CreateNewExpense`, formData);
                 console.log('成功提交:', response.data);
                 alert('成功提交');
                 $("#btnGetExpense").click();
@@ -182,14 +182,13 @@
 
     async function GetUserSchedules() {
         try {
-            console.log(token);
-            var response = await axios.get(`${baseAddress}/api/schedules/GetRelatedSchedules`, {
+            let response = await axios.get(`${baseAddress}/api/schedules/GetRelatedSchedules`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
 
-            var data = response.data;
+            let data = response.data;
             console.log(data);
 
             populateSelect('#scheduleSelect', response.data);
@@ -201,7 +200,7 @@
 
     async function GetGroupUser() {
         try {
-            var response = await axios.get(`${baseAddress}/api/ScheduleGroups`, {
+            let response = await axios.get(`${baseAddress}/api/ScheduleGroups`, {
                 params: {
                     schedule_id: $('#scheduleSelect').val(),
                 }, 
@@ -246,7 +245,7 @@
     }
 
     function payerSelectchange() {
-        var copydata = { ...group_data };
+        let copydata = { ...group_data };
         delete copydata[$('#payerSelect').val()];
 
         $('#participantBlock').empty();
@@ -258,26 +257,26 @@
 
     function CreateParticipant(name, index) {
 
-        var form = $('<form class="form border border-dark rounded p-3 mb-3 participant" id="participant" novalidate></form>')
-        var legend = $(`<legend>團員${index}</legend>`)
+        let form = $('<form class="form border border-dark rounded p-3 mb-3 participant" id="participant" novalidate></form>')
+        let legend = $(`<legend>團員${index}</legend>`)
 
-        var formGroup = $('<div class="form-group col-md-6"></div>');
+        let formGroup = $('<div class="form-group col-md-6"></div>');
 
-        var nameInputGroup = $('<div class="input-group mb-3"></div>');
-        var nameLabel = $('<span class="input-group-text">團員</span>');
-        var nameInput = $('<input type="text" class="form-control" required>').attr('id', 'name').val(name);
+        let nameInputGroup = $('<div class="input-group mb-3"></div>');
+        let nameLabel = $('<span class="input-group-text">團員</span>');
+        let nameInput = $('<input type="text" class="form-control" required>').attr('id', 'name').val(name);
 
         nameInputGroup.append(nameLabel).append(nameInput);
 
-        var amountInputGroup = $('<div class="input-group mb-3"></div>');
-        var amountLabel = $('<span class="input-group-text">金額</span>');
-        var amountInput = $('<input type="number" class="form-control amount" required>').attr('id', 'amount');
+        let amountInputGroup = $('<div class="input-group mb-3"></div>');
+        let amountLabel = $('<span class="input-group-text">金額</span>');
+        let amountInput = $('<input type="number" class="form-control amount" required>').attr('id', 'amount');
 
         amountInputGroup.append(amountLabel).append(amountInput);
 
-        var checkboxInputGroup = $('<div class="input-group mb-3 d-flex align-items-center"></div>');
-        var checkboxLabel = $('<span class="input-group-text">是否付款</span>');
-        var checkbox = $('<input type="checkbox" class="form-check-input ms-2 required">').attr('id', 'isPaid');
+        let checkboxInputGroup = $('<div class="input-group mb-3 d-flex align-items-center"></div>');
+        let checkboxLabel = $('<span class="input-group-text">是否付款</span>');
+        let checkbox = $('<input type="checkbox" class="form-check-input ms-2 required">').attr('id', 'isPaid');
 
 
         checkboxInputGroup.append(checkboxLabel).append(checkbox);
@@ -293,15 +292,15 @@
     }
 
     async function GetCurrency_category() {
-        var response = await axios.get(`${baseAddress}/api/category/Getcurrency_category`)
-        var data = response.data;
+        let response = await axios.get(`${baseAddress}/api/category/Getcurrency_category`)
+        let data = response.data;
 
         populateSelect('#currencySelect', data);
     }
 
     async function GetSplit_category() {
-        var response = await axios.get(`${baseAddress}/api/category/GetSplitCategories`)
-        var data = response.data;
+        let response = await axios.get(`${baseAddress}/api/category/GetSplitCategories`)
+        let data = response.data;
 
         populateSelect('#categorySelect', data);
     }

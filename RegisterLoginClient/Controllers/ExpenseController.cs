@@ -21,5 +21,11 @@ namespace PinPinClient.Controllers
         {
             return PartialView("_createPartial");
         }
+
+        //GET:Expense/ModalExpense
+        public IActionResult ModalExpense()
+        {
+            return PartialView("_ModalExpensePartial");
+        }
     }
 }
