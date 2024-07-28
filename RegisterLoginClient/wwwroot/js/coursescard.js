@@ -1,38 +1,60 @@
-﻿
-function createCourseItem(course) {
-    var courseItem = document.createElement('div');
+﻿function createCourseCard(course) {
+    const courseItem = document.createElement('div');
     courseItem.className = 'item course_card_owl_item';
     courseItem.innerHTML = `
     <a href="#" class="course_card_link">
-       <div class="course_card">
+        <div class="course_card">
             <div class="course_card_container">
                 <div class="course_card_top">
-                    <div class="course_card_category trans_200"></div>
+                    <div class="course_menu_section">
+                     <div class="dropdown" style="display:none;">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1-${course.id}"
+                            data-bs-toggle="dropdown" aria-expanded="false" style="display:none;">
+                            Dropdown button
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1-${course.id}" style="display:none;">
+                            <li style="display:none;"><a class="dropdown-item" href="#">Action</a></li>
+                            <li style="display:none;"><a class="dropdown-item" href="#">Another action</a></li>
+                            <li style="display:none;"><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <div class="course_card_category trans_200" type="button" id="courseDropdown-${course.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-ellipsis"></i>
+                        </div>
+                        <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}" >
+                            <li><a class="dropdown-item" data-id="${course.id}" data-function="MemberManager">成員管理</a></li>
+                            <li><a class="dropdown-item" data-id="${course.id}"data-name="${course.name}" data-function="Delete">刪除行程</a></li>
+                        </ul>
+                    </div>
+                    </div>
                     <div class="course_card_pic">
-                        <img src="/images/caourse/course_03.jpg">
+                         <img src="/images/caourse/course_03.jpg">
                     </div>
-                    <div class="course_card_content">
-                        <div class="course_card_meta d-flex flex-row align-items-center"></div>
-                        <div class="course_card_title">
-                            <h3>${course.name}</h3>
+                        <div class="course_card_content">
+                            <div class="course_card_meta d-flex flex-row align-items-center"></div>
+                            <div class="course_card_title">
+                                <h3>${course.name}</h3>
+                            </div>
+                            <div class="course_card_author">
+                                <span>by ${course.userName}</span>
+                            </div>
+                            <div class="course_card_rating d-flex flex-row align-items-center">
+                                <h5>${course.startTime}</h5>
+                                <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
+                                <h5>${course.endTime}</h5>
+                            </div>
                         </div>
-                        <div class="course_card_author">
-                            <span>by ${course.userName}</span>
-                        </div>
-                        <div class="course_card_rating d-flex flex-row align-items-center">
-                            <h5>${course.startTime}</h5>
-                            <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
-                            <h5>${course.endTime}</h5>
-                        </div>
-                    </div>
+                     </div>
                 </div>
             </div>
         </div>
-    </a>
+     </a>
     `;
     return courseItem;
 }
-
+ 
+    
 function creategroupCourseItem(gcourse) {
     var gcourseItem = document.createElement('div');
     gcourseItem.className = 'item course_card_owl_item';
@@ -45,18 +67,18 @@ function creategroupCourseItem(gcourse) {
                     <div class="course_card_pic">
                         <img src="/images/caourse/course_03.jpg">
                     </div>
-                    <div class="course_card_content">
-                        <div class="course_card_meta d-flex flex-row align-items-center"></div>
-                        <div class="course_card_title">
-                            <h3>${gcourse.name}</h3>
-                        </div>
-                        <div class="course_card_author">
-                            <span>by ${gcourse.userName}</span>
-                        </div>
-                        <div class="course_card_rating d-flex flex-row align-items-center">
-                            <h5>${gcourse.startTime}</h5>
-                            <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
-                            <h5>${gcourse.endTime}</h5>
+                        <div class="course_card_content">
+                            <div class="course_card_meta d-flex flex-row align-items-center"></div>
+                            <div class="course_card_title">
+                                <h3>${gcourse.name}</h3>
+                            </div>
+                            <div class="course_card_author">
+                                <span>by ${gcourse.userName}</span>
+                            </div>
+                            <div class="course_card_rating d-flex flex-row align-items-center">
+                                <h5>${gcourse.startTime}</h5>
+                                <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
+                                <h5>${gcourse.endTime}</h5>
                         </div>
                     </div>
                 </div>
@@ -66,10 +88,6 @@ function creategroupCourseItem(gcourse) {
     `;
     return gcourseItem;
 }
-
-
-
-
 
 function createAddNewCard() {
     var addNewCard = document.createElement('div');
@@ -90,21 +108,28 @@ function createAddNewCard() {
     return addNewCard;
 }
 
-function renderCourses(data) {
-    var container = document.getElementById('course-container');
-    container.innerHTML = ''; // Clear existing content
+    function renderCourses(data) {
+        var container = document.getElementById('course-container');
+        container.innerHTML = '';
 
-    data.forEach(course => {
-        var courseItem = createCourseItem(course);
-        container.appendChild(courseItem);
-    });
+        data.forEach(course => {
+            var courseItem = createCourseCard(course);
+            container.appendChild(courseItem);
 
-    // Add the "Add New" card
-    var addNewCard = createAddNewCard();
-    container.appendChild(addNewCard);
+            // 初始化 Bootstrap 下拉菜单
+            var dropdownToggleList = [].slice.call(courseItem.querySelectorAll('[data-bs-toggle="dropdown"]'));
+            dropdownToggleList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+        });
 
-    initPopularCoursesSlider('#course-container');
-}
+        // "Add New" 卡片
+        var addNewCard = createAddNewCard();
+        container.appendChild(addNewCard);
+
+        // 初始化轮播等其他功能（假设 initPopularCoursesSlider 是这样做的）
+        initPopularCoursesSlider('#course-container');
+    }
 
 function groupCourses(data2) {
     var gcontainer = document.getElementById('group_course-container');
@@ -114,7 +139,7 @@ function groupCourses(data2) {
         var gcourseItem = creategroupCourseItem(gcourse);
         gcontainer.appendChild(gcourseItem);
     });
-    
+
 
     initPopularCoursesSlider('#group_course-container');
 }

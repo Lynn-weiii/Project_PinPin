@@ -44,8 +44,8 @@
     
     /*目前所在頁籤*/
     .tab:checked + label {
-        background-color: #D6BD98;
-        color: #1A3636;
+        background-color: #D0E7D2;
+        color: #65451F;
         text-shadow: #FCF8F3 0.1em 0.1em 0.1em;
     }
 
@@ -64,7 +64,7 @@
         cursor: pointer;
         display: block;
         text-decoration: none;
-        color: #A3AEAE;
+        color: #CCD3CA;
         flex-grow: 3;
         text-align: center;
         background-color: #FCF8F3;

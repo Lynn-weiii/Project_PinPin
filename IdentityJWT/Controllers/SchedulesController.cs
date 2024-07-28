@@ -249,6 +249,7 @@ namespace PinPinServer.Controllers
         {
             var schedule = await _context.Schedules.FindAsync(id);
 
+
             if (schedule == null)
             {
                 return NotFound();

@@ -19,6 +19,7 @@ builder.Services.AddHttpClient<WeatherService>(client =>
     client.BaseAddress = new Uri("https://api.openweathermap.org");
 });
 
+
 builder.Services.AddSingleton<WeatherService>(provider =>
 {
     var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(WeatherService));

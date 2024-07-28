@@ -27,7 +27,7 @@ namespace PinPinServer.Controllers
         /// <returns>回應格式為JSON，架構為一個Day的列表裡頭包含兩個天氣資訊，分別為上下午，資訊為WeatherDataDTO格式</returns>
         //GET:api/Weather
         [HttpGet]
-        public async Task<ActionResult> Get(double lat, double lon, string units)
+        public async Task<ActionResult> Get(decimal lat, decimal lon, string units)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");

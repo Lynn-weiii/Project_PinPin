@@ -1,5 +1,5 @@
 ﻿<!-- CSS  -->
-<link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" defer />
+<link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/popular_courses_slider.css" rel="stylesheet" />
 <link href="~/css/tabs_style.css" type="text/css" rel="stylesheet" />
@@ -7,25 +7,26 @@
 <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
 
 <!-- JS  -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
 <script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
-
-
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCV7zooAQnROJE-aQusJjkCln2GZGsHrcg&loading=async&callback=initMap">
 </script>
 
+<!-- 其他特定页面需要的 JS  -->
+<script src="~/js/owl.carousel.js" type="text/javascript"></script>
+<script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
+<script src="~/js/coursescard.js" type="text/javascript"></script>
+
 @section Styles{
 <style>
-    body{
-            background: #FCF8F3
-    }
 
+    body {
+        background: #FCF8F3;
+    }
 
     #createbtn, #newschbtn {
         background: #638889;
@@ -87,11 +88,10 @@
         transition: all 0.3s ease; 
     }
 
-        /* 悬停效果 */
-        .course_card_link:hover {
-            box-shadow: 0px 8px 8px #638889; 
-            border-radius: 14px;
-        }
+    .course_card_link:hover {
+        box-shadow: 0px 8px 8px #638889; 
+        border-radius: 14px;
+    }
 </style>
 }
 
@@ -120,8 +120,13 @@
             </div>
         </div>
     </div> 
+    
+
+
+
+
     @*-顯示schedule-*@
-    <div class="row">
+    <div class="row">        
         <div class="tab-wrap">
         <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
             <label for="tab1">我的行程</label>
@@ -134,7 +139,7 @@
                     <div class="row" style="margin-top:1px;margin-bottom:2px">
                         <div class="section_title_container mb-1">
                             <div class="d-flex flex-row align-items-center">
-                            <button id="newschbtn" type="button" class="btn" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;font-weight: bold;">
+                            <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
                                     新增行程
                                 </button>
                             </div>
@@ -220,13 +225,15 @@
 @section Scripts {
      <script>
         $(document).ready(async function () {
-            
+
             setTimeout(function () {
                 console.log('Calling initPopularCoursesSlider');
                 initPopularCoursesSlider();
             }, 5000); 
+
             var baseAddress = "https://localhost:7280";
             var token = localStorage.getItem('token');
+
             $('#errmsg').hide();
             //user發起的主題
             try {
@@ -272,7 +279,6 @@
                 $('.popular_courses_slider').trigger('destroy.owl.carousel');
                 initPopularCoursesSlider();
             });
-
 
             // 進入detail
             $(document).on('click', '.edit_btn', function () {
@@ -329,7 +335,50 @@
                     console.error('Error:', error);
                 }
             });
+            
+            // 删除行程函数
+            $(document).on('click', '.dropdown-item', function (event) {
+                event.preventDefault(); // 阻止默认的链接跳转行为
 
+                var name = $(this).data('name');  
+                var deleteid = $(this).data('id');  
+                var func = $(this).data('function');  
+
+                if (func === 'MemberManager') {
+                    alert('go to manager controller');
+                    console.log('处理成員管理:', deleteid);
+                } else if (func === 'delete') {
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: `您確定要刪除${name}這個行程嗎?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#FF6868",
+                        cancelButtonColor: "#F1F8E8",
+                        confirmButtonText: "確認刪除"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                           /*  deleteSchedule(deleteid)  */ // 传入正确的 deleteid
+                            .then(() => {
+                                Swal.fire({
+                                    title: "已刪除!",
+                                    text: `${name}行程已刪除`,
+                                    icon: "success"
+                                });                                    
+                            })
+                            .catch(error => {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "刪除失敗",
+                                    text: `行程刪除失敗: ${error.message}`
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+            
+            
 
             @*Function Section*@
             // Google Autocomplete
@@ -400,6 +449,29 @@
                 }
             
             }
+
+            //delete schedule
+            // async function deleteSchedule(deleteId) {
+            //     try {
+            //         var response = await fetch(`${baseAddress}/api/Schedules/${deleteId}`, {
+            //             method: 'DELETE',
+            //             headers: {
+            //                 'Authorization': `Bearer ${token}`,
+            //                 'Content-Type': 'application/json'
+            //             }
+            //         });
+
+            //         if (!response.ok) {
+            //             throw new Error('刪除行程失敗');
+            //         }
+
+            //         // 可以在此处进行额外的 UI 更新，例如从页面中移除已删除的行程项
+            //         return true;  // 返回删除成功
+            //     } catch (error) {
+            //         console.error('Error:', error);
+            //         throw error;  // 将错误抛出，以便在调用处捕获
+            //     }
+            // }
 
         });
     </script>

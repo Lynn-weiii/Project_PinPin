@@ -312,10 +312,20 @@ section {
     position: absolute;
     top: 16px;
     left: 16px;
-    height: 27px;
+    width: 30px; /* 设置宽度为30px */
+    height: 30px; /* 设置高度为30px */
     background-color: var(--primary_text);
-    border-radius: 14px;
+    border-radius: 50%; /* 设置为50%确保为圆形 */
+    color: white; /* 设置文字颜色与背景对比 */
+    font-size: 14px; /* 根据需要调整文字大小 */
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center; /* 居中文字 */
+    line-height: 1; /* 根据需要调整行高 */
+    padding: 0; /* 去掉内边距 */
+    box-sizing: border-box;
 }
 
     .course_card_category a {
