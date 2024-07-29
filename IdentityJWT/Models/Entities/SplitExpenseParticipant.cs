@@ -11,7 +11,7 @@ public partial class SplitExpenseParticipant
 
     public int UserId { get; set; }
 
-    public decimal Amount { get; set; }
+    public float Amount { get; set; }
 
     public bool? IsPaid { get; set; }
 

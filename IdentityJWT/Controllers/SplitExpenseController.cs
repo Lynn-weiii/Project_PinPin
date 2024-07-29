@@ -7,6 +7,7 @@ using PinPinServer.Services;
 
 namespace PinPinServer.Controllers
 {
+    //時間、幣別
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -86,6 +87,10 @@ namespace PinPinServer.Controllers
             }
         }
 
+        /// <summary>
+        /// 獲取所有scheduleId行程內的分帳表
+        /// </summary>
+        //Get:/api/SplitExpenses/GetExpense{scheduleId}
         [HttpGet("GetExpense{scheduleId}")]
         public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetExpense(int scheduleId)
         {
@@ -119,6 +124,44 @@ namespace PinPinServer.Controllers
 
 
                 return Ok(ExpenseDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        //Get:/api/SplitExpenses/GetBalance{scheduleId}
+        [HttpGet("GetBalance{scheduleId}")]
+        public async Task<ActionResult<IEnumerable<ExpenseBalanceDTO>>> GetBalance(int scheduleId)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+
+            //檢查有無此行程表
+            bool hasSchedule = await _context.Schedules.AnyAsync(sc => sc.Id == scheduleId);
+            if (!hasSchedule) return NotFound("Not found schedule");
+
+            //檢查使用者有無在此行程
+            bool isInSchedule = await _context.ScheduleGroups.AnyAsync(sg => sg.ScheduleId == scheduleId && sg.UserId == userID);
+            if (!isInSchedule) return Forbid("You can't search not your group");
+
+            try
+            {
+                List<SplitExpense> ExpenseList = await _context.SplitExpenses.Where(se => se.ScheduleId == scheduleId)
+                                                                             .Include(se => se.SplitExpenseParticipants)
+                                                                             .AsNoTracking()
+                                                                             .ToListAsync();
+                List<ExpenseBalanceDTO> members = await _context.ScheduleGroups.Where(sg => sg.ScheduleId == scheduleId)
+                                                                               .Include(sg => sg.User)
+                                                                               .Select(sg => new ExpenseBalanceDTO
+                                                                               {
+                                                                                   UserName = sg.User.Name,
+                                                                                   UserId = sg.UserId,
+                                                                               }).ToListAsync();
+                var ec = new ExpenseCalculator();
+                var d = ec.CalculateBalance(ExpenseList, members, (int)userID);
+                return Ok(d);
             }
             catch (Exception ex)
             {
@@ -232,7 +275,7 @@ namespace PinPinServer.Controllers
             }
 
             //檢查明細金額相加是否等於總金額
-            decimal total = dto.Participants.Sum(participant => participant.Amount);
+            float total = dto.Participants.Sum(participant => participant.Amount);
             if (dto.Amount != total)
             {
                 return BadRequest("The total amount of participants does not match the main amount.");
@@ -391,7 +434,7 @@ namespace PinPinServer.Controllers
             }
 
             //檢查明細金額相加是否等於總金額
-            decimal total = dto.Participants.Sum(participant => participant.Amount);
+            float total = dto.Participants.Sum(participant => participant.Amount);
             if (dto.Amount != total)
             {
                 return BadRequest("The total amount of participants does not match the main amount.");

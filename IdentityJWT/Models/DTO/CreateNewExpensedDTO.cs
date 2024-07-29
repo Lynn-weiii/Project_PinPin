@@ -21,8 +21,8 @@ namespace PinPinServer.Models.DTO
         public int CurrencyId { get; set; }
 
         [Required(ErrorMessage = "Amount is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
-        public decimal Amount { get; set; }
+        [Range(0.01, float.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public float Amount { get; set; }
 
         public string Remark { get; set; } = string.Empty;
 
