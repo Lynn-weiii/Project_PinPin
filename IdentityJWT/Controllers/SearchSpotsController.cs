@@ -45,7 +45,7 @@ namespace PinPinServer.Controllers
 
             var apiKey = _configuration["GoogleMaps:ApiKey"];
             var client = _httpClientFactory.CreateClient();
-            var url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={query}&key={apiKey}";
+            var url = $"https://maps.googleapis.com/maps/api/place/textsearch/json?query={query}&language=zh-TW&key={apiKey}";
             var response = await client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
@@ -60,6 +60,30 @@ namespace PinPinServer.Controllers
 
             return Ok(result);
         }
+
+        //GET:api/SearchSpots/GetDetails
+        [HttpGet("GetDetails")]
+        public async Task<IActionResult> GetDetails(string placeId)
+        {
+            if (string.IsNullOrEmpty(placeId))
+            {
+                return BadRequest("placeId parameter is required.");
+            }
+
+            var apiKey = _configuration["GoogleMaps:ApiKey"];
+            var client = _httpClientFactory.CreateClient();
+            var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&language=zh-TW&key={apiKey}";
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return StatusCode((int)response.StatusCode, response.ReasonPhrase);
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            return Ok(result);
+        }
+
 
         //GET:api/SearchSpots/GetPhoto
         [HttpGet("GetPhoto")]

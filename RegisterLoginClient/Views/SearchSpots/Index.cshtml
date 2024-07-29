@@ -5,6 +5,60 @@
             height: 200px;
             object-fit: cover;
         }
+
+        .map-details {
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .map-details-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a73e8;
+        }
+
+        .map-details-address {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .map-details-rating {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .map-details-hours {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .map-details-reviews-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .map-details-reviews {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .map-details-review {
+            background-color: #f1f3f4;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+            .map-details-review strong {
+                color: #1a73e8;
+            }
     </style>
 }
 <meta charset="UTF-8">
@@ -24,6 +78,28 @@
         </div>
     </div>
     <div id="results" class="row"></div>
+
+    <!-- Button trigger modal -->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">詳細資訊</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detailContent">
+                        <p>載入地點詳細資訊</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button> 
+                    <button type="button" class="btn btn-primary">加入願望清單</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts
@@ -33,6 +109,7 @@
         //var baseAddress = "https://localhost:xx";       //Staging Server(Testing Server)
         //var baseAddress = "https://localhost:yy";       //Production Server(上線營運Server)
 
+        //搜尋地點、關鍵字
         async function search() {
             const searchCity = document.getElementById('searchCity').value;
             const searchKeyword = document.getElementById('searchKeyword').value;
@@ -83,9 +160,6 @@
                         const topFoodResult = processResults(foodData.results, 3);
                         const topAttractionResults = processResults(attractionsData.results, 3);
                         const topActivitiesResults = processResults(activitiesData.results, 3);
-                        // const sortedFoodResults = processResults(foodData.results);
-                        // const sortedAttractionsResults = processResults(attractionsData.results);
-                        // const sortedActivitiesResults = processResults(activitiesData.results);
 
                         await displayResults(topFoodResult, '美食', searchCity);
                         await displayResults(topAttractionResults, '景點', searchCity);
@@ -99,8 +173,7 @@
             }
         }
 
-
-
+        //取得地點照片
         async function getPhotoUrl(photoReference) {
             try {
                 const response = await axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
@@ -115,7 +188,7 @@
             }
         }
 
-        //以card形式顯示[美食]、[景點]、[體驗活動]搜尋結果
+        //以card形式顯示搜尋結果
         async function displayResults(sortedResults, category, searchCity) {
             const resultsContainer = document.getElementById('results');
             if (sortedResults.length > 0) {
@@ -137,17 +210,65 @@
                                 <p class="card-text">${place.formatted_address}</p>
                                 <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
                                 <a href="#" class="btn btn-primary" target="_blank">加入願望清單</a>
-                                <a href="#" class="btn btn-primary" target="_blank">詳細資訊</a>
+                                        <button type="button" class="btn btn-primary btnDetail" data-bs-toggle="modal" data-bs-target="#exampleModal" data-place-id="${place.place_id}">
+                                    詳細資訊
+                                </button>
                             </div>
                         </div>
                     `;
                     resultsContainer.appendChild(card);
                 }
+                const detailButtons = document.querySelectorAll('.btnDetail');
+                detailButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const placeId = e.currentTarget.getAttribute('data-place-id');
+                        loadDetails(placeId);
+                    });
+                });
             }
         }
 
         //在user點選地點的[詳細資料]後，以跳出視窗顯示評論、營業時間、價格
+        async function loadDetails(placeId) {
+            console.log(`placeId=${placeId}`);
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = '載入中...';
 
+            try {
+                const response = await axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
+                    params: {placeId}
+                });
+
+                console.log('api response', response);
+                const details = response.data.result;
+
+                if (details) {
+                    detailContent.innerHTML = `
+                            <div class="map-details">
+                            <h5 class="map-details-title">${details.name}</h5>
+                            <p class="map-details-address">${details.formatted_address}</p>
+                            <p class="map-details-rating">評價: ${details.rating} (${details.user_ratings_total} reviews)</p>
+                            <p class="map-details-hours"><strong>營業時間:</strong><br>
+                            ${details.opening_hours ? details.opening_hours.weekday_text.join('<br>') : '未提供'}</p>
+                            <h6 class="map-details-reviews-title">評論</h6>
+                            <ul class="map-details-reviews">
+                                ${details.reviews ? details.reviews.map(review => `
+                                    <li class="map-details-review">
+                                        <strong>${review.author_name}:</strong> ${review.text}
+                                    </li>
+                                `).join('') : '<li>無評論</li>'}
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    detailContent.innerHTML = '無法找到此地點的詳細資料。';
+                }
+                
+            } catch(error) { 
+                console.error('Error fetching details', error);
+                detailContent.innerHTML = '無法加載詳細資料，請稍後再試';
+            }
+        }
 
         //在user點選地點的[加入願望清單]後，加到DB願望清單中
     </script>
