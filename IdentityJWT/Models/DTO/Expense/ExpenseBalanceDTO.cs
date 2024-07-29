@@ -1,4 +1,4 @@
-﻿namespace PinPinServer.Models.DTO
+﻿namespace PinPinServer.Models.DTO.Expense
 {
     public class ExpenseBalanceDTO
     {

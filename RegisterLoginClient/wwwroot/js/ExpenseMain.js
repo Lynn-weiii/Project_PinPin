@@ -16,6 +16,7 @@ $(function () {
         setup() {
           const schedules = ref([]);
           const expenses = ref([]);
+          const userExpenses = ref([]);
           const loading = ref(true);
           const scheduleId = ref(null);
           const scheduleName = ref("");
@@ -89,11 +90,20 @@ $(function () {
             }
           };
 
-          const getUserExpense = async (id, name) => {
+          const getUserExpense = async (id, name, memberid) => {
             userName.value = name;
             loading.value = true;
             try {
-              
+              let response = await axios.get(
+                `${baseAddress}/api/SplitExpenses/GetUserExpense${id}&${memberid}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              userExpenses.val = response.data;
+              console.log(userExpenses.val);
             } catch (error) {
               console.log(error);
             } finally {
@@ -109,11 +119,13 @@ $(function () {
           return {
             schedules,
             expenses,
+            userName,
             loading,
             scheduleId,
             scheduleName,
             getSchedules,
             getScheduleExpense,
+            getUserExpense,
             goBack,
             init,
           };

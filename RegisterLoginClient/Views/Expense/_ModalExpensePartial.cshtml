@@ -70,7 +70,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="expens in expenses" :key="expens.userName">
+                                    <tr v-for="expens in expenses" :key="expens.userId" v-on:click="getUserExpense(scheduleId,expens.userName,expens.userId)">
                                         <td>{{ expens.userName }}</td>
                                         <td class="text-end">{{ expens.balance }}$</td>
                                         <td class="text-end">{{ expens.isPaidBalance }}$</td>
@@ -100,7 +100,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 ﻿using PinPinServer.Models;
-using PinPinServer.Models.DTO;
+using PinPinServer.Models.DTO.Expense;
 
 namespace PinPinServer.Services
 {
