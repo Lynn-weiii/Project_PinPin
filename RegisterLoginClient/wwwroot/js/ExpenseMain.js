@@ -10,7 +10,7 @@ $(function () {
       let data = partialresponse.data;
       $("#modal-container").html(data);
 
-      const { createApp, ref, onMounted } = Vue;
+      const { createApp, ref, onMounted, nextTick } = Vue;
 
       createApp({
         setup() {
@@ -19,6 +19,7 @@ $(function () {
           const loading = ref(true);
           const scheduleId = ref(null);
           const scheduleName = ref("");
+          const userName = ref("");
 
           //獲取使用者有加入的行程
           const getSchedules = async () => {
@@ -39,6 +40,24 @@ $(function () {
             } finally {
               loading.value = false;
             }
+          };
+
+          //初始化彈出視窗
+          const init = () => {
+            var popoverTriggerList = [].slice.call(
+              document.querySelectorAll('[data-bs-toggle="popover"]')
+            );
+            var popoverList = popoverTriggerList.map(function (
+              popoverTriggerEl
+            ) {
+              console.log("ok");
+              return new bootstrap.Popover(popoverTriggerEl);
+            });
+          };
+
+          const goBack = () => {
+            $("#ExpenseModal").modal("hide");
+            getSchedules();
           };
 
           //獲取某行程的分帳表
@@ -64,13 +83,25 @@ $(function () {
               console.log(error);
             } finally {
               loading.value = false;
+              nextTick(() => {
+                init();
+              });
             }
           };
 
-          const goBack = () => {
-            $("#ExpenseModal").modal("hide");
-            getSchedules();
+          const getUserExpense = async (id, name) => {
+            userName.value = name;
+            loading.value = true;
+            try {
+              
+            } catch (error) {
+              console.log(error);
+            } finally {
+              loading.value = false;
+              init();
+            }
           };
+
           onMounted(() => {
             getSchedules();
           });
@@ -84,6 +115,7 @@ $(function () {
             getSchedules,
             getScheduleExpense,
             goBack,
+            init,
           };
         },
       }).mount("#vue-container");
@@ -103,6 +135,8 @@ $("#btnCreateExpense").on("click", async () => {
     alert("獲取資料失敗");
   }
 });
+
+$("#btnGetExpense").on("click", () => {});
 
 function ShowDetail() {
   $("#DataTable tbody")

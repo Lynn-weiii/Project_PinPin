@@ -148,7 +148,7 @@ namespace PinPinServer.Controllers
 
             try
             {
-                List<SplitExpense> ExpenseList = await _context.SplitExpenses.Where(se => se.ScheduleId == scheduleId)
+                List<SplitExpense> expenseList = await _context.SplitExpenses.Where(se => se.ScheduleId == scheduleId)
                                                                              .Include(se => se.SplitExpenseParticipants)
                                                                              .AsNoTracking()
                                                                              .ToListAsync();
@@ -160,8 +160,49 @@ namespace PinPinServer.Controllers
                                                                                    UserId = sg.UserId,
                                                                                }).ToListAsync();
                 var ec = new ExpenseCalculator();
-                var d = ec.CalculateBalance(ExpenseList, members, (int)userID);
+                var d = ec.CalculateBalance(expenseList, members, (int)userID);
                 return Ok(d);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("GetUserExpense")]
+        public async Task<ActionResult> GetUserExpense(int scheduleId, int memberId)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+
+            //檢查是否自己搜尋自己
+            if (memberId == userID)
+                return BadRequest("You can't search yourself");
+
+            //檢查有無此行程表
+            bool hasSchedule = await _context.Schedules.AnyAsync(sc => sc.Id == scheduleId);
+            if (!hasSchedule) return NotFound("Not found schedule");
+
+            //檢查使用者和團員有無在此行程
+            bool areBothInSchedule = await _context.ScheduleGroups
+                                       .Where(sg => sg.ScheduleId == scheduleId)
+                                       .CountAsync(sg => sg.UserId == userID || sg.UserId == memberId) == 2;
+
+            if (!areBothInSchedule) return Forbid("You or member not in group");
+
+            try
+            {
+                //找所有跟使用者與指定團員的分帳表
+                var expenseList = await _context.SplitExpenses
+                                                .Where(se => se.ScheduleId == scheduleId &&
+                                                             (se.SplitExpenseParticipants.Any(sep => sep.UserId == userID) ||
+                                                              se.PayerId == userID))
+                                                .Include(se => se.SplitExpenseParticipants)
+                                                .AsNoTracking()
+                                                .ToListAsync();
+
+
+                return Ok(expenseList);
             }
             catch (Exception ex)
             {

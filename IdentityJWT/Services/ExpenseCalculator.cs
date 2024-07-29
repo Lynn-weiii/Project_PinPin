@@ -1,5 +1,4 @@
-﻿using NuGet.Protocol.Core.Types;
-using PinPinServer.Models;
+﻿using PinPinServer.Models;
 using PinPinServer.Models.DTO;
 
 namespace PinPinServer.Services
@@ -15,9 +14,9 @@ namespace PinPinServer.Services
             //先算出誰欠我
             foreach (var sep in payYourself)
             {
-                var member = members.First(m=>m.UserId==sep.UserId);
+                var member = members.First(m => m.UserId == sep.UserId);
                 member.Balance += sep.Amount;
-                if (sep.IsPaid==false)
+                if (sep.IsPaid == false)
                     member.IsPaidBalance += sep.Amount;
             }
 
