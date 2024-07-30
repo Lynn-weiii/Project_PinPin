@@ -17,5 +17,7 @@
         public float Amount { get; set; }
 
         public string? Remark { get; set; }
+
+        public List<ExpenseParticipantDTO> ExpenseParticipants { get; set; } = [];
     }
 }

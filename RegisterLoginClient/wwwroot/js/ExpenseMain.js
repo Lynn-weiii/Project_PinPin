@@ -10,7 +10,7 @@ $(function () {
       let data = partialresponse.data;
       $("#modal-container").html(data);
 
-      const { createApp, ref, onMounted, nextTick } = Vue;
+      const { createApp, ref, onMounted, nextTick, computed } = Vue;
 
       createApp({
         setup() {
@@ -21,11 +21,74 @@ $(function () {
           const scheduleId = ref(null);
           const scheduleName = ref("");
           const userName = ref("");
+          const modalStack = ref([]);
+
+          const getCurrentModalId = () => {
+            return modalStack.value.length
+              ? modalStack.value[modalStack.value.length - 1]
+              : null;
+          };
+
+          const getPreviousModalId = () => {
+            return modalStack.value.length > 1
+              ? modalStack.value[modalStack.value.length - 2]
+              : null;
+          };
+
+          const showModal = (modalId) => {
+            modalStack.value.push(modalId);
+            $(`#${getCurrentModalId()}`).modal("show");
+          };
+
+          const hideModal = () => {
+            if (getCurrentModalId() !== null) {
+              $(`#${getCurrentModalId()}`).modal("hide");
+            }
+          };
+
+          const SwitchModal = (modalId) => {
+            hideModal();
+            showModal(modalId);
+          };
+
+          const showModalWithData = async (modalId, dataFunction) => {
+            SwitchModal(modalId);
+            loading.value = true;
+            try {
+              await dataFunction();
+            } catch (error) {
+              console.log(error);
+            } finally {
+              loading.value = false;
+              nextTick(() => {
+                init();
+              });
+            }
+          };
+
+          //初始化彈出視窗
+          const init = () => {
+            var popoverTriggerList = [].slice.call(
+              document.querySelectorAll('[data-bs-toggle="popover"]')
+            );
+            var popoverList = popoverTriggerList.map(function (
+              popoverTriggerEl
+            ) {
+              return new bootstrap.Popover(popoverTriggerEl);
+            });
+          };
+
+          const goBack = () => {
+            let PmodalId = getPreviousModalId();
+            let CmodalId = getCurrentModalId();
+            modalStack.value.pop();
+            modalStack.value.pop();
+            $(`#${CmodalId}`).modal("hide");
+            showModal(PmodalId);
+          };
 
           //獲取使用者有加入的行程
           const getSchedules = async () => {
-            $("#ScheduleModal").modal("show");
-            loading.value = true;
             try {
               let response = await axios.get(
                 `${baseAddress}/api/schedules/GetRelatedSchedules`,
@@ -38,35 +101,13 @@ $(function () {
               schedules.value = response.data;
             } catch (error) {
               console.log(error);
-            } finally {
-              loading.value = false;
             }
-          };
-
-          //初始化彈出視窗
-          const init = () => {
-            var popoverTriggerList = [].slice.call(
-              document.querySelectorAll('[data-bs-toggle="popover"]')
-            );
-            var popoverList = popoverTriggerList.map(function (
-              popoverTriggerEl
-            ) {
-              console.log("ok");
-              return new bootstrap.Popover(popoverTriggerEl);
-            });
-          };
-
-          const goBack = () => {
-            $("#ExpenseModal").modal("hide");
-            getSchedules();
           };
 
           //獲取某行程的分帳表
           const getScheduleExpense = async (id, name) => {
             scheduleId.value = id;
             scheduleName.value = name;
-            loading.value = true;
-            console.log(scheduleId.value);
             try {
               let response = await axios.get(
                 `${baseAddress}/api/SplitExpenses/GetBalance${scheduleId.value}`,
@@ -77,57 +118,62 @@ $(function () {
                 }
               );
               expenses.value = response.data;
-
-              $("#ScheduleModal").modal("hide");
-              $("#ExpenseModal").modal("show");
             } catch (error) {
               console.log(error);
-            } finally {
-              loading.value = false;
-              nextTick(() => {
-                init();
-              });
             }
           };
 
-          const getUserExpense = async (id, name, memberid) => {
+          //獲取某行程的分帳表
+          const getUserExpense = async (name, memberid) => {
             userName.value = name;
-            loading.value = true;
             try {
               let response = await axios.get(
-                `${baseAddress}/api/SplitExpenses/GetUserExpense${id}&${memberid}`,
+                `${baseAddress}/api/SplitExpenses/GetUserExpense${scheduleId.value}&${memberid}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
                   },
                 }
               );
-              userExpenses.val = response.data;
-              console.log(userExpenses.val);
+              userExpenses.value = response.data;
             } catch (error) {
               console.log(error);
-            } finally {
-              loading.value = false;
-              init();
             }
           };
 
+          const totalBalance = computed(() => {
+            return expenses.value.reduce(
+              (sum, expens) => sum + expens.isPaidBalance,
+              0
+            );
+          });
+
+          const totalUserBalance = computed(() => {
+            return userExpenses.value.reduce(
+              (sum, expens) => sum + expens.amount,
+              0
+            );
+          });
+
           onMounted(() => {
-            getSchedules();
+            showModalWithData("ScheduleModal", getSchedules);
           });
 
           return {
+            showModalWithData,
             schedules,
             expenses,
+            userExpenses,
             userName,
-            loading,
             scheduleId,
             scheduleName,
-            getSchedules,
+            totalBalance,
+            totalUserBalance,
+            loading,
+            goBack,
             getScheduleExpense,
             getUserExpense,
-            goBack,
-            init,
+            getScheduleExpense,
           };
         },
       }).mount("#vue-container");

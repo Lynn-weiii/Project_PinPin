@@ -54,7 +54,7 @@ namespace PinPinServer.Controllers
         /// <summary>
         /// 獲取付款人為user的所有付費表
         /// </summary>
-        //Get:api/SplitExpenses/GetExpense
+        //Get:api/SplitExpenses/GetUserExpense
         [HttpGet("GetExpense")]
         public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetUserExpense()
         {
@@ -90,9 +90,9 @@ namespace PinPinServer.Controllers
         /// <summary>
         /// 獲取所有scheduleId行程內的分帳表
         /// </summary>
-        //Get:api/SplitExpenses/GetExpense{scheduleId}
-        [HttpGet("GetExpense{scheduleId}")]
-        public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetExpense(int scheduleId)
+        //Get:api/SplitExpenses/GetScheduleIdExpense{scheduleId}
+        [HttpGet("GetScheduleIdExpense{scheduleId}")]
+        public async Task<ActionResult<IEnumerable<ExpenseDTO>>> GetScheduleIdExpense(int scheduleId)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
@@ -131,6 +131,9 @@ namespace PinPinServer.Controllers
             }
         }
 
+        /// <summary>
+        /// 獲取某個行程的使用者與所有團員之間的分帳關西
+        /// </summary>
         //Get:api/SplitExpenses/GetBalance{scheduleId}
         [HttpGet("GetBalance{scheduleId}")]
         public async Task<ActionResult<IEnumerable<ExpenseBalanceDTO>>> GetBalance(int scheduleId)
@@ -159,6 +162,7 @@ namespace PinPinServer.Controllers
                                                                                    UserName = sg.User.Name,
                                                                                    UserId = sg.UserId,
                                                                                }).ToListAsync();
+                members.Remove(members.First(m => m.UserId == userID));
                 var ec = new ExpenseCalculator();
                 var d = ec.CalculateBalance(expenseList, members, (int)userID);
                 return Ok(d);
@@ -169,9 +173,12 @@ namespace PinPinServer.Controllers
             }
         }
 
+        /// <summary>
+        /// 獲取某個行程的使用者與團員之間的分帳關西
+        /// </summary>
         //api/SplitExpenses/GetUserExpense{scheduleId}&{memberId}
         [HttpGet("GetUserExpense{scheduleId}&{memberId}")]
-        public async Task<ActionResult> GetUserExpense(int scheduleId, int memberId)
+        public async Task<ActionResult<IEnumerable<ExpenseUserDTO>>> GetUserExpense(int scheduleId, int memberId)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
@@ -194,35 +201,35 @@ namespace PinPinServer.Controllers
             try
             {
                 //找所有跟使用者與指定團員的分帳表
-                //!!!!!!!!!邏輯錯誤
-                //!!!!!!!!!!行程詳細分帳頁面會有自己
                 var expenseList = await _context.SplitExpenses
-                                                .Where(se => se.ScheduleId == scheduleId &&
-                                                             (se.SplitExpenseParticipants.Any(sep => sep.UserId == userID) ||
-                                                              se.PayerId == userID))
-                                                .Include(se => se.SplitExpenseParticipants)
-                                                .Include(se=>se.SplitCategory)
-                                                .AsNoTracking()
-                                                .ToListAsync();
+                                        .Where(se => se.ScheduleId == scheduleId && (se.PayerId == userID) || (se.PayerId == memberId && se.SplitExpenseParticipants
+                                        .Any(sep => sep.UserId == userID)))
+                                        .Include(se => se.SplitExpenseParticipants)
+                                        .Include(se => se.SplitCategory)
+                                        .AsNoTracking()
+                                        .ToListAsync();
 
                 List<ExpenseUserDTO> expenseUsers = new List<ExpenseUserDTO>();
                 foreach (var expense in expenseList)
                 {
                     ExpenseUserDTO dto = new ExpenseUserDTO();
+                    dto.ExpenseId = expense.Id;
                     if (expense.PayerId == userID)
                     {
                         dto.ExpenseName = expense.Name;
                         dto.ExpenseCategory = expense.SplitCategory.Category;
                         //!!!!!!!!!!!!!代辦幣別
                         dto.Amount = expense.SplitExpenseParticipants.First(sep => sep.UserId == memberId).Amount;
+                        dto.IsPaid = expense.SplitExpenseParticipants.First(sep => sep.UserId == memberId).IsPaid;
                     }
-                    else if(expense.PayerId==memberId)
+                    else if (expense.PayerId == memberId)
                     {
                         dto.ExpenseName = expense.Name;
                         dto.ExpenseCategory = expense.SplitCategory.Category;
                         //!!!!!!!!!!!!!代辦幣別
                         dto.Amount = expense.SplitExpenseParticipants.First(sep => sep.UserId == userID).Amount;
-                        dto.Amount = dto.Amount > 0 ? dto.Amount*-1 : throw new Exception("LogicError");
+                        dto.Amount = dto.Amount > 0 ? dto.Amount * -1 : throw new Exception("LogicError");
+                        dto.IsPaid = expense.SplitExpenseParticipants.First(sep => sep.UserId == userID).IsPaid;
                     }
                     else
                     {
@@ -238,17 +245,23 @@ namespace PinPinServer.Controllers
             }
         }
 
-        //POST:api/SplitExpenses/GetExpense_participant
-        [HttpPost("GetExpense_participant")]
-        public async Task<ActionResult<IEnumerable<ExpenseParticipantDTO>>> GetExpense_participant([FromForm] int Id)
+        /// <summary>
+        /// 獲取指定分帳表的主表和所有明細
+        /// </summary>
+        //Get:api/SplitExpenses/GetExpense{id}
+        [HttpGet("GetExpense{id}")]
+        public async Task<ActionResult<ExpenseDTO>> GetExpense(int id)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
 
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 
+            bool isExist = _context.SplitExpenses.Any(se => se.Id == id);
+            if (!isExist) return NotFound("Not expense found for this id");
+
             //確認要查詢表的行程團是否有user
             List<int> userIds = await _context.SplitExpenses
-                .Where(se => se.Id == Id)
+                .Where(se => se.Id == id)
                 .Include(se => se.Schedule)
                 .ThenInclude(s => s.ScheduleGroups)
                 .SelectMany(se => se.Schedule.ScheduleGroups.Select(sg => sg.UserId))
@@ -257,19 +270,33 @@ namespace PinPinServer.Controllers
 
             try
             {
-                List<ExpenseParticipantDTO> participantDTOs = await _context.SplitExpenseParticipants
-                    .AsNoTracking()
-                    .Where(participant => participant.SplitExpenseId == Id)
-                    .Select(participant => new ExpenseParticipantDTO
+                SplitExpense expense = _context.SplitExpenses
+                    .Include(se => se.Schedule)
+                    .Include(se => se.Payer)
+                    .Include(se => se.SplitCategory)
+                    .Include(se => se.Currency)
+                    .Include(se => se.SplitExpenseParticipants)
+                    .ThenInclude(sep => sep.User)
+                    .First(se => se.Id == id);
+                ExpenseDTO dto = new ExpenseDTO
+                {
+                    Id = expense.Id,
+                    Name = expense.Name,
+                    Schedule = expense.Schedule.Name,
+                    Payer = expense.Payer.Name,
+                    Category = expense.SplitCategory.Category,
+                    Currency = expense.Currency.Name,
+                    Amount = expense.Amount,
+                    Remark = expense.Remark,
+                    ExpenseParticipants = expense.SplitExpenseParticipants.Select(sep => new ExpenseParticipantDTO
                     {
-                        UserName = participant.User.Name,
-                        Amount = participant.Amount,
-                        IsPaid = participant.IsPaid,
-
-                    }).ToListAsync();
-
-
-                return Ok(participantDTOs);
+                        UserId = sep.UserId,
+                        UserName = sep.User.Name,
+                        Amount = sep.Amount,
+                        IsPaid = sep.IsPaid,
+                    }).ToList(),
+                };
+                return Ok(dto);
             }
             catch (Exception ex)
             {
