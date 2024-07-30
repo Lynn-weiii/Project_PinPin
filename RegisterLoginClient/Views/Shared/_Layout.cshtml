@@ -46,9 +46,128 @@
                         <a id="logout" class="nav-link text-dark" style="display:none" asp-area="" asp-controller="" asp-action="">登出</a>
                     </li>
                 </ul>
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideBarOffcanvas" aria-controls="sideBarOffcanvas">
+                    側邊欄
+                </button>
             </div>
         </nav>
     </header>
+
+    <!-- 聊天室側邊欄 offcanvas start -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="sideBarOffcanvas" aria-labelledby="sideBarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <!-- 側邊欄頁籤Navs and tabs start -->
+            <ul class="nav nav-tabs" id="sideBarOffcanvasLabel">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">願望清單</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">聊天室</a>
+                </li>
+            </ul>
+            <!-- 側邊欄頁籤Navs and tabs end -->
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- accordion start -->
+            <div class="accordion accordion-flush" id="wishlist_accordionFlush">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            願望清單＃1
+                        </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
+                         data-bs-parent="#wishlist_accordionFlush">
+                        <div class="accordion-body d-flex">
+                            <!-- 行程卡片start -->
+                            <div class="card m-1" style="width: 10rem;">
+                                <img src="../images/wishlist1.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">行程1</h5>
+                                    <p class="card-text">地址</p>
+                                    <a href="#" class="btn btn-primary">加入行程</a>
+                                </div>
+                            </div>
+                            <div class="card m-1" style="width: 10rem;">
+                                <img src="../images/wishlist2.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">行程2</h5>
+                                    <p class="card-text">地址</p>
+                                    <a href="#" class="btn btn-primary">加入行程</a>
+                                </div>
+                            </div>
+                            <!-- 行程卡片end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            願望清單＃2
+                        </button>
+                    </h2>
+                    <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo"
+                         data-bs-parent="#wishlist_accordionFlush">
+                        <div class="accordion-body d-flex">
+                            <div class="card m-1" style="width: 10rem;">
+                                <img src="../images/wishlist1.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">行程1</h5>
+                                    <p class="card-text">地址</p>
+                                    <a href="#" class="btn btn-primary">加入行程</a>
+                                </div>
+                            </div>
+                            <div class="card m-1" style="width: 10rem;">
+                                <img src="../images/wishlist2.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">行程2</h5>
+                                    <p class="card-text">地址</p>
+                                    <a href="#" class="btn btn-primary">加入行程</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                aria-controls="flush-collapseThree">
+                            願望清單＃3
+                        </button>
+                    </h2>
+                    <div id="flush-collapseThree" class="accordion-collapse collapse"
+                         aria-labelledby="flush-headingThree" data-bs-parent="#wishlist_accordionFlush">
+                        <div class="accordion-body d-flex">
+                            <div class="card m-1" style="width: 10rem;">
+                                <img src="../images/wishlist1.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">行程1</h5>
+                                    <p class="card-text">地址</p>
+                                    <a href="#" class="btn btn-primary">加入行程</a>
+                                </div>
+                            </div>
+                            <div class="card m-1" style="width: 10rem;">
+                                <img src="../images/wishlist2.jpg" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">行程2</h5>
+                                    <p class="card-text">地址</p>
+                                    <a href="#" class="btn btn-primary">加入行程</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- accordion end -->
+        </div>
+    </div>
+
+
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -60,7 +179,7 @@
             &copy; 2024 - RegisterLoginClient - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"" asp-fallback-src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" asp-fallback-src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/js/bootstrap.min.js" asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/axios/axios.min.js" asp-append-version="true"></script>
