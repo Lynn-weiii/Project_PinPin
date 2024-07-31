@@ -11,7 +11,8 @@ using System.Text;
 
 namespace PinPinServer.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    //僅有admin權限可使用 [Authorize(Roles = "Admin")]
+    //僅有User權限可使用 [Authorize(Roles = "User")]
     [EnableCors("PinPinPolicy")]
     [Route("api/[controller]")]
     [ApiController]
