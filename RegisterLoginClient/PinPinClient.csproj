@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Chatroom\" />
     <Folder Include="Views\Schdules\Partials\" />
   </ItemGroup>
 
