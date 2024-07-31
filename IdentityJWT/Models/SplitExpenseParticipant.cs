@@ -7,6 +7,8 @@ namespace PinPinServer.Models;
 
 public partial class SplitExpenseParticipant
 {
+    public int Id { get; set; }
+
     public int SplitExpenseId { get; set; }
 
     public int UserId { get; set; }
