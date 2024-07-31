@@ -15,7 +15,7 @@ namespace PinPinServer.Services
         }
 
         //呼叫獲取天氣資料的API
-        public async Task<string> GetWeatherData(string units, double lat, double lon)
+        public async Task<string> GetWeatherData(string units, decimal lat, decimal lon)
         {
             string baseaddress = $"BaseAddress: {_httpClient.BaseAddress}";
             string weatherAPI = $"data/2.5/forecast?lat={lat}&lon={lon}&appid={_apiKey}&units={units}";

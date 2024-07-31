@@ -18,6 +18,8 @@
 
         public string? Remark { get; set; }
 
+        public string? CreatedAt { get; set; }
+
         public List<ExpenseParticipantDTO> ExpenseParticipants { get; set; } = [];
     }
 }

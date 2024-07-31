@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Expense Sharing Modal</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#expenseModal"
+    >
+      View Expense Details
+    </button>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="expenseModal"
+      tabindex="-1"
+      aria-labelledby="expenseModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="expenseModalLabel">
+              <i class="fa-solid fa-receipt"></i> Expense Sharing Details
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <h6>
+                <strong><i class="fa-solid fa-user"></i> Payer's Name:</strong>
+              </h6>
+              <p id="payerName">John Doe</p>
+            </div>
+            <div class="mb-3">
+              <h6>
+                <strong><i class="fa-solid fa-tags"></i> Type:</strong>
+              </h6>
+              <p id="expenseType">Food</p>
+            </div>
+            <div class="mb-3">
+              <h6>
+                <strong><i class="fa-solid fa-note-sticky"></i> Notes:</strong>
+              </h6>
+              <p id="expenseNotes">Dinner at a restaurant</p>
+            </div>
+            <div class="mb-3">
+              <h6>
+                <strong
+                  ><i class="fa-solid fa-map-marker-alt"></i> Trip Name:</strong
+                >
+              </h6>
+              <p id="tripName">Weekend Getaway</p>
+            </div>
+            <div class="mb-3">
+              <h6>
+                <strong
+                  ><i class="fa-solid fa-clock"></i> Creation Time:</strong
+                >
+              </h6>
+              <p id="creationTime">2024-07-31 18:45</p>
+            </div>
+            <div class="mb-3">
+              <h6>
+                <strong
+                  ><i class="fa-solid fa-dollar-sign"></i> Total Amount:</strong
+                >
+              </h6>
+              <p id="totalAmount">$200.00</p>
+            </div>
+            <div class="mb-3">
+              <h6>
+                <strong
+                  ><i class="fa-solid fa-list"></i> Detailed Breakdown of
+                  Expenses:</strong
+                >
+              </h6>
+              <ul class="list-group" id="expenseBreakdown">
+                <li class="list-group-item">Item 1: $50.00</li>
+                <li class="list-group-item">Item 2: $100.00</li>
+                <li class="list-group-item">Item 3: $50.00</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="fa-solid fa-times"></i> Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

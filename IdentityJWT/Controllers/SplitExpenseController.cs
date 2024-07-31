@@ -174,7 +174,7 @@ namespace PinPinServer.Controllers
         }
 
         /// <summary>
-        /// 獲取某個行程的使用者與團員之間的分帳關西
+        /// 獲取某個行程的使用者與某個團員之間的分帳關西
         /// </summary>
         //api/SplitExpenses/GetUserExpense{scheduleId}&{memberId}
         [HttpGet("GetUserExpense{scheduleId}&{memberId}")]
@@ -288,6 +288,7 @@ namespace PinPinServer.Controllers
                     Currency = expense.Currency.Name,
                     Amount = expense.Amount,
                     Remark = expense.Remark,
+                    CreatedAt = expense.CreatedAt.HasValue ? expense.CreatedAt.Value.ToString("f") : "查無時間",
                     ExpenseParticipants = expense.SplitExpenseParticipants.Select(sep => new ExpenseParticipantDTO
                     {
                         UserId = sep.UserId,
