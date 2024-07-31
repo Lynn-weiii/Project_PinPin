@@ -28,6 +28,7 @@
   <ItemGroup>
     <Content Remove="Views\Home\Schedule.cshtml" />
     <Content Remove="Views\Schdules\CreateNewSchdule.cshtml" />
+    <Content Remove="Views\Schdules\_ScheduleList.cshtml" />
     <Content Remove="wwwroot\css\main_styles2.css" />
     <Content Remove="wwwroot\js\DateRangePicker.js" />
     <Content Remove="wwwroot\js\loadGoogleMapsApi.js" />

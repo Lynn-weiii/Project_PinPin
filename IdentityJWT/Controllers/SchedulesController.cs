@@ -248,8 +248,6 @@ namespace PinPinServer.Controllers
         public async Task<IActionResult> DeleteSchedule(int id)
         {
             var schedule = await _context.Schedules.FindAsync(id);
-
-
             if (schedule == null)
             {
                 return NotFound();
@@ -258,7 +256,7 @@ namespace PinPinServer.Controllers
             {
                 _context.Schedules.Remove(schedule);
                 await _context.SaveChangesAsync();
-                return Ok("行程刪除");
+                return Ok();
             }
             catch (Exception ex)
             {

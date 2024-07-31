@@ -20,10 +20,10 @@
 //						items: 1
 //					},
 //					768: {
-//						items: 2
+//						items: 3
 //					},
 //					1200: {
-//						items: 3
+//						items: 4
 //					}
 //				},
 //				onInitialized: on_change,

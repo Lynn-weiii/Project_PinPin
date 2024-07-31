@@ -98,58 +98,39 @@
 @*Header End*@
 
 @*Body*@
-
-
-
-
-<div class="container-fluid">
-    <div class="row">
-        @*-搜尋-*@
-        <div class="container search_container pb-1">
-            <div class="row">
-                <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
-                    <div class="header_search_container position-relative">
-                        <form class="header_search_form d-flex align-items-center" action="#">
-                        <input id="header_search_input" class="search_input" type="text" v-model="name" placeholder="搜尋?">
-                        <button class="header_search_btn position-absolute" type="button">
-                        <img src="/images/icon_search.png" alt="">
-                        </button>
-                        </form>
-                    </div>
+<div class="container">
+    @*-搜尋-*@
+    <div class="container search_container pb-1">
+        <div class="row">
+            <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
+                <div class="header_search_container position-relative">
+                   
+                        <div class="d-flex flex-row justify-content-end">
+                            <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
+                                新增行程
+                            </button>
+                        </div>
                 </div>
             </div>
         </div>
-    </div> 
-    
-
-
-
-
+    </div>
     @*-顯示schedule-*@
-    <div class="row">        
+
+    <div class="row">
         <div class="tab-wrap">
-        <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
+            <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
             <label for="tab1">我的行程</label>
-        <input type="radio" id="tab2" name="tabGroup1" class="tab">
-        <label for="tab2">旅遊群組</label>
+            <input type="radio" id="tab2" name="tabGroup1" class="tab">
+            <label for="tab2">旅遊群組</label>
             <!-- tabGroup1: 我的行程 -->
             <div class="tab__content" id="tab1_content">
                 <div id="errmsg"></div>
                 <div class="popular" id="result_container">
-                    <div class="row" style="margin-top:1px;margin-bottom:2px">
-                        <div class="section_title_container mb-1">
-                            <div class="d-flex flex-row align-items-center">
-                            <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
-                                    新增行程
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="row" style="margin-top:1px;margin-bottom:2px"></div>
                     <div class="row course_cards_container section_content_row">
                         <div class="col">
                             <div class="popular_courses_slider_container">
                                 <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
-                                    <!-- Add New Course Card -->
                                     <!-- foreach schedule Course Card -->
                                 </div>
                             </div>
@@ -266,8 +247,13 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                var data2 = await response.json();
-                groupCourses(data2);
+                    if (!response.ok) {
+                        $('#result_container').hide();
+                        alert('gologin');
+                        return;
+                    }
+                    var data2 = await response.json();
+                    groupCourses(data2);
             } catch (error) {
                 console.log(error);
                 $('#group_course-container').hide();
@@ -300,7 +286,6 @@
                     var endTime = $('#el2').val();
                     var latitude = $('#Lat').val();
                     var longitude = $('#Lng').val();
-                                
                     var body = {
                         "Name": name,
                         "StartTime": startTime,
@@ -339,72 +324,111 @@
             // 删除行程函数
             $(document).on('click', '.dropdown-item', function (event) {
                 event.preventDefault(); // 阻止默认的链接跳转行为
+                var fun = $(this).data('fun');
+                var deleteId = $(this).data('id');
+                var sch_name = $(this).data('name');
+                console.log(`fun: ${fun}, id: ${deleteId}, schname: ${sch_name}`);
 
-                var name = $(this).data('name');  
-                var deleteid = $(this).data('id');  
-                var func = $(this).data('function');  
-
-                if (func === 'MemberManager') {
+                if (fun === 'MemberManager') {
                     alert('go to manager controller');
-                    console.log('处理成員管理:', deleteid);
-                } else if (func === 'delete') {
+                    console.log('成員管理', deleteId);
+                } else if (fun === 'Delete') {
                     Swal.fire({
                         title: "Are you sure?",
-                        text: `您確定要刪除${name}這個行程嗎?`,
+                        text: `您確定要刪除${sch_name}這個行程嗎?`,
                         icon: "warning",
+                        iconColor: '#E4003A',
                         showCancelButton: true,
                         confirmButtonColor: "#FF6868",
-                        cancelButtonColor: "#F1F8E8",
+                        cancelButtonColor: "#399918",
                         confirmButtonText: "確認刪除"
-                    }).then((result) => {
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
-                           /*  deleteSchedule(deleteid)  */ // 传入正确的 deleteid
-                            .then(() => {
-                                Swal.fire({
-                                    title: "已刪除!",
-                                    text: `${name}行程已刪除`,
-                                    icon: "success"
-                                });                                    
-                            })
-                            .catch(error => {
+                            try {
+                                let success = await deleteSchedule(deleteId);
+                                if (success) {
+                                    Swal.fire({
+                                        title: "已刪除!",
+                                        text: `${sch_name}行程已刪除`,
+                                        icon: "success"
+                                    }).then(() => {
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 1500); // 延迟1.5秒
+                                    });
+                                }
+                            } catch (error) {
                                 Swal.fire({
                                     icon: "error",
                                     title: "刪除失敗",
                                     text: `行程刪除失敗: ${error.message}`
                                 });
-                            });
+                            }
                         }
+                    }).catch(error => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "刪除失敗",
+                            text: `行程刪除失敗: ${error.message}`
+                        });
                     });
                 }
-            });
+            })
             
             
 
             @*Function Section*@
             // Google Autocomplete
+            let debounceTimer;
+
             function initMap() {
-                let search_input = document.getElementById('search_input');
-                if (!search_input) {
-                    console.error("Input element not found");
-                    return;
+                var options = {
+                    types: ['geocode'], // 修改为你需要的类型
+                    fields: ['place_id', 'geometry', 'name', 'photos'] // 指定要返回的字段
+                };
+
+                var input = $('#search_input')[0];
+                if (input) {
+                    var autocomplete = new google.maps.places.Autocomplete(input, options);
+
+                    // 监听 place_changed 事件
+                    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                        let place = autocomplete.getPlace();
+                        if (!place.geometry) {
+                            console.error("No details available for input: '" + place.name + "'");
+                            return;
+                        }
+
+                        let latitude = place.geometry.location.lat();
+                        let longitude = place.geometry.location.lng();
+                        let name = place.name;
+                        let placeId = place.place_id;
+
+                        // 提取照片 URL
+                        let photos = place.photos;
+                        let photoUrls = photos ? photos.map(photo => photo.getUrl({ maxWidth: 400 })) : [];
+
+                        // 更新输入框的值
+                        $('#Lat').val(latitude);
+                        $('#Lng').val(longitude);
+
+                        // 输出调试信息
+                        console.log('Name:', name);
+                        console.log('Place ID:', placeId);
+                        console.log('Latitude:', latitude);
+                        console.log('Longitude:', longitude);
+                        console.log('Photo URLs:', photoUrls);
+                    });
+
+                    // 使用 debounce 处理输入事件
+                    $('#search_input').on('input', function (event) {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(function () {
+                            // 触发 initMap 函数
+                            google.maps.event.trigger(input, 'focus', {});
+                        }, 1000); // 延迟1秒
+                    });
                 }
-
-                let autocomplete = new google.maps.places.Autocomplete(search_input, {
-                    types: ['geocode']
-                });
-
-                google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                    let place = autocomplete.getPlace();
-                    if (!place.geometry) {
-                        console.error("No details available for input: '" + place.name + "'");
-                        return;
-                    }
-                    let latitude = place.geometry.location.lat();
-                    let longitude = place.geometry.location.lng();
-
-                    $('#Lat').val(latitude);
-                    $('#Lng').val(longitude);
-                });
             }
 
             //air daterangepiker
@@ -447,32 +471,32 @@
                 } catch (error) {
                     console.log(`datepicker error ${error}`)
                 }
-            
             }
 
-            //delete schedule
-            // async function deleteSchedule(deleteId) {
-            //     try {
-            //         var response = await fetch(`${baseAddress}/api/Schedules/${deleteId}`, {
-            //             method: 'DELETE',
-            //             headers: {
-            //                 'Authorization': `Bearer ${token}`,
-            //                 'Content-Type': 'application/json'
-            //             }
-            //         });
+            //Delete schedule
+            async function deleteSchedule(deleteId) {
+                try {
+                        var response = await fetch(`${baseAddress}/api/Schedules/${deleteId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
 
-            //         if (!response.ok) {
-            //             throw new Error('刪除行程失敗');
-            //         }
+                        if (!response.ok) {
+                            throw new Error('刪除行程失敗');
+                        }     
+                        return true;
 
-            //         // 可以在此处进行额外的 UI 更新，例如从页面中移除已删除的行程项
-            //         return true;  // 返回删除成功
-            //     } catch (error) {
-            //         console.error('Error:', error);
-            //         throw error;  // 将错误抛出，以便在调用处捕获
-            //     }
-            // }
+                } catch (error) {
+                    console.error('Error:', error);
+                    throw error; 
+                }
+            }
 
+
+        //document end
         });
     </script>
 }
