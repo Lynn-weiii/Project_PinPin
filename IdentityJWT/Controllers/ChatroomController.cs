@@ -9,22 +9,26 @@ using PinPinServer.DTO;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Cors;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace PinPinServer.Controllers
 {
+    [EnableCors("PinPinPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class ChatroomController : ControllerBase
     {
         private readonly PinPinContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<ChatroomController> _logger;
 
-        public ChatroomController(PinPinContext context, IConfiguration configuration)
+        public ChatroomController(PinPinContext context, IConfiguration configuration, ILogger<ChatroomController> logger)
         {
             _context = context;
             _configuration = configuration;
+            _logger = logger;
         }
 
         //取得user所有群組，以及群組所有成員
@@ -34,6 +38,7 @@ namespace PinPinServer.Controllers
         {
             await foreach (var group in _context.ScheduleGroups
                 .Where(g => g.UserId == userId && g.LeftDate == null)
+                .AsNoTracking()
                 .Select(g => new ScheduleGroupsDTO
                 {
                     Id = g.Id,
@@ -44,7 +49,8 @@ namespace PinPinServer.Controllers
                            .Select(sg => new GroupMemberDTO
                            {
                                UserId = sg.UserId,
-                               UserName = sg.User.Name
+                               UserName = sg.User.Name,
+                               isHoster = sg.IsHoster
                            }).ToList()
                 })
                 .AsAsyncEnumerable())
@@ -65,66 +71,69 @@ namespace PinPinServer.Controllers
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                WebSockets.TryAdd(webSocket.GetHashCode(), webSocket);  //將連接進來的使用者加到WebSockets集合(ConcurrentDictionary)
-                await ProcessWebSocket(webSocket);
+                var query = HttpContext.Request.Query;
+                if (!query.TryGetValue("token", out var token))
+                {
+                    await webSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Token missing", CancellationToken.None);
+                    return;
+                }
+
+                var principal = ValidateToken(token);
+                if (principal == null)
+                {
+                    await webSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Invalid token", CancellationToken.None);
+                    return;
+                }
+
+                var userId = int.Parse(principal.FindFirst(ClaimTypes.NameIdentifier).Value);
+                WebSockets.TryAdd(userId, webSocket);  // 使用 userId 作为 key
+                _logger.LogInformation($"WebSocket connection established for user ID: {userId}");
+                await ProcessWebSocket(webSocket, userId);
+
             }
             else
             {
+                _logger.LogWarning("Received a non-WebSocket request");
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
         }
 
         //定義ProcessWebSocket函式
-        private async Task ProcessWebSocket(WebSocket webSocket)
+        private async Task ProcessWebSocket(WebSocket webSocket, int userId)
         {
-            //處理身分驗證
-            var query = HttpContext.Request.Query;
-            if (!query.TryGetValue("token", out var token))
-            {
-                await webSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Token missing", CancellationToken.None);
-                return;
-            }
-
-            // Validate the token and extract the user ID
-            var principal = ValidateToken(token);
-            if (principal == null)
-            {
-                await webSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Invalid token", CancellationToken.None);
-                return;
-            }
-
-            var userId = int.Parse(principal.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            //處理訊息
-            var buffer = new byte[1024 * 4]; //建立一個1024k大小的RAM空間，用來存放要傳送的資料
-
-            //將接收到資料塞進buffer中，不做取消的處理
+            var buffer = new byte[1024 * 4];
             var res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            while (!res.CloseStatus.HasValue)
+            try
             {
-                string json = Encoding.UTF8.GetString(buffer, 0, res.Count);
-                var options = new JsonSerializerOptions()
+                while (!res.CloseStatus.HasValue)
                 {
-                    PropertyNameCaseInsensitive = true
-                };
-                ChatroomChat? receivedMsg = JsonSerializer.Deserialize<ChatroomChat>(json, options);
-                if (receivedMsg != null)
-                {
-                    receivedMsg.UserId = userId;
-                    receivedMsg.CreatedAt = DateTime.Now;
+                    string json = Encoding.UTF8.GetString(buffer, 0, res.Count);
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    ChatroomChat? receivedMsg = JsonSerializer.Deserialize<ChatroomChat>(json, options);
+                    if (receivedMsg != null)
+                    {
+                        receivedMsg.UserId = userId;
+                        receivedMsg.CreatedAt = DateTime.Now;
 
-                    _context.ChatroomChats.Add(receivedMsg);
-                    await _context.SaveChangesAsync();
+                        _context.ChatroomChats.Add(receivedMsg);
+                        await _context.SaveChangesAsync();
 
-                    Broadcast(receivedMsg); //接收到的資料傳給Broadcase自訂函式，在此函式中廣播給所有連線的使用者
+                        Broadcast(receivedMsg);
+                    }
+                    res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 }
-                res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             }
-            //websocket關閉
-            await webSocket.CloseAsync(res.CloseStatus.Value, res.CloseStatusDescription, CancellationToken.None);
-            //從WebSockets集合(ConcurrentDictionary)移除離線使用者
-            WebSockets.TryRemove(webSocket.GetHashCode(), out var removed);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in WebSocket processing");
+            }
+            finally
+            {
+                await webSocket.CloseAsync(res.CloseStatus.Value, res.CloseStatusDescription, CancellationToken.None);
+                WebSockets.TryRemove(userId, out _);
+            }
         }
+
 
 
         //定義Broadcase函式
@@ -133,10 +142,17 @@ namespace PinPinServer.Controllers
             //平行運算
             Parallel.ForEach(WebSockets.Values, async (webSocket) =>
             {
-                if (webSocket.State == WebSocketState.Open && webSocket.GetHashCode() != message.UserId)
+                if (webSocket.State == WebSocketState.Open)
                 {
-                    string msgJson = JsonSerializer.Serialize(message);
-                    await webSocket.SendAsync(Encoding.UTF8.GetBytes(msgJson), WebSocketMessageType.Text, true, CancellationToken.None);
+                    try
+                    {
+                        string msgJson = JsonSerializer.Serialize(message);
+                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msgJson)), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error broadcasting message");
+                    }
                 }
             });
         }

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PinPinServer.DTO;
 using PinPinServer.Models;
+using System.Collections.Immutable;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,36 +23,47 @@ namespace PinPinServer.Controllers
             _configuration = configuration;
         }
 
-        // GET: api/<WishlistController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        //取得user所有願望清單
+        //GET:api/Wishlist/GetAllWishlist/{userId}
+        [HttpGet("GetAllWishlist/{userId}")]
+        public async Task<ActionResult<IEnumerable<WishlistDTO>>> GetAllWishlist(int userId)
         {
-            return new string[] { "value1", "value2" };
+            var wishlists = await _context.Wishlists
+                .Where(w => w.UserId == userId)
+                .ToListAsync();
+
+            if (wishlists == null || !wishlists.Any())
+            {
+                return NotFound();
+            }
+
+            var locationCategories = await _context.LocationCategories
+                .Where(l => l.UserId == userId)
+                .ToListAsync();
+
+            var result = wishlists.Select(w => new WishlistDTO
+            {
+                Wishlists = w,
+                LocationCategories = locationCategories
+            }).ToList();
+
+            return Ok(result);
         }
 
-        // GET api/<WishlistController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        //取得user所有願望清單子標籤
+        //GET:api/Wishlist/GetAllLocationCategories/{userId}
+        [HttpGet("GetAllLocationCategories/{userId}")]
+        public async Task<ActionResult<IEnumerable<LocationCategory>>> GetAllLocationCategories(int userId) 
         {
-            return "value";
-        }
+            var locationCategories = await _context.LocationCategories
+                .Where(l => l.UserId == userId)
+                .ToListAsync();
 
-        // POST api/<WishlistController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<WishlistController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<WishlistController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (locationCategories == null || !locationCategories.Any()) 
+            {
+                return NotFound();
+            }
+            return Ok(locationCategories);
         }
     }
 }

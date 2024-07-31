@@ -68,6 +68,9 @@
         const liveToast = document.querySelector('#liveToast');
         const room = document.querySelector('#room');
         const send = document.querySelector('#send');
+
+        let socket = null;
+
         enterRoom();
 
         function enterRoom() {
@@ -76,29 +79,24 @@
                 console.error('No token found in localStorage');
                 return;
             }
+            let testSocket = new WebSocket(`wss://localhost:7280/api/Chatroom/GetUserConnect?token=${token}`);
+            testSocket.onopen = function (event) {
+                console.log("WebSocket connection established");
+            };
+            testSocket.onerror = function (error) {
+                console.error("WebSocket connection error:", error);
+            };
+            testSocket.onclose = function (event) {
+                console.log("WebSocket connection closed:", event);
+            };
 
-            // Adjust WebSocket URL according to your setup
-            //連線WebSocket
-            //const socket = new WebSocket(`wss://localhost:7280/api/Chatroom/GetUserConnect?token=${encodeURIComponent(token)}`);
-            const socket = new WebSocket(`wss://localhost:7280/api/Chatroom/GetUserConnect`);
+            const socket = new WebSocket(`wss://localhost:7280/api/Chatroom/GetUserConnect?token=${token}`);
 
             //const socket = new WebSocket("wss://localhost:7188/Ws2/chatRoom");
 
             //連線建立成功
             socket.onopen = (event) => {
-
-                //userName.textContent = txtUser.value;
-
-                const data = {
-                    Type: "newUser",
-                    //User: txtUser.value
-                }
-                // console.log(data);
-                // socket.send(JSON.stringify(data));
-
                 console.log('WebSocket connection established');
-                socket.send(JSON.stringify({ Type: "authenticate", Token: token }));
-
             };
 
             //接收WebSocket傳送過來的資料
@@ -114,28 +112,43 @@
 
             //關閉WebSocket連線
             socket.onclose = (event) => {
-                alert('關閉連線: ' + event.toString());
+                //alert('關閉連線: ' + event.toString());
                 console.log(event);
+                removeEventListeners();
             };
 
             //WebSocket連線發生錯誤
             socket.onerror = (error) => {
-                alert('連線錯誤: ' + error.toString());
+                //alert('連線錯誤: ' + error.toString());
                 console.error(error);
             };
 
             //按下enter送出訊息
-            txtMsg.addEventListener("keyup", function (event) {
+            //老師的寫法
+            // txtMsg.addEventListener("keyup", function (event) {
+            //     if (event.keyCode === 13) {
+            //         event.preventDefault();
+            //         sendMessage();
+            //     }
+            // });
+
+            txtMsg.addEventListener("keyup", onEnterPress);
+
+            //按下send送出訊息
+            // send.addEventListener("click", function (event) {
+            //     sendMessage();
+            // });
+
+            // 按下 send 送出訊息
+            send.addEventListener("click", sendMessage);
+
+            function onEnterPress(event) {
                 if (event.keyCode === 13) {
                     event.preventDefault();
                     sendMessage();
                 }
-            });
+            }
 
-            //按下send送出訊息
-            send.addEventListener("click", function (event) {
-                sendMessage();
-            });
 
             //傳送訊息
             function sendMessage() {
@@ -147,7 +160,7 @@
                 const data = {
                     Type: "message",
                     //User: txtUser.value,
-                    Message: txtMsg.value
+                    Message: txtMsg.value.trim()
                 }
                 console.log(data);
                 socket.send(JSON.stringify(data));
@@ -170,6 +183,12 @@
                                         </div>
                                     `;
                 room.innerHTML += bubble;
+            }
+
+            // 移除事件監聽器
+            function removeEventListeners() {
+                txtMsg.removeEventListener("keyup", onEnterPress);
+                send.removeEventListener("click", sendMessage);
             }
         }
 

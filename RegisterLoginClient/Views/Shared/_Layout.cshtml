@@ -100,29 +100,6 @@
                 $("#MemberInfo").show();
             }
         }
-
-        //取得所有群組
-        // // 假設 userId 是已知的用戶 ID
-        // const userId = 1; // 替換為實際的用戶 ID
-        // const groupListElement = document.getElementById('groupList');
-
-        // // 獲取用戶的群組列表
-        // fetch(`${baseAddress}/api/Chatroom/GetGroupMembers/${userId}`)
-        //     .then(response => response.json())
-        //     .then(groups => {
-        //         groups.forEach(group => {
-        //             const groupButton = document.createElement('button');
-        //             groupButton.className = 'list-group-item list-group-item-action';
-        //             groupButton.textContent = `群組 ${group.Id}`;
-        //             groupButton.onclick = () => loadGroupChat(group.Id);
-        //             groupListElement.appendChild(groupButton);
-        //         });
-        //     });
-
-        // function loadGroupChat(groupId) {
-        //     // 在這裡處理加載群組聊天的邏輯
-        //     // 可以使用 AJAX 獲取聊天記錄並顯示在聊天室視圖中
-        //     console.log(`Loading chat for group ${groupId}`);
-        }
+        
     });
 </script>

@@ -80,12 +80,12 @@
     <div id="results" class="row"></div>
 
     <!-- Button trigger modal -->
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- 詳細資訊Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">詳細資訊</h5>
+                    <h5 class="modal-title" id="detailModalLabel">詳細資訊</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -95,15 +95,60 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-                    <button type="button" class="btn btn-primary">加入願望清單</button>
+                    <button type="button" class="btn btn-primary wishlists">加入願望清單</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <!--願望清單Modal-->
+    <div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="wishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="wishlistModalLabel">願望清單</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="wishlistForm">
+                        <!-- 你可以在这里添加输入字段或其他内容 -->
+                        <div id="app">
+                            <div class="mb-3">
+                                @* <label for="wishlistItem" class="form-label">項目名稱</label>
+                                <input type="text" class="form-control" id="wishlistItem" placeholder="項目名稱"> *@
+                                <label>選擇清單:</label>
+                                <select id="wishlist" v-model="selectedWishlist" v-on:change="changeOption">
+                                    <option v-for="option in wishlists" :key="option.id" :value="option.id">
+                                        {{option.name}}
+                                    </option>
+                                </select>
+                                <label>選擇標籤:</label>
+                                <select id="location" v-model="selectedLocationCategory" v-on:change="changeOption">
+                                    <option v-for="option in locationCategories" :key="option.id" :value="option.id">
+                                        {{option.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- 其他内容 -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary wishlists">加入</button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+   
+
 </div>
 
 @section Scripts
 {
+    <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.js"></script>
     <script>
         var baseAddress = "https://localhost:7280";       //Developr Server //注意結尾沒有斜線!
         //var baseAddress = "https://localhost:xx";       //Staging Server(Testing Server)
@@ -209,8 +254,8 @@
                                         <h5 class="card-title">${place.name}</h5>
                                         <p class="card-text">${place.formatted_address}</p>
                                         <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
-                            <a href="#" class="btn btn-primary" target="_blank">加入願望清單</a>
-                            <button type="button" class="btn btn-primary btnDetail" data-bs-toggle="modal" data-bs-target="#exampleModal" data-place-id="${place.place_id}">詳細資訊</button>
+                                                    <button type="button" class="btn btn-primary wishlists" target="_blank" data-bs-toggle="modal" data-bs-target="#wishlistModal">加入願望清單</button>
+                                    <button type="button" class="btn btn-primary btnDetail" data-bs-toggle="modal" data-bs-target="#detailModal" data-place-id="${place.place_id}">詳細資訊</button>
                                </div>
                        </div>
                             `;
@@ -269,5 +314,45 @@
         }
 
         //在user點選地點的[加入願望清單]後，加到DB願望清單中
+        // $(document).on("click", ".wishlists", async function () {
+        //     alert("加入願望清單")
+        // });
+
+        const vueApp = {
+            data() {
+                return {
+                    selectedWishlist: null,
+                    selectedLocationCategory: null,
+                    wishlists: [],
+                    locationCategories: []
+                };
+            },
+            methods: {
+                changeOption() {
+                    alert(`Selected Wishlist: ${this.selectedWishlist}, Selected Location Category: ${this.selectedLocationCategory}`);
+                }
+            },
+            mounted() {
+                const token = localStorage.getItem('token');
+                const uri = `${baseAddress}/api/Wishlist/GetAllWishlist`;
+                axios.get(uri, {
+                    headers: {
+                        'Authorization': `bearer ${token}`
+                    }
+                }).then(response => {
+                    this.wishlists = response.data.wishlists;
+                    this.locationCategories = response.data.locationCategories;
+                    // 在选项加载完毕后初始化 multi-select-tag
+                    this.$nextTick(() => {
+                        new MultiSelectTag('wishlist');
+                    });
+                }).catch(error => {
+                    alert(error);
+                });
+            }
+        };
+        Vue.createApp(vueApp).mount("#app");
+
+
     </script>
 }
