@@ -1,120 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Expense Sharing Modal</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <button
-      type="button"
-      class="btn btn-primary"
-      data-bs-toggle="modal"
-      data-bs-target="#expenseModal"
-    >
-      View Expense Details
-    </button>
-
-    <!-- Modal -->
-    <div
-      class="modal fade"
-      id="expenseModal"
-      tabindex="-1"
-      aria-labelledby="expenseModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="expenseModalLabel">
-              <i class="fa-solid fa-receipt"></i> Expense Sharing Details
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <h6>
-                <strong><i class="fa-solid fa-user"></i> Payer's Name:</strong>
-              </h6>
-              <p id="payerName">John Doe</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>借款人表單範例</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+<body>
+<div id="vue-container" class="container mt-5">
+    <!-- 保留區塊 -->
+    <div class="mt-4">
+        <h5 class="fw-bold"><i class="fa-solid fa-user-friends me-2"></i>借款人區塊</h5>
+        <div class="mb-3">
+            <label for="borrowers" class="form-label fw-bold"><i class="fa-solid fa-users me-2"></i>選擇借款人</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="borrowersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    選擇借款人
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="borrowersDropdown">
+                    <li v-for="borrower in borrowers" :key="borrower.id" class="dropdown-item" @click="toggleBorrower(borrower.id)">
+                        <input type="checkbox" :id="'borrower-' + borrower.id" v-model="selectedBorrowers" :value="borrower.id" @click.stop>
+                        <label :for="'borrower-' + borrower.id" class="form-check-label ms-2">{{ borrower.name }}</label>
+                    </li>
+                </ul>
             </div>
-            <div class="mb-3">
-              <h6>
-                <strong><i class="fa-solid fa-tags"></i> Type:</strong>
-              </h6>
-              <p id="expenseType">Food</p>
-            </div>
-            <div class="mb-3">
-              <h6>
-                <strong><i class="fa-solid fa-note-sticky"></i> Notes:</strong>
-              </h6>
-              <p id="expenseNotes">Dinner at a restaurant</p>
-            </div>
-            <div class="mb-3">
-              <h6>
-                <strong
-                  ><i class="fa-solid fa-map-marker-alt"></i> Trip Name:</strong
-                >
-              </h6>
-              <p id="tripName">Weekend Getaway</p>
-            </div>
-            <div class="mb-3">
-              <h6>
-                <strong
-                  ><i class="fa-solid fa-clock"></i> Creation Time:</strong
-                >
-              </h6>
-              <p id="creationTime">2024-07-31 18:45</p>
-            </div>
-            <div class="mb-3">
-              <h6>
-                <strong
-                  ><i class="fa-solid fa-dollar-sign"></i> Total Amount:</strong
-                >
-              </h6>
-              <p id="totalAmount">$200.00</p>
-            </div>
-            <div class="mb-3">
-              <h6>
-                <strong
-                  ><i class="fa-solid fa-list"></i> Detailed Breakdown of
-                  Expenses:</strong
-                >
-              </h6>
-              <ul class="list-group" id="expenseBreakdown">
-                <li class="list-group-item">Item 1: $50.00</li>
-                <li class="list-group-item">Item 2: $100.00</li>
-                <li class="list-group-item">Item 3: $50.00</li>
-              </ul>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              <i class="fa-solid fa-times"></i> Close
-            </button>
-          </div>
         </div>
-      </div>
+        <div v-for="borrower in selectedBorrowers" :key="borrower" class="border border-dark rounded p-3 mb-3">
+            <h6>{{ getBorrowerName(borrower) }}</h6>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label :for="'amount-' + borrower" class="form-label"><i class="fa-solid fa-dollar-sign me-2"></i>金額</label>
+                    <input type="number" class="form-control" :id="'amount-' + borrower" v-model="borrowerAmounts[borrower]" required>
+                </div>
+                <div class="col-md-4">
+                    <label :for="'isPaid-' + borrower" class="form-label"><i class="fa-solid fa-circle-check me-2"></i>是否付款</label>
+                    <select class="form-select" :id="'isPaid-' + borrower" v-model="borrowerPayments[borrower]">
+                        <option :value="true">已付款</option>
+                        <option :value="false">未付款</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+<script>
+new Vue({
+    el: '#vue-container',
+    data() {
+        return {
+            borrowers: [
+                { id: 1, name: '張三' },
+                { id: 2, name: '李四' },
+                // 其他借款人
+            ],
+            selectedBorrowers: [],
+            borrowerAmounts: {},
+            borrowerPayments: {}
+        };
+    },
+    methods: {
+        toggleBorrower(borrowerId) {
+            const index = this.selectedBorrowers.indexOf(borrowerId);
+            if (index === -1) {
+                this.selectedBorrowers.push(borrowerId);
+                this.$set(this.borrowerAmounts, borrowerId, 0);
+                this.$set(this.borrowerPayments, borrowerId, false);
+            } else {
+                this.selectedBorrowers.splice(index, 1);
+                this.$delete(this.borrowerAmounts, borrowerId);
+                this.$delete(this.borrowerPayments, borrowerId);
+            }
+        },
+        getBorrowerName(borrowerId) {
+            const borrower = this.borrowers.find(b => b.id === borrowerId);
+            return borrower ? borrower.name : '';
+        }
+    }
+});
+</script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+</body>
 </html>

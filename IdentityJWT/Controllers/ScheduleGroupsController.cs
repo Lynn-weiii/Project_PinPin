@@ -21,7 +21,7 @@ namespace PinPinTest.Controllers
         }
 
         //GET:api/ScheduleGroups
-        [HttpGet]
+        [HttpGet("GetScheduleGroups{schedule_id}")]
         public async Task<ActionResult<Dictionary<int, string>>> GetScheduleGroups(int schedule_id)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;

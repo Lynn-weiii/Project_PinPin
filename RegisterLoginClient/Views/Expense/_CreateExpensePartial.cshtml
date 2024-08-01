@@ -3,8 +3,7 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white d-flex align-items-center">
-                    <i class="fa-solid fa-arrow-left me-auto" style="cursor: pointer; font-size: 1.5rem;"></i>
-                    <h5 class="modal-title ms-3" id="SchedulDetailModalLabel">創建新的分帳表</h5>
+                    <h5 class="modal-title ms-3" id="SchedulDetailModalLabel"> 創建新的分帳表</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -12,8 +11,97 @@
                         <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
                     </div>
                     <div v-else>
-                        <p>{{expenseName}}</p>
+                        <!-- 付款人區塊 -->
+                        <form class="form border border-dark rounded p-3 mb-3" id="main" novalidate>
+                            <legend class="fw-bold"><i class="fa-solid fa-money-bill"></i> 付款人 {{selectedSchedule}}</legend>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="expenseName" class="form-label fw-bold"><i class="fa-solid fa-file-invoice-dollar me-2"></i>費用名稱</label>
+                                    <input type="text" class="form-control" id="expenseName" v-model="expenseName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="amount" class="form-label fw-bold"><i class="fa-solid fa-dollar-sign me-2"></i>金額</label>
+                                    <input type="number" class="form-control" id="amount" v-model="amount" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="schedule" class="form-label fw-bold"><i class="fa-solid fa-calendar-alt me-2"></i>行程表</label>
+                                    <select class="form-select" id="schedule" v-model="selectedSchedule" v-on:change="getScheduleGroups" required>
+                                        <option v-for="(name,id) in schedules" :key="id" :value="id">{{ name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="payer" class="form-label fw-bold"><i class="fa-solid fa-user me-2"></i>付款者</label>
+                                    <select class="form-select" id="payer" v-model="selectedPayer" required>
+                                        <option v-for="(name,id) in payers" :key="id" :value="id">{{ name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="category" class="form-label fw-bold"><i class="fa-solid fa-tags me-2"></i>付款種類</label>
+                                    <select class="form-select" id="category" v-model="selectedCategory" required>
+                                        <option v-for="(name,id) in categories" :key="id" :value="id">{{ name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="currency" class="form-label fw-bold"><i class="fa-solid fa-coins me-2"></i>幣別</label>
+                                    <select class="form-select" id="currency" v-model="selectedCurrency" required>
+                                        <option v-for="(name,id) in currencies" :key="id" :value="id">{{ name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label for="remark" class="form-label fw-bold"><i class="fa-solid fa-comments me-2"></i>備註</label>
+                                    <textarea class="form-control" id="remark" v-model="remark" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane me-2"></i>提交</button>
+                        </form>
+                        <!-- 保留區塊 -->
+                        <div class="mt-4">
+                            <h5 class="fw-bold"><i class="fa-solid fa-user-friends me-2"></i>借款人區塊</h5>
+                            <div class="mb-3">
+                                <label for="borrowers" class="form-label fw-bold"><i class="fa-solid fa-users me-2"></i>選擇借款人</label>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="borrowersDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                        選擇借款人
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="borrowersDropdown" >
+                                        <li v-for="(name,id) in payers" :key="id" class="dropdown-item">
+                                            <input type="checkbox" :id="'borrower-' + id" v-model="selectedBorrowers" :value="id">
+                                            <label :for="'borrower-' + id" class="form-check-label ms-2">{{ name }}</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div v-for="borrower in selectedBorrowers" :key="borrower" class="border border-dark rounded p-3 mb-3">
+                                <h6>酷哥</h6>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label :for="'amount-' + borrower" class="form-label"><i class="fa-solid fa-dollar-sign me-2"></i>金額</label>
+                                        <input type="number" class="form-control" :id="'amount-' + borrower" v-model="borrowerAmounts[borrower]" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label :for="'isPaid-' + borrower" class="form-label"><i class="fa-solid fa-circle-check me-2"></i>是否付款</label>
+                                        <select class="form-select" :id="'isPaid-' + borrower" v-model="borrowerPayments[borrower]">
+                                            <option :value="true">已付款</option>
+                                            <option :value="false">未付款</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" v-on:click="">
+                        <i class="fa-solid fa-xmark"></i></i> 取消
+                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane me-2"></i>提交</button>
                 </div>
             </div>
         </div>
