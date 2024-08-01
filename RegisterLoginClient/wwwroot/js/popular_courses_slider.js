@@ -75,7 +75,7 @@ function initPopularCoursesSlider() {
             loop: false,
             margin: 24,
             nav: false,
-            dots: false,
+            dots: true,
             responsive: {
                 0: {
                     items: 1
@@ -98,7 +98,6 @@ function initPopularCoursesSlider() {
         stageElement.addEventListener('touchend', function (event) {
             // 处理 touchend 事件
         }, { passive: true });
-
     }
 
 }

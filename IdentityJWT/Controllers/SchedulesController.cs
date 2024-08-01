@@ -44,10 +44,9 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
+                    PictureUrl = s.PictureUrl,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList(),
-                    lng = s.Lng,
-                    lat = s.Lat,
                 }).ToListAsync();
 
                 if (schedules == null || !schedules.Any())
@@ -97,6 +96,7 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
+                    PictureUrl = s.PictureUrl,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups
                         .Where(sg => sg.UserId != userID)
@@ -225,6 +225,9 @@ namespace PinPinServer.Controllers
                 UserId = userID,
                 Lng = editschDTO.lng,
                 Lat = editschDTO.lat,
+                PlaceId = editschDTO.PlaceId,
+                PictureUrl = editschDTO.PictureUrl
+
             };
             _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();

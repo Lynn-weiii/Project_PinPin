@@ -34,11 +34,16 @@
     <Content Remove="wwwroot\js\loadGoogleMapsApi.js" />
     <Content Remove="wwwroot\js\main.js" />
     <Content Remove="wwwroot\js\newschdule.js" />
+    <Content Remove="wwwroot\js\schedule_authority.js" />
     <Content Remove="wwwroot\js\searchcoursescard.js" />
   </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\js\loadGoogleMapsApi.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\schedule_authority.js" />
   </ItemGroup>
 
   <ItemGroup>

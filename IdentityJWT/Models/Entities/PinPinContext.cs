@@ -179,6 +179,10 @@ public partial class PinPinContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100)
                 .HasColumnName("name");
+            entity.Property(e => e.PictureUrl).HasColumnName("picture_url");
+            entity.Property(e => e.PlaceId)
+                .HasMaxLength(200)
+                .HasColumnName("place_id");
             entity.Property(e => e.StartTime).HasColumnName("start_time");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -208,7 +212,6 @@ public partial class PinPinContext : DbContext
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.ScheduleAuthorities)
                 .HasForeignKey(d => d.ScheduleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_schedule_authority_schedule");
 
             entity.HasOne(d => d.User).WithMany(p => p.ScheduleAuthorities)
@@ -305,7 +308,6 @@ public partial class PinPinContext : DbContext
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.ScheduleGroups)
                 .HasForeignKey(d => d.ScheduleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_schedule_group_schedule");
 
             entity.HasOne(d => d.User).WithMany(p => p.ScheduleGroups)
@@ -330,7 +332,6 @@ public partial class PinPinContext : DbContext
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.SchedulePreviews)
                 .HasForeignKey(d => d.ScheduleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_schedule_preview_schedule");
         });
 

@@ -22,6 +22,14 @@ namespace PinPinServer.Models.DTO
         [Display(Name = "主辦人")]
         public string UserName { get; set; }
 
+        public string? PictureUrl { get; set; }
+
+        public string PlaceId { get; set; }
+
+        public List<int?> SharedUserIDs { get; set; } = new List<int?>();
+        [Display(Name = "群組成員")]
+        public List<string?> SharedUserNames { get; set; } = new List<string?>();
+
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
 
@@ -29,9 +37,6 @@ namespace PinPinServer.Models.DTO
 
         public Decimal? lat { get; set; }
 
-        public List<int?> SharedUserIDs { get; set; } = new List<int?>();
-        [Display(Name = "群組成員")]
-        public List<string?> SharedUserNames { get; set; } = new List<string?>();
 
     }
 }

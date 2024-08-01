@@ -23,6 +23,10 @@ public partial class Schedule
 
     public decimal? Lat { get; set; }
 
+    public string PictureUrl { get; set; }
+
+    public string PlaceId { get; set; }
+
     public virtual ICollection<ChatroomChat> ChatroomChats { get; set; } = new List<ChatroomChat>();
 
     public virtual ICollection<ScheduleAuthority> ScheduleAuthorities { get; set; } = new List<ScheduleAuthority>();

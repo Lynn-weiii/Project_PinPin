@@ -19,6 +19,8 @@ namespace PinPinServer.Models.DTO
 
         public int UserId { get; set; }
 
+        public string PlaceId { get; set; }
+
 
 
         //允許空值
@@ -33,6 +35,8 @@ namespace PinPinServer.Models.DTO
         public Decimal? lng { get; set; }
 
         public Decimal? lat { get; set; }
+
+        public string? PictureUrl { get; set; }
 
     }
 }

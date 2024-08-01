@@ -7,7 +7,7 @@
 <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
 
 <!-- JS  -->
-<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous" asp-fallback-href="/lib/font-awesome/js/fontawesome.js"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
@@ -92,6 +92,11 @@
         box-shadow: 0px 8px 8px #638889; 
         border-radius: 14px;
     }
+
+    .swal2-popup .swal2-cancel {
+        color: #758694 !important; /* 设置取消按钮文字颜色 */
+    }
+
 </style>
 }
 
@@ -115,7 +120,6 @@
         </div>
     </div>
     @*-顯示schedule-*@
-
     <div class="row">
         <div class="tab-wrap">
             <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
@@ -126,13 +130,19 @@
             <div class="tab__content" id="tab1_content">
                 <div id="errmsg"></div>
                 <div class="popular" id="result_container">
-                    <div class="row" style="margin-top:1px;margin-bottom:2px"></div>
+                    <div class="row" style="margin-top:1px;margin-bottom:2px">
+                        <div class="section_title_container mb-3">
+                            <div class="d-flex flex-row align-items-center">
+                            </div>
+                        </div>
+                    </div>
                     <div class="row course_cards_container section_content_row">
                         <div class="col">
                             <div class="popular_courses_slider_container">
                                 <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
                                     <!-- foreach schedule Course Card -->
-                                </div>
+                                </div>                                                                
+                                <div class="owl-dots"></div>
                             </div>
                         </div>
                     </div>
@@ -153,6 +163,7 @@
                                 <div class="owl-carousel owl-theme popular_courses_slider" id="group_course-container">
                                     <!-- foreach schedule Course Card -->
                                 </div>
+                                <div class="owl-dots"></div>
                             </div>
                         </div>
                     </div>
@@ -161,47 +172,139 @@
         </div>
     </div>
 </div>
-     @*-新增行程Modal-*@
-    <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="container-fluid modal-body">
-                    <form id="newschdule" class="needs-validation" method="post" novalidate autocomplete="off">
-                        <!-- 行程 -->
-                        <div class="mb-3">
-                                <label for="Name" class="form-label mb-2">行程名稱</label>
-                                <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
-                                <label for="search_input" class="form-label mb-2">目的地</label>
-                                <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
+
+@*-新增行程Modal-*@
+<div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="container-fluid modal-body">
+                <form id="newschdule" class="needs-validation" method="post" novalidate autocomplete="off">
+                    <!-- 行程 -->
+                    <div class="mb-3">
+                            <label for=""></label>
+                            <label for="Name" class="form-label mb-2">行程名稱</label>
+                            <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
+                            <label for="search_input" class="form-label mb-2">目的地</label>
+                            <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
+                    <input id="lat" type="hidden" name="lat">
+                    <input id="lng" type="hidden" name="lng">
+                            <input id="place_id" type="hidden" name="place_id">
+                            <input id="picture_url" type="hidden" name="picture_url">
+                        </div>
+                    <div class="mb-3">
+                        <div class="row">
+                        <label for="search_input" class="form-label mb-2">旅程日期</label>
+                            <div class="col-5">
+                                <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期"/>
                             </div>
-                        <div class="mb-3">
-                            <div class="row">
-                            <label for="search_input" class="form-label mb-2">旅程日期</label>
-                                <div class="col-5">
-                                    <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期"/>
-                                </div>
-                                <div class="col-2 text-center align-center pt-1 pb-1">
-                                    <i class="fa-solid fa-arrow-right fa-xl"></i>
-                                </div>
-                                <div class="col-5">
-                                    <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期"/>
-                                </div>
+                            <div class="col-2 text-center align-center pt-1 pb-1">
+                                <i class="fa-solid fa-arrow-right fa-xl"></i>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期"/>
                             </div>
                         </div>
-                        <input type="hidden" id="Lat" name="Lat">
-                        <input type="hidden" id="Lng" name="Lng">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn" id="createbtn">完成</button>
-                </div>
+                    </div>
+
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="createbtn">完成</button>
             </div>
         </div>
     </div>
+</div>
+
+@*-查看成員-*@
+<div class="modal fade" id="editor_right_modal" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header  d-flex justify-content-between">
+                <p class="modal-title">權限設定</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered-buttom table-bordered-light">
+                    <thead>
+                        <tr>
+                            <th>成員</th>
+                            <th>編輯行程</th>
+                            <th>邀請成員</th>
+                            <th>移除成員</th>
+                            <th>建立投票</th>
+                            <th>禁止發言</th>
+                            <th>刪除訊息</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>user1"(userid)"</td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category1_user1_id">
+                                    <label class="form-check-label" for="category1_user1_id"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category2_user1_id">
+                                    <label class="form-check-label" for="category2_user1_id"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category3_user1_id">
+                                    <label class="form-check-label" for="category3_user1_id"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category4_user1_id">
+                                    <label class="form-check-label" for="category4_user1_id"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category5_user1_id">
+                                    <label class="form-check-label" for="category5_user1_id"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="category6_user1_id">
+                                    <label class="form-check-label" for="category6_user1_id"></label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-sm btn-primary">修改</button>
+                <button class="btn btn-sm btn-secondary">取消</button>
+            </div>
+            <div class="modal-footer">
+                <div class="input-group mx-auto mb-3 justify-content-center">
+                    <input class="form-control email-input rounded" style="font-size:12px" type="email"
+                           id="invited_member" placeholder="請輸入email" required>
+                   <br/>
+                    <button class="btn btn-primary rounded-pill" style="font-size:12px"
+                            id="invited_member_byemail">
+                        發送邀請
+                    </button>
+                    <span class="px-2"></span>
+                    <!-- <button class="btn btn-primary rounded-pill" style="font-size:12px" id="inviteMemberButton">複製連結邀請</button> -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
      <script>
@@ -210,7 +313,7 @@
             setTimeout(function () {
                 console.log('Calling initPopularCoursesSlider');
                 initPopularCoursesSlider();
-            }, 5000); 
+            }, 3000); 
 
             var baseAddress = "https://localhost:7280";
             var token = localStorage.getItem('token');
@@ -284,14 +387,18 @@
                     var name = $('#Name').val();
                     var startTime = $('#el1').val();
                     var endTime = $('#el2').val();
-                    var latitude = $('#Lat').val();
-                    var longitude = $('#Lng').val();
+                    var lat = $('#Lat').val();
+                    var lng = $('#Lng').val();
+                    var picture_url = $('#picture_url').val();
+                    var place_id = $('#place_id').val();
                     var body = {
                         "Name": name,
-                        "StartTime": startTime,
-                        "EndTime": endTime,
-                        "Lat": latitude,
-                        "Lng": longitude,
+                        "StartTime": startTime, 
+                        "EndTime": endTime, 
+                        "Lat": lat,
+                        "Lng": lng,
+                        "PlaceId": place_id,
+                        "PictureUrl": picture_url
                     };
 
                     console.log(JSON.stringify(body));
@@ -335,12 +442,16 @@
                 } else if (fun === 'Delete') {
                     Swal.fire({
                         title: "Are you sure?",
-                        text: `您確定要刪除${sch_name}這個行程嗎?`,
+                        html: `
+                                您確認要刪除此行程?<br>
+                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                                也會一併刪除!
+                            `,
                         icon: "warning",
                         iconColor: '#E4003A',
                         showCancelButton: true,
-                        confirmButtonColor: "#FF6868",
-                        cancelButtonColor: "#399918",
+                        confirmButtonColor: "#405D72",
+                        cancelButtonColor: "#F9E0BB",
                         confirmButtonText: "確認刪除"
                     }).then(async (result) => {
                         if (result.isConfirmed) {
@@ -352,9 +463,7 @@
                                         text: `${sch_name}行程已刪除`,
                                         icon: "success"
                                     }).then(() => {
-                                        setTimeout(() => {
-                                            location.reload();
-                                        }, 1500); // 延迟1.5秒
+                                        location.reload();                                        
                                     });
                                 }
                             } catch (error) {
@@ -380,7 +489,6 @@
             @*Function Section*@
             // Google Autocomplete
             let debounceTimer;
-
             function initMap() {
                 var options = {
                     types: ['geocode'], // 修改为你需要的类型
@@ -391,7 +499,6 @@
                 if (input) {
                     var autocomplete = new google.maps.places.Autocomplete(input, options);
 
-                    // 监听 place_changed 事件
                     google.maps.event.addListener(autocomplete, 'place_changed', function () {
                         let place = autocomplete.getPlace();
                         if (!place.geometry) {
@@ -399,32 +506,35 @@
                             return;
                         }
 
-                        let latitude = place.geometry.location.lat();
-                        let longitude = place.geometry.location.lng();
-                        let name = place.name;
+                        let lat = place.geometry.location.lat();
+                        let lng = place.geometry.location.lng();
                         let placeId = place.place_id;
 
                         // 提取照片 URL
                         let photos = place.photos;
-                        let photoUrls = photos ? photos.map(photo => photo.getUrl({ maxWidth: 400 })) : [];
+                        let photoUrl = '';
+                        if (photos && photos.length > 0) {
+                            photoUrl = photos[0].getUrl({ maxWidth: 340, maxHeight: 255 });
+                        }
 
                         // 更新输入框的值
-                        $('#Lat').val(latitude);
-                        $('#Lng').val(longitude);
+                        $('#Lat').val(lat);
+                        $('#Lng').val(lng);
+                        $('#place_id').val(placeId);
+                        $('#picture_url').val(photoUrl);
 
                         // 输出调试信息
-                        console.log('Name:', name);
                         console.log('Place ID:', placeId);
-                        console.log('Latitude:', latitude);
-                        console.log('Longitude:', longitude);
-                        console.log('Photo URLs:', photoUrls);
+                        console.log('Latitude:', lat);
+                        console.log('Longitude:', lng);
+                        console.log('Photo URL:', photoUrl);
                     });
 
                     // 使用 debounce 处理输入事件
-                    $('#search_input').on('input', function (event) {
+                    $('#search_input').on('input', function () {
                         clearTimeout(debounceTimer);
                         debounceTimer = setTimeout(function () {
-                            // 触发 initMap 函数
+                            // 触发 place_changed 事件
                             google.maps.event.trigger(input, 'focus', {});
                         }, 1000); // 延迟1秒
                     });
