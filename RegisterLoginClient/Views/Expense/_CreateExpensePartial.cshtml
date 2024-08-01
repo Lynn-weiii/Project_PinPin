@@ -1,0 +1,21 @@
+﻿<div id="vue-container">
+    <div class="modal fade" id="CreateExpenseModal" tabindex="-1" aria-labelledby="SchedulDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white d-flex align-items-center">
+                    <i class="fa-solid fa-arrow-left me-auto" style="cursor: pointer; font-size: 1.5rem;"></i>
+                    <h5 class="modal-title ms-3" id="SchedulDetailModalLabel">創建新的分帳表</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div v-if="loading" class="text-center">
+                        <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+                    </div>
+                    <div v-else>
+                        <p>{{expenseName}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
