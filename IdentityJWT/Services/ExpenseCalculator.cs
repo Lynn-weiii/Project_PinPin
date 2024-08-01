@@ -14,6 +14,7 @@ namespace PinPinServer.Services
             //先算出誰欠我
             foreach (var sep in payYourself)
             {
+                if (sep.UserId == userId) continue;
                 var member = members.First(m => m.UserId == sep.UserId);
                 member.Balance += sep.Amount;
                 if (sep.IsPaid == false)

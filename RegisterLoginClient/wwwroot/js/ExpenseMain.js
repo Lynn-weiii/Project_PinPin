@@ -25,6 +25,7 @@ $(function () {
           const userName = ref("");
           const modalStack = ref([]);
 
+          //------------------------------------------燈箱操控----------------------------------------------------
           const getCurrentModalId = () => {
             return modalStack.value.length
               ? modalStack.value[modalStack.value.length - 1]
@@ -89,6 +90,7 @@ $(function () {
             showModal(PmodalId);
           };
 
+          //------------------------------------------獲取資料----------------------------------------------------
           //獲取使用者有加入的行程
           const getSchedules = async () => {
             try {
@@ -159,7 +161,7 @@ $(function () {
             }
           };
 
-          const getExpense = async () => {
+          const getExpense = async (id) => {
             try {
               let response = await axios.get(
                 `${baseAddress}/api/SplitExpenses/GetExpense${id}`,
@@ -182,11 +184,18 @@ $(function () {
             );
           });
 
-          const totalUserBalance = computed(() => {
-            return userExpenses.value.reduce(
-              (sum, expens) => sum + expens.amount,
+          const totalExpensAmount = computed(() => {
+            return expenses.value.reduce(
+              (sum, amount) => sum + amount.amount,
               0
             );
+          });
+
+          const totalUserBalance = computed(() => {
+            const userBalance = schedulebalances.value.find(
+              (sb) => sb.userName === userName.value
+            );
+            return userBalance?.isPaidBalance ?? 0;
           });
 
           onMounted(() => {
@@ -205,6 +214,7 @@ $(function () {
             scheduleName,
             totalBalance,
             totalUserBalance,
+            totalExpensAmount,
             loading,
             goBack,
             getScheduleBalance,

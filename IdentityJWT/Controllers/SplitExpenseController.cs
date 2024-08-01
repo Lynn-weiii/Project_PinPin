@@ -202,8 +202,8 @@ namespace PinPinServer.Controllers
             {
                 //找所有跟使用者與指定團員的分帳表
                 var expenseList = await _context.SplitExpenses
-                                        .Where(se => se.ScheduleId == scheduleId && (se.PayerId == userID) || (se.PayerId == memberId && se.SplitExpenseParticipants
-                                        .Any(sep => sep.UserId == userID)))
+                                        .Where(se => se.ScheduleId == scheduleId)
+                                        .Where(se => se.PayerId == userID && se.SplitExpenseParticipants.Any(sep => sep.UserId == memberId) || (se.PayerId == memberId && se.SplitExpenseParticipants.Any(sep => sep.UserId == userID)))
                                         .Include(se => se.SplitExpenseParticipants)
                                         .Include(se => se.SplitCategory)
                                         .AsNoTracking()
@@ -306,8 +306,8 @@ namespace PinPinServer.Controllers
         }
 
         //POST:api/SplitExpenses/CreateNewExpense
-        [HttpPost("CreateNewExpense")]
-        public async Task<ActionResult> CreateNewExpense([FromBody] CreateNewExpensedDTO dto)
+        [HttpPost("PostExpense")]
+        public async Task<ActionResult> PostExpense([FromBody] CreateNewExpensedDTO dto)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
 
@@ -322,6 +322,7 @@ namespace PinPinServer.Controllers
                 );
 
                 return BadRequest(new { Error = errors });
+
             }
 
             var groupUserList = await _context.ScheduleGroups
@@ -415,9 +416,8 @@ namespace PinPinServer.Controllers
                         SplitExpenseId = splitExpense.Id,
                         UserId = userId,
                         Amount = item.Amount,
-                        IsPaid = item.IsPaid,
+                        IsPaid = item.UserId == splitExpense.PayerId ? true : item.IsPaid,
                     };
-
                     participants.Add(participant);
                 }
 
