@@ -109,6 +109,27 @@ namespace PinPinServer.Controllers
                         await _context.SaveChangesAsync();
                     }
 
+                    //建立預設的願望清單
+                    Wishlist defaultWishlist = new Wishlist
+                    {
+                        UserId = user.Id,
+                        Name = "我的願望清單"
+                    };
+
+                    _context.Wishlists.Add(defaultWishlist);
+                    await _context.SaveChangesAsync();
+
+                    //建立預設的願望清單分類
+                    var defaultCategories = new List<LocationCategory>
+                    {
+                        new LocationCategory { WishlistId = defaultWishlist.Id, Name = "住宿", Color = "#FF5733" },
+                        new LocationCategory { WishlistId = defaultWishlist.Id, Name = "景點", Color = "#33FF57" },
+                        new LocationCategory { WishlistId = defaultWishlist.Id, Name = "餐廳", Color = "#3357FF" }
+                    };
+
+                    _context.LocationCategories.AddRange(defaultCategories);
+                    await _context.SaveChangesAsync();
+
                     // 提交事務
                     transaction.Commit();
 

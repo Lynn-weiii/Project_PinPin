@@ -31,8 +31,6 @@ public partial class User
 
     public virtual ICollection<ChatroomChat> ChatroomChats { get; set; } = new List<ChatroomChat>();
 
-    public virtual ICollection<LocationCategory> LocationCategories { get; set; } = new List<LocationCategory>();
-
     public virtual ICollection<ScheduleAuthority> ScheduleAuthorities { get; set; } = new List<ScheduleAuthority>();
 
     public virtual ICollection<ScheduleDetail> ScheduleDetails { get; set; } = new List<ScheduleDetail>();

@@ -19,8 +19,6 @@ public partial class SplitExpense
 
     public int CurrencyId { get; set; }
 
-    public decimal ExchangeRate { get; set; }
-
     public decimal Amount { get; set; }
 
     public string Remark { get; set; }

@@ -11,6 +11,8 @@ public partial class FavorCategory
 
     public string Category { get; set; }
 
+    public string Icon { get; set; }
+
     public bool? IsDeleted { get; set; }
 
     public virtual ICollection<UserFavor> UserFavors { get; set; } = new List<UserFavor>();

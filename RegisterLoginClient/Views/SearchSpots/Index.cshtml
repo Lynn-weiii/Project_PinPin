@@ -101,7 +101,6 @@
         </div>
     </div>
 
-
     <!--願望清單Modal-->
     <div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="wishlistModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -115,18 +114,18 @@
                         <!-- 你可以在这里添加输入字段或其他内容 -->
                         <div id="app">
                             <div class="mb-3">
-                                @* <label for="wishlistItem" class="form-label">項目名稱</label>
-                                <input type="text" class="form-control" id="wishlistItem" placeholder="項目名稱"> *@
                                 <label>選擇清單:</label>
                                 <select id="wishlist" v-model="selectedWishlist" v-on:change="changeOption">
-                                    <option v-for="option in wishlists" :key="option.id" :value="option.id">
-                                        {{option.name}}
+                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                        {{ wishlist.name }}
                                     </option>
                                 </select>
-                                <label>選擇標籤:</label>
-                                <select id="location" v-model="selectedLocationCategory" v-on:change="changeOption">
-                                    <option v-for="option in locationCategories" :key="option.id" :value="option.id">
-                                        {{option.name}}
+                            </div>
+                            <div class="mb-3">
+                                <label>選擇分類:</label>
+                                <select id="location" v-model="selectedLocationCategory">
+                                    <option v-for="location in locationCategories" :key="location.id" :value="location.id">
+                                        {{ location.name }}
                                     </option>
                                 </select>
                             </div>
@@ -138,17 +137,18 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                     <button type="submit" class="btn btn-primary wishlists">加入</button>
                 </div>
-                
+
             </div>
         </div>
     </div>
-   
-
 </div>
 
 @section Scripts
 {
     <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
+            integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         var baseAddress = "https://localhost:7280";       //Developr Server //注意結尾沒有斜線!
         //var baseAddress = "https://localhost:xx";       //Staging Server(Testing Server)
@@ -248,17 +248,17 @@
                     const card = document.createElement('div');
                     card.className = 'col-md-4 mb-3';
                     card.innerHTML = `
-                      <div class="card">
-                                    ${photoUrl ? `<img src="${photoUrl}" class="card-img-top" width:150px alt="${place.name}">` : '<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="No image available">'}
-                                    <div class="card-body">
-                                        <h5 class="card-title">${place.name}</h5>
-                                        <p class="card-text">${place.formatted_address}</p>
-                                        <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
-                                                    <button type="button" class="btn btn-primary wishlists" target="_blank" data-bs-toggle="modal" data-bs-target="#wishlistModal">加入願望清單</button>
-                                    <button type="button" class="btn btn-primary btnDetail" data-bs-toggle="modal" data-bs-target="#detailModal" data-place-id="${place.place_id}">詳細資訊</button>
-                               </div>
-                       </div>
-                            `;
+                                              <div class="card">
+                                                            ${photoUrl ? `<img src="${photoUrl}" class="card-img-top" width:150px alt="${place.name}">` : '<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="No image available">'}
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">${place.name}</h5>
+                                                                <p class="card-text">${place.formatted_address}</p>
+                                                                <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
+                                                                            <button type="button" class="btn btn-primary wishlists" target="_blank" data-bs-toggle="modal" data-bs-target="#wishlistModal">加入願望清單</button>
+                                                            <button type="button" class="btn btn-primary btnDetail" data-bs-toggle="modal" data-bs-target="#detailModal" data-place-id="${place.place_id}">詳細資訊</button>
+                                                       </div>
+                                               </div>
+                                                    `;
                     resultsContainer.appendChild(card);
                 }
                 const detailButtons = document.querySelectorAll('.btnDetail');
@@ -287,22 +287,22 @@
 
                 if (details) {
                     detailContent.innerHTML = `
-                                    <div class="map-details">
-                                    <h5 class="map-details-title">${details.name}</h5>
-                                    <p class="map-details-address">${details.formatted_address}</p>
-                                    <p class="map-details-rating">評價: ${details.rating} (${details.user_ratings_total} reviews)</p>
-                                    <p class="map-details-hours"><strong>營業時間:</strong><br>
-                                    ${details.opening_hours ? details.opening_hours.weekday_text.join('<br>') : '未提供'}</p>
-                                    <h6 class="map-details-reviews-title">評論</h6>
-                                    <ul class="map-details-reviews">
-                                        ${details.reviews ? details.reviews.map(review => `
-                                            <li class="map-details-review">
-                                                <strong>${review.author_name}:</strong> ${review.text}
-                                            </li>
-                                        `).join('') : '<li>無評論</li>'}
-                                    </ul>
-                                </div>
-                            `;
+                                                            <div class="map-details">
+                                                            <h5 class="map-details-title">${details.name}</h5>
+                                                            <p class="map-details-address">${details.formatted_address}</p>
+                                                            <p class="map-details-rating">評價: ${details.rating} (${details.user_ratings_total} reviews)</p>
+                                                            <p class="map-details-hours"><strong>營業時間:</strong><br>
+                                                            ${details.opening_hours ? details.opening_hours.weekday_text.join('<br>') : '未提供'}</p>
+                                                            <h6 class="map-details-reviews-title">評論</h6>
+                                                            <ul class="map-details-reviews">
+                                                                ${details.reviews ? details.reviews.map(review => `
+                                                                    <li class="map-details-review">
+                                                                        <strong>${review.author_name}:</strong> ${review.text}
+                                                                    </li>
+                                                                `).join('') : '<li>無評論</li>'}
+                                                            </ul>
+                                                        </div>
+                                                    `;
                 } else {
                     detailContent.innerHTML = '無法找到此地點的詳細資料。';
                 }
@@ -313,46 +313,93 @@
             }
         }
 
-        //在user點選地點的[加入願望清單]後，加到DB願望清單中
-        // $(document).on("click", ".wishlists", async function () {
-        //     alert("加入願望清單")
-        // });
-
-        const vueApp = {
+        //當user點選[加入願望清單]時，以modal視窗供user選擇要加入的清單。系統載入user所有願望清單，選定願望清單後，系統載入清單項下的所有分類
+        const vueWishlist = {
             data() {
                 return {
                     selectedWishlist: null,
                     selectedLocationCategory: null,
                     wishlists: [],
-                    locationCategories: []
+                    locationCategories: [],
+                    allLocationCategories: []
                 };
             },
             methods: {
                 changeOption() {
-                    alert(`Selected Wishlist: ${this.selectedWishlist}, Selected Location Category: ${this.selectedLocationCategory}`);
+                    this.filterLocationCategories();
+                },
+                filterLocationCategories() {
+                    if (this.selectedWishlist !== null) {
+                        // 根據選擇的願望清單過濾分類
+                        this.locationCategories = this.allLocationCategories.filter(category => {
+                            return category.wishlistId === this.selectedWishlist;
+                        });
+                    } else {
+                        // 沒有選擇清單時，保持分類為空
+                        this.locationCategories = [];
+                    }
                 }
             },
             mounted() {
-                const token = localStorage.getItem('token');
-                const uri = `${baseAddress}/api/Wishlist/GetAllWishlist`;
-                axios.get(uri, {
-                    headers: {
-                        'Authorization': `bearer ${token}`
-                    }
-                }).then(response => {
-                    this.wishlists = response.data.wishlists;
-                    this.locationCategories = response.data.locationCategories;
-                    // 在选项加载完毕后初始化 multi-select-tag
-                    this.$nextTick(() => {
-                        new MultiSelectTag('wishlist');
-                    });
+                const userId = getUserIdFromToken();
+                console.log('User ID:', userId);
+
+                const uri = `${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`;
+                axios.get(uri).then(response => {
+                    console.log('Response data:', response.data);
+
+                    this.wishlists = response.data.map(wishlist => ({
+                        id: wishlist.id,
+                        name: wishlist.name
+                    }));
+
+                    this.allLocationCategories = response.data.flatMap(wishlist => wishlist.locationCategories);
+
+                    this.locationCategories = [];
                 }).catch(error => {
+                    console.error('Error loading data:', error);
                     alert(error);
                 });
             }
         };
-        Vue.createApp(vueApp).mount("#app");
+        Vue.createApp(vueWishlist).mount("#app");
 
+        /*取得當前用戶ID start*/
+        //處理Base64
+        function base64UrlDecode(base64Url) {
+            // 替換 Base64Url 特有字符
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            // 解碼 Base64 字符串
+            return decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+        }
+        //decode JWT
+        function parseJwt(token) {
+            // 分割 JWT 字符串
+            const parts = token.split('.');
+            if (parts.length !== 3) {
+                throw new Error('Invalid token');
+            }
 
+            // 解碼 payload 部分
+            const payload = parts[1];
+            return JSON.parse(base64UrlDecode(payload));
+        }
+        function getUserIdFromToken() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const decodedToken = parseJwt(token);
+                    return decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']; // 根據實際的 claim 名稱來提取 userId
+                } catch (error) {
+                    console.error('Failed to decode token:', error);
+                }
+            }
+            return null;
+        }
+        /*取得當前用戶ID end*/
+
+        //在user點選地點的[加入願望清單]後，加到DB願望清單中
     </script>
 }

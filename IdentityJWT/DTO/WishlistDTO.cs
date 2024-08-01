@@ -4,7 +4,9 @@ namespace PinPinServer.DTO
 {
     public class WishlistDTO
     {
-        public Wishlist Wishlists { get; set; }
-        public IEnumerable<LocationCategory> LocationCategories { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Name { get; set; }
+        public IEnumerable<LocationCategoryDTO> LocationCategories { get; set; }
     }
 }
