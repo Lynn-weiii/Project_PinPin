@@ -21,17 +21,11 @@ public partial class ScheduleDetail
 
     public DateTime EndTime { get; set; }
 
-    public int? CostCurrencyId { get; set; }
-
-    public decimal? Cost { get; set; }
-
     public string Remark { get; set; }
 
     public bool? IsDeleted { get; set; }
 
     public DateTime? ModifiedTime { get; set; }
-
-    public virtual CostCurrencyCategory CostCurrency { get; set; }
 
     public virtual SchedulePreview ScheduleDay { get; set; }
 

@@ -13,6 +13,8 @@ public partial class Wishlist
 
     public string Name { get; set; }
 
+    public virtual ICollection<LocationCategory> LocationCategories { get; set; } = new List<LocationCategory>();
+
     public virtual User User { get; set; }
 
     public virtual ICollection<WishlistDetail> WishlistDetails { get; set; } = new List<WishlistDetail>();

@@ -28,6 +28,10 @@
         background: #FCF8F3;
     }
 
+    .edit_btn{
+        z-index:1500;
+    }
+   
     #createbtn, #newschbtn {
         background: #638889;
         color: #F0F0F0;
@@ -86,6 +90,7 @@
         text-decoration: none;
         color: inherit;
         transition: all 0.3s ease; 
+        z-index:9999;
     }
 
     .course_card_link:hover {
@@ -97,19 +102,29 @@
         color: #758694 !important; /* 设置取消按钮文字颜色 */
     }
 
+        #loading {
+            display: none !important;
+        }
+
+        .table thead th {
+            font-size:12px;
+
+        }
 </style>
 }
 
 @*Header End*@
 
 @*Body*@
+<div id="loading"  class="d-flex justify-content-center">
+    <img src="~/images/loading.gif" style="width:100px; position:absolute;" />
+</div>
 <div class="container">
-    @*-搜尋-*@
+    @*-新增行程-*@
     <div class="container search_container pb-1">
         <div class="row">
             <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
                 <div class="header_search_container position-relative">
-                   
                         <div class="d-flex flex-row justify-content-end">
                             <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
                                 新增行程
@@ -119,6 +134,7 @@
             </div>
         </div>
     </div>
+
     @*-顯示schedule-*@
     <div class="row">
         <div class="tab-wrap">
@@ -130,6 +146,7 @@
             <div class="tab__content" id="tab1_content">
                 <div id="errmsg"></div>
                 <div class="popular" id="result_container">
+                    <div id="errmsg1" style="color:red;"></div>
                     <div class="row" style="margin-top:1px;margin-bottom:2px">
                         <div class="section_title_container mb-3">
                             <div class="d-flex flex-row align-items-center">
@@ -141,7 +158,7 @@
                             <div class="popular_courses_slider_container">
                                 <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
                                     <!-- foreach schedule Course Card -->
-                                </div>                                                                
+                                </div>
                                 <div class="owl-dots"></div>
                             </div>
                         </div>
@@ -151,6 +168,7 @@
             <!-- tabGroup2: 旅遊群組 -->
             <div class="tab__content" id="tab2_content">
                 <div class="popular" id="result_container">
+                    <div id="errmsg2" style="color:red;"></div>
                     <div class="row" style="margin-top:1px;margin-bottom:2px">
                         <div class="section_title_container mb-3">
                             <div class="d-flex flex-row align-items-center">
@@ -172,6 +190,8 @@
         </div>
     </div>
 </div>
+
+
 
 @*-新增行程Modal-*@
 <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
@@ -221,7 +241,7 @@
 </div>
 
 @*-查看成員-*@
-<div class="modal fade" id="editor_right_modal" tabindex="-1" aria-labelledby="exampleModalCenterTitle"
+<div class="modal fade" id="schedule_authority_modal" tabindex="-1" aria-labelledby="schedule_authority_modal"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -244,43 +264,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>user1"(userid)"</td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category1_user1_id">
-                                    <label class="form-check-label" for="category1_user1_id"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category2_user1_id">
-                                    <label class="form-check-label" for="category2_user1_id"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category3_user1_id">
-                                    <label class="form-check-label" for="category3_user1_id"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category4_user1_id">
-                                    <label class="form-check-label" for="category4_user1_id"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category5_user1_id">
-                                    <label class="form-check-label" for="category5_user1_id"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="category6_user1_id">
-                                    <label class="form-check-label" for="category6_user1_id"></label>
-                                </div>
-                            </td>
+                            <!--foreach userid authright tables-->
                         </tr>
                     </tbody>
                 </table>
@@ -307,70 +291,95 @@
 
 
 @section Scripts {
-     <script>
+
+<script>
         $(document).ready(async function () {
-
-            setTimeout(function () {
-                console.log('Calling initPopularCoursesSlider');
-                initPopularCoursesSlider();
-            }, 3000); 
-
+            $('#loading').show();
             var baseAddress = "https://localhost:7280";
             var token = localStorage.getItem('token');
 
-            $('#errmsg').hide();
-            //user發起的主題
             try {
-                var response = await fetch(`${baseAddress}/api/Schedules/MainSchedules`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                if (!response.ok) {
+                // Fetch main schedules and schedules group concurrently
+                var [mainSchedulesResponse, schedulesGroupResponse] = await Promise.all([
+                    fetch(`${baseAddress}/api/Schedules/MainSchedules`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch(`${baseAddress}/api/Schedules/SchedulesGroup`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                ]);
+
+                // Handle main schedules response
+                if (mainSchedulesResponse.status === 401) {
+                    $('#course-container').hide();
+                    alert('gologin');
+                    $('#loading').hide(); // Ensure loading is hidden even if unauthorized
+                    return;
+                } else if (mainSchedulesResponse.status === 204) {
+                    $('#course-container').hide();
+                    $('#errmsg1').show().text('尚未有新增的行程!');
+                } else if (mainSchedulesResponse.ok) {
+                    const data = await mainSchedulesResponse.json();
+                    renderCourses(data);
+                }
+
+                // Handle schedules group response
+                if (schedulesGroupResponse.status === 401) {
                     $('#result_container').hide();
                     alert('gologin');
+                    $('#loading').hide(); // Ensure loading is hidden even if unauthorized
                     return;
-                }
-                var data = await response.json();
-                renderCourses(data);
-            } catch (error) {
-                console.log(error);
-                $('#result_container').hide();
-                $('#errmsg').show().text('Error: ' + error.message);
-            }
-
-            // 旅遊群組Infoloading
-            try {
-                var response = await fetch(`${baseAddress}/api/Schedules/SchedulesGroup`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                    if (!response.ok) {
-                        $('#result_container').hide();
-                        alert('gologin');
-                        return;
-                    }
-                    var data2 = await response.json();
+                } else if (schedulesGroupResponse.status === 204) {
+                    $('#group_course-container').hide();
+                    $('#errmsg2').show().text('目前尚未有共享的旅行群組');
+                } else if (schedulesGroupResponse.ok) {
+                    const data2 = await schedulesGroupResponse.json();
                     groupCourses(data2);
+                }
+
+                // Initialize the slider
+                console.log('Calling initPopularCoursesSlider');
+                initPopularCoursesSlider();
+
             } catch (error) {
                 console.log(error);
+                $('#course-container').hide();
                 $('#group_course-container').hide();
-                $('#errmsg').show().text('Error: ' + error.message);
+                $('#errmsg1').show().text('Error: ' + error.message);
+                $('#errmsg2').show().text('Error: ' + error.message);
+            } finally {
+                // Ensure loading is hidden after all operations
+                $('#loading').hide();
+                console.log('Loading hidden');
             }
 
-            // 當切換標籤之後
+            // 切換標籤
             $('input[name="tabGroup1"]').on('change', function () {
                 $('.popular_courses_slider').trigger('destroy.owl.carousel');
                 initPopularCoursesSlider();
             });
 
-            // 進入detail
+            // 編輯詳細行程
             $(document).on('click', '.edit_btn', function () {
+                event.preventDefault();
+                var fun = $(this).data('fun');
+                var editId = $(this).data('id');
+                if (fun === 'EditGroupSch') {
+                alert(`$Fun_${fun}:Id$_${editId}`);
+                console.log(`$Fun_${fun}:Id$_${editId}`);
+                }
+                    else if (fun === 'EditMainSch') {
+                alert(`$Fun_${fun}:Id$_${editId}`);
+                console.log(`$Fun_${fun}:Id$_${editId}`);
+                }
                 alert('go schedule detail');
             });
 
@@ -380,10 +389,10 @@
                 initAirDatepicker();
             });
 
-            //新增行程
+            // 新增行程
             $('#createbtn').on('click', async function () {
                 $('#newschdule').modal('hide');
-                try{ 
+                try {
                     var name = $('#Name').val();
                     var startTime = $('#el1').val();
                     var endTime = $('#el2').val();
@@ -393,8 +402,8 @@
                     var place_id = $('#place_id').val();
                     var body = {
                         "Name": name,
-                        "StartTime": startTime, 
-                        "EndTime": endTime, 
+                        "StartTime": startTime,
+                        "EndTime": endTime,
                         "Lat": lat,
                         "Lng": lng,
                         "PlaceId": place_id,
@@ -402,9 +411,7 @@
                     };
 
                     console.log(JSON.stringify(body));
-                
-                    var response = await fetch(
-                        `${baseAddress}/api/Schedules`, {
+                    var response = await fetch(`${baseAddress}/api/Schedules`, {
                         method: "POST",
                         body: JSON.stringify(body),
                         headers: {
@@ -416,18 +423,17 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    
+
                     alert('行程已成功新增');
 
-                    // 在成功提示后重新加载页面
+                    // 成功提示后重新加载页面
                     location.reload();
 
-                } 
-                catch (error) {
+                } catch (error) {
                     console.error('Error:', error);
                 }
             });
-            
+
             // 删除行程函数
             $(document).on('click', '.dropdown-item', function (event) {
                 event.preventDefault(); // 阻止默认的链接跳转行为
@@ -443,10 +449,10 @@
                     Swal.fire({
                         title: "Are you sure?",
                         html: `
-                                您確認要刪除此行程?<br>
-                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
-                                也會一併刪除!
-                            `,
+                            您確認要刪除此行程?<br>
+                            當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                            也會一併刪除!
+                        `,
                         icon: "warning",
                         iconColor: '#E4003A',
                         showCancelButton: true,
@@ -463,7 +469,7 @@
                                         text: `${sch_name}行程已刪除`,
                                         icon: "success"
                                     }).then(() => {
-                                        location.reload();                                        
+                                        location.reload();
                                     });
                                 }
                             } catch (error) {
@@ -482,17 +488,14 @@
                         });
                     });
                 }
-            })
-            
-            
+            });
 
-            @*Function Section*@
             // Google Autocomplete
             let debounceTimer;
             function initMap() {
                 var options = {
-                    types: ['geocode'], // 修改为你需要的类型
-                    fields: ['place_id', 'geometry', 'name', 'photos'] // 指定要返回的字段
+                    types: ['geocode'],
+                    fields: ['place_id', 'geometry', 'name', 'photos']
                 };
 
                 var input = $('#search_input')[0];
@@ -541,7 +544,7 @@
                 }
             }
 
-            //air daterangepiker
+            // Air Datepicker
             function initAirDatepicker() {
                 try {
                     let today = new Date();
@@ -579,34 +582,31 @@
                         }
                     });
                 } catch (error) {
-                    console.log(`datepicker error ${error}`)
+                    console.log(`datepicker error ${error}`);
                 }
             }
 
-            //Delete schedule
+            // 删除行程
             async function deleteSchedule(deleteId) {
                 try {
-                        var response = await fetch(`${baseAddress}/api/Schedules/${deleteId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
+                    var response = await fetch(`${baseAddress}/api/Schedules/${deleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-                        if (!response.ok) {
-                            throw new Error('刪除行程失敗');
-                        }     
-                        return true;
+                    if (!response.ok) {
+                        throw new Error('刪除行程失敗');
+                    }
+                    return true;
 
                 } catch (error) {
                     console.error('Error:', error);
-                    throw error; 
+                    throw error;
                 }
             }
-
-
-        //document end
         });
     </script>
 }

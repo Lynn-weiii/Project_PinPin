@@ -29,7 +29,8 @@ namespace PinPinServer.Controllers
 
         private List<LocationCategory> GetDefaultCategory(int userId)
         {
-            List<LocationCategory> categories = _context.LocationCategories.AsNoTracking().Where(lc => lc.UserId == userId).ToList();
+            int UserId = _getUserId.PinGetUserId(User).Value;
+            List<LocationCategory> categories = _context.LocationCategories.AsNoTracking().Where(lc => lc.Id == userId).ToList();
             if (categories.Count == 0)
             {
                 throw new Exception("Default category not found");

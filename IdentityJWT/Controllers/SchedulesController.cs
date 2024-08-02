@@ -30,6 +30,10 @@ namespace PinPinServer.Controllers
             try
             {
                 int userID = _getUserId.PinGetUserId(User).Value;
+                if (userID == 0)
+                {
+                    return Unauthorized(new { message = "請先登入會員" });
+                }
                 schedules = await _context.Schedules
                 .Where(s => s.UserId == userID)
                 .Include(s => s.User)
@@ -44,7 +48,7 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
-                    PictureUrl = s.PictureUrl,
+                    PictureUrl = s.Pictureurl,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList(),
                 }).ToListAsync();
@@ -53,7 +57,7 @@ namespace PinPinServer.Controllers
                 {
 
                     Console.WriteLine("查無使用者相關紀錄");
-                    return NotFound(new { message = "未找到匹配的行程" });
+                    return NoContent();
                 }
 
                 return Ok(schedules);
@@ -96,22 +100,20 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
-                    PictureUrl = s.PictureUrl,
+                    PictureUrl = s.Pictureurl,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups
                         .Where(sg => sg.UserId != userID)
                         .Select(sg => (string?)sg.User.Name)
                         .Distinct()
                         .ToList(),
-                    lng = s.Lng,
-                    lat = s.Lat,
                 })
                 .ToListAsync();
 
                 if (gschedules == null || !gschedules.Any())
                 {
                     Console.WriteLine("查無使用者相關紀錄");
-                    return NotFound(new { message = "未找到匹配的行程" });
+                    return NoContent();
                 }
 
                 return Ok(gschedules);
@@ -226,7 +228,7 @@ namespace PinPinServer.Controllers
                 Lng = editschDTO.lng,
                 Lat = editschDTO.lat,
                 PlaceId = editschDTO.PlaceId,
-                PictureUrl = editschDTO.PictureUrl
+                Pictureurl = editschDTO.Pictureurl,
 
             };
             _context.Schedules.Add(schedule);

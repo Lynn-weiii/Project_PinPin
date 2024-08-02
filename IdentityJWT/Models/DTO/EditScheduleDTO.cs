@@ -36,7 +36,7 @@ namespace PinPinServer.Models.DTO
 
         public Decimal? lat { get; set; }
 
-        public string? PictureUrl { get; set; }
+        public string? Pictureurl { get; set; }
 
     }
 }
