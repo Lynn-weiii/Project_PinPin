@@ -59,5 +59,47 @@ namespace PinPinServer.Controllers
         }
 
 
+        //加入願望清單
+        //GET:api/Wishlist/AddtoWishlistDetail
+        //[HttpPost("AddtoWishlistDetail")]
+        //public async Task<IActionResult> AddToWishlistDetail([FromBody] WishlistDetail wishlistDetail)
+        //{
+        //    if (wishlistDetail == null)
+        //    {
+        //        return BadRequest("Invalid wishlist detail data.");
+        //    }
+
+        //    wishlistDetail.CreatedAt = DateTime.UtcNow; // 確保在後端設置 CreatedAt 時間
+
+        //    _context.WishlistDetails.Add(wishlistDetail);
+        //    await _context.SaveChangesAsync();
+
+        //    return Ok(wishlistDetail);
+        //}
+
+        [HttpPost("AddtoWishlistDetail")]
+        public async Task<IActionResult> AddtoWishlistDetail([FromBody] WishlistDetailDTO wishlistDetailDTO)
+        {
+            if (wishlistDetailDTO == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var wishlistDetail = new WishlistDetail
+            {
+                WishlistId = wishlistDetailDTO.WishlistId,
+                LocationLng = wishlistDetailDTO.LocationLng,
+                LocationLat = wishlistDetailDTO.LocationLat,
+                GooglePlaceId = wishlistDetailDTO.GooglePlaceId,
+                Name = wishlistDetailDTO.Name,
+                LocationCategoryId = wishlistDetailDTO.LocationCategoryId,
+                CreatedAt = wishlistDetailDTO.CreatedAt
+            };
+
+            _context.WishlistDetails.Add(wishlistDetail);
+            await _context.SaveChangesAsync();
+
+            return Ok(wishlistDetail);
+        }
     }
 }
