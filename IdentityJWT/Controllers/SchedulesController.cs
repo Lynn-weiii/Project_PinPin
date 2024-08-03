@@ -26,7 +26,7 @@ namespace PinPinServer.Controllers
         [HttpGet("MainSchedules")]
         public async Task<IActionResult> GetUserMainSchedule()
         {
-            IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
+            //IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
             try
             {
                 int userID = _getUserId.PinGetUserId(User).Value;
@@ -34,11 +34,10 @@ namespace PinPinServer.Controllers
                 {
                     return Unauthorized(new { message = "請先登入會員" });
                 }
-                schedules = await _context.Schedules
+                var schedules = await _context.Schedules
                 .Where(s => s.UserId == userID)
                 .Include(s => s.User)
                 .Include(s => s.ScheduleGroups)
-                .ThenInclude(sg => sg.User)
                 .Select(s => new ScheduleDTO
                 {
                     Id = s.Id,
@@ -50,7 +49,7 @@ namespace PinPinServer.Controllers
                     UserName = s.User.Name,
                     PictureUrl = s.Pictureurl,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
-                    SharedUserNames = s.ScheduleGroups.Select(sg => (string?)sg.User.Name).Distinct().ToList(),
+                    SharedUserNames = s.ScheduleGroups.Select(s => (string?)s.User.Name).Distinct().ToList(),
                 }).ToListAsync();
 
                 if (schedules == null || !schedules.Any())
@@ -229,7 +228,6 @@ namespace PinPinServer.Controllers
                 Lat = editschDTO.lat,
                 PlaceId = editschDTO.PlaceId,
                 Pictureurl = editschDTO.Pictureurl,
-
             };
             _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
@@ -243,6 +241,16 @@ namespace PinPinServer.Controllers
                 IsHoster = true,
             };
             _context.ScheduleGroups.Add(schedulegroup);
+            await _context.SaveChangesAsync();
+
+            var scheduleAuthority = new ScheduleAuthority
+            {
+                Id = 0,
+                ScheduleId = newScheduleId,
+                UserId = userID,
+                AuthorityCategoryId = 7
+            };
+            _context.ScheduleAuthorities.Add(scheduleAuthority);
             await _context.SaveChangesAsync();
 
             return Ok();

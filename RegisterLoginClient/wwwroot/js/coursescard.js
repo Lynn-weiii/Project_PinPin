@@ -27,7 +27,8 @@ function createCourseCard(course, isGroup = false) {
                         </div>
                         <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}" >
                              <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#schedule_authority_modal">成員管理</a></li>
-                             <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
+                             <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#schedule_authority_modal">邀請成員</a></li>
+                            <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
                         </ul>
                     </div>
                     </div>
@@ -97,7 +98,7 @@ function createGroupCourseCard(gcourse) {
                     <div class="course_card_content">
                         <div class="course_card_meta d-flex flex-row align-items-center"></div>
                         <div class="course_card_title">
-                            <h3>${gcourse.name}</h3>
+                            <h4>${gcourse.name}</h4>
                         </div>
                         <div class="course_card_author">
                             <span>by ${gcourse.userName}</span>
