@@ -445,7 +445,7 @@ public partial class PinPinContext : DbContext
 
             entity.HasOne(d => d.SplitExpense).WithMany(p => p.SplitExpenseParticipants)
                 .HasForeignKey(d => d.SplitExpenseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_split_expense_participant_split_expense");
 
             entity.HasOne(d => d.User).WithMany(p => p.SplitExpenseParticipants)

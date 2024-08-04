@@ -19,6 +19,23 @@ $(function () {
     }
   });
 
+  window.addEventListener("closeModal", (event) => {
+    const modalId = event.detail.modalId;
+    const modalElement = document.getElementById(modalId);
+
+    if (modalElement) {
+      const bsModal = bootstrap.Modal.getInstance(modalElement);
+
+      if (bsModal) {
+        bsModal.hide();
+      }
+
+      modalElement.addEventListener("hidden.bs.modal", () => {
+        modalElement.parentNode.removeChild(modalElement);
+      });
+    }
+  });
+
   window.addEventListener("createExpense", async function () {
     $("#modal-container").empty();
 
