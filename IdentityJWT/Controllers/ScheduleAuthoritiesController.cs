@@ -56,8 +56,10 @@ namespace PinPinServer.Controllers
         {
             if (saDTOs == null || !saDTOs.Any())
             {
-                return BadRequest("無法修改");
+                return BadRequest("Invalid data.");
             }
+
+            bool hasChanges = false; // 标志用于跟踪是否有变化
 
             foreach (var saDTO in saDTOs)
             {
@@ -69,41 +71,59 @@ namespace PinPinServer.Controllers
                 var existingAuthorities = await _context.ScheduleAuthorities
                     .Where(sa => sa.ScheduleId == saDTO.ScheduleId && sa.UserId == saDTO.UserId)
                     .ToListAsync();
+
                 var existingAuthorityIds = existingAuthorities.Select(ea => ea.AuthorityCategoryId).ToHashSet();
                 var newAuthorityIds = saDTO.AuthorityCategoryIds.ToHashSet();
+
                 bool isSame = existingAuthorityIds.SetEquals(newAuthorityIds);
-                if (!isSame)
+
+                // 如果权限未变化，跳过当前 saDTO
+                if (isSame)
                 {
-                    if (existingAuthorities.Any())
-                    {
-                        _context.ScheduleAuthorities.RemoveRange(existingAuthorities);
-                    }
-
-                    var addedAuthorities = new List<ScheduleAuthority>();
-                    foreach (var authorityCategoryId in saDTO.AuthorityCategoryIds)
-                    {
-                        var adduserauthority = new ScheduleAuthority
-                        {
-                            ScheduleId = saDTO.ScheduleId,
-                            UserId = saDTO.UserId,
-                            AuthorityCategoryId = authorityCategoryId
-                        };
-
-                        _context.ScheduleAuthorities.Add(adduserauthority);
-                        addedAuthorities.Add(adduserauthority);
-                    }
-
-                    await _context.SaveChangesAsync();
-                    var resultDTOs = addedAuthorities.Select(a => new ScheduleAuthorityDTO
-                    {
-                        ScheduleId = a.ScheduleId,
-                        UserId = a.UserId,
-                        AuthorityCategoryIds = new List<int> { a.AuthorityCategoryId },
-                    }).ToList();
-                    return Ok(resultDTOs);
+                    continue;
                 }
+
+                // 权限有变化，标记有变化
+                hasChanges = true;
+
+                // 删除现有权限并添加新权限
+                if (existingAuthorities.Any())
+                {
+                    _context.ScheduleAuthorities.RemoveRange(existingAuthorities);
+                }
+
+                var addedAuthorities = new List<ScheduleAuthority>();
+                foreach (var authorityCategoryId in saDTO.AuthorityCategoryIds)
+                {
+                    var adduserauthority = new ScheduleAuthority
+                    {
+                        ScheduleId = saDTO.ScheduleId,
+                        UserId = saDTO.UserId,
+                        AuthorityCategoryId = authorityCategoryId
+                    };
+
+                    _context.ScheduleAuthorities.Add(adduserauthority);
+                    addedAuthorities.Add(adduserauthority);
+                }
+
+                await _context.SaveChangesAsync();
+
+                var resultDTOs = addedAuthorities.Select(a => new ScheduleAuthorityDTO
+                {
+                    ScheduleId = a.ScheduleId,
+                    UserId = a.UserId,
+                    AuthorityCategoryIds = new List<int> { a.AuthorityCategoryId },
+                }).ToList();
+                return Ok(resultDTOs);
             }
-            return Ok();
+
+            // 如果没有任何变化，返回 OK
+            if (!hasChanges)
+            {
+                return Ok(new { message = "No changes detected" });
+            }
+
+            return Ok(); // 有变化时的默认返回
         }
     }
 }

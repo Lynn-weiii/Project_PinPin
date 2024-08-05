@@ -1,5 +1,4 @@
-﻿
-<!-- CSS  -->
+﻿<!-- CSS  -->
 <link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/popular_courses_slider.css" rel="stylesheet" />
@@ -7,7 +6,7 @@
 <link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
 
-<!-- JS  -->    
+<!-- JS  -->
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
@@ -114,11 +113,6 @@
         display: none !important;
     }
 
-    .table thead th {
-        font-size:12px;
-
-    }
-
     .modal-footer{
             justify-content: flex-start !important;
             display: flex !important;
@@ -134,8 +128,9 @@
     display:none;
     }
 
-    #schedule-authority-table td, #schedule-authority-table th {
-        text-align: center; 
+    #schedule-authority-table td th {
+        font-size: 14px;
+        text-align: center;
         vertical-align: middle;
     }
 
@@ -578,13 +573,15 @@
                                 }).get();
 
                                 var userData = {
+                                    'UserName': '',
                                     'ScheduleId': ScheduleId,
-                                    'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [], // 确保 AuthorityCategoryIds 不为空
+                                    'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [],
                                     'UserId': UserId,
+                                    'Id': null
                                 };
                                 usersData.push(userData);
                             });
-                            console.log(JSON.stringify(usersData));
+
                             try {
                                 var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/Modified`, {
                                     method: 'POST',
@@ -601,10 +598,14 @@
                                     console.error(`Error response: ${errorText}`);
                                 } else {
                                     const data = await response.json();
-                                    alert('成員權限修改成功');
-                                    location.reload();
+                                    console.log('Success:', data);
+
+                                    if (data.message === 'No changes detected') {
+                                        $('#scheduleauthority_modal').modal('hide');
+                                    }
                                 }
-                            } catch (error) {
+                            }
+                            catch (error) {
                                 console.error(`Fetch error: ${error}`);
                             }
                         });
