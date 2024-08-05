@@ -432,7 +432,7 @@ export function initExpenseModal() {
           }).then((result) => {
             if (result.isConfirmed) {
               const event = new CustomEvent("closeModal", {
-                detail: { modalId: "ExpenseModal" },
+                detail: { modalId: "EditExpenseModal" },
               });
               window.dispatchEvent(event);
             }
@@ -504,6 +504,144 @@ export function initExpenseModal() {
         window.dispatchEvent(event);
       };
 
+      //------------------------------------------存緩存IndexedDB----------------------------------------------------
+      const initDatabase = (code) => {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open("ExchangeRatesDB", 1);
+
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            const metaStore = db.createObjectStore("meta", { keyPath: "key" });
+          };
+
+          request.onsuccess = (event) => {
+            resolve(event.target.result);
+          };
+
+          request.onerror = (event) => {
+            reject(event.target.error);
+          };
+        });
+      };
+
+      function createObjectStore(db, storeName) {
+        return new Promise((resolve, reject) => {
+          if (!db.objectStoreNames.contains(storeName)) {
+            const version = db.version + 1;
+            db.close();
+            const request = indexedDB.open(db.name, version);
+
+            request.onupgradeneeded = (event) => {
+              const upgradeDb = event.target.result;
+              if (!upgradeDb.objectStoreNames.contains(storeName)) {
+                const store = upgradeDb.createObjectStore(storeName, {
+                  keyPath: "id",
+                });
+                store.createIndex("currency", "code", { unique: false });
+              }
+            };
+
+            request.onsuccess = (event) => {
+              resolve(event.target.result);
+            };
+
+            request.onerror = (event) => {
+              reject(event.target.error);
+            };
+          } else {
+            resolve(db);
+          }
+        });
+      }
+
+      const storeExchangeRates = async (code, data) => {
+        try {
+          const db = await initDatabase();
+          const updatedDb = await createObjectStore(db, `${code}rates`);
+
+          const transaction = updatedDb.transaction(
+            [`${code}rates`, "meta"],
+            "readwrite"
+          );
+          const rateStore = transaction.objectStore(`${code}rates`);
+          const metaStore = transaction.objectStore("meta");
+
+          const today = new Date().toISOString().split("T")[0];
+
+          data.forEach((item) => {
+            rateStore.put(item);
+          });
+
+          metaStore.put({ key: `${code}lastUpdate`, date: today });
+
+          transaction.oncomplete = () => {
+            console.log("All data and update time inserted successfully!");
+          };
+
+          transaction.onerror = (event) => {
+            console.error("Transaction error:", event.target.error);
+          };
+        } catch (error) {
+          console.error("Failed to store exchange rates:", error);
+        }
+      };
+
+      async function getExchangeRates(code) {
+        try {
+          const db = await initDatabase();
+          const transaction = db.transaction(
+            [`${code}rates`, "meta"],
+            "readonly"
+          );
+          const rateStore = transaction.objectStore(`${code}rates`);
+          const metaStore = transaction.objectStore("meta");
+
+          const lastUpdateRequest = metaStore.get("lastUpdate");
+          const ratesRequest = rateStore.getAll();
+
+          return new Promise((resolve, reject) => {
+            transaction.oncomplete = () => {
+              const lastUpdate = lastUpdateRequest.result;
+              const rates = ratesRequest.result;
+              resolve({ lastUpdate, rates });
+            };
+
+            transaction.onerror = (event) => {
+              console.error("Transaction error:", event.target.error);
+              reject(event.target.error);
+            };
+          });
+        } catch (error) {
+          console.error("Failed to retrieve exchange rates:", error);
+        }
+      }
+
+      const ensureExchangeRates = async (code) => {
+        try {
+          const today = new Date().toISOString().split("T")[0];
+          const { lastUpdate, rates } = await getExchangeRates(code);
+          if (!rates || rates.length === 0 || lastUpdate != today) {
+            console.log(`No rates found for code ${code}, storing data...`);
+            const response = await axios.get(
+              `${baseAddress}/api/ChangeRate/${code}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            const data = await response.data;
+            await storeExchangeRates(code, data);
+            return data;
+          } else {
+            console.log(`Rates found for code ${code}`);
+            return rates;
+          }
+        } catch (error) {
+          console.error("Error ensuring exchange rates:", error);
+        }
+      };
+
       const totalBalance = computed(() => {
         return schedulebalances.value.reduce(
           (sum, balance) => sum + balance.isPaidBalance,
@@ -570,6 +708,8 @@ export function initExpenseModal() {
         validateForm,
         mainForm,
         deleteExpense,
+        //匯率蕭觀
+        ensureExchangeRates,
       };
     },
   }).mount("#vue-container");

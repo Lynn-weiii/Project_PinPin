@@ -376,6 +376,7 @@ namespace PinPinTest.Controllers
             {
                 costCurrency.Code = dto.Code;
                 costCurrency.Name = dto.Name;
+                costCurrency.Icon = dto.Icon;
 
                 _context.Update(costCurrency);
                 await _context.SaveChangesAsync();
@@ -384,6 +385,7 @@ namespace PinPinTest.Controllers
                 {
                     costCurrency.Code,
                     costCurrency.Name,
+                    costCurrency.Icon,
                 });
             }
             catch

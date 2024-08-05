@@ -25,6 +25,20 @@ builder.Services.AddSingleton<WeatherService>(provider =>
     return new WeatherService(builder.Configuration["AppSettings:WeatherApiKey"], httpClient);
 });
 
+//註冊計算服務
+builder.Services.AddSingleton<ExpenseCalculatorService>();
+
+//註冊匯率服務
+builder.Services.AddHttpClient<ChangeRateService>(client =>
+{
+    client.BaseAddress = new Uri("https://v6.exchangerate-api.com");
+});
+builder.Services.AddSingleton<ChangeRateService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(ChangeRateService));
+    return new ChangeRateService(builder.Configuration["AppSettings:ExChangeRateApiKey"], httpClient);
+});
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

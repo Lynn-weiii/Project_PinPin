@@ -16,10 +16,12 @@ namespace PinPinServer.Controllers
     {
         private readonly PinPinContext _context;
         private readonly AuthGetuserId _getUserId;
-        public SplitExpensesController(PinPinContext context, AuthGetuserId getuserId)
+        private readonly ExpenseCalculatorService _calculatorService;
+        public SplitExpensesController(PinPinContext context, AuthGetuserId getuserId, ExpenseCalculatorService calculatorService)
         {
             _context = context;
             _getUserId = getuserId;
+            _calculatorService = calculatorService;
         }
 
         //POST:api/SplitExpenses/GetAllExpense
@@ -163,9 +165,8 @@ namespace PinPinServer.Controllers
                                                                                    UserId = sg.UserId,
                                                                                }).ToListAsync();
                 members.Remove(members.First(m => m.UserId == userID));
-                var ec = new ExpenseCalculator();
-                var d = ec.CalculateBalance(expenseList, members, (int)userID);
-                return Ok(d);
+                var balanceDTOs = _calculatorService.CalculateBalance(expenseList, members, (int)userID);
+                return Ok(balanceDTOs);
             }
             catch (Exception ex)
             {
@@ -339,7 +340,7 @@ namespace PinPinServer.Controllers
                 return BadRequest("There are duplicate users.");
             }
             //檢查是否全部都有在群組裡
-            if ((!users.All(user => groupUserList.Contains(user)))||!groupUserList.Contains(dto.PayerId))
+            if ((!users.All(user => groupUserList.Contains(user))) || !groupUserList.Contains(dto.PayerId))
             {
                 return BadRequest("Some users are not in the group.");
             }

@@ -3,7 +3,7 @@ using PinPinServer.Models.DTO.Expense;
 
 namespace PinPinServer.Services
 {
-    public class ExpenseCalculator
+    public class ExpenseCalculatorService
     {
         public List<ExpenseBalanceDTO> CalculateBalance(List<SplitExpense> expenses, List<ExpenseBalanceDTO> members, int userId)
         {

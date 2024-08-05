@@ -265,7 +265,9 @@
           }).then((result) => {
             console.log(result.isConfirmed);
             if (result.isConfirmed) {
-              const event = new CustomEvent("closeModal");
+              const event = new CustomEvent("closeModal", {
+                detail: { modalId: "CreateExpenseModal" },
+              });
               window.dispatchEvent(event);
             }
           });
