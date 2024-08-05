@@ -3,11 +3,11 @@
     tableBody.innerHTML = '';
 
     data.forEach(item => {
-        const { userId, userName, authorityCategoryIds } = item;
+        const { userId, userName, authorityCategoryIds, scheduleId } = item;
         const row = document.createElement('tr');
 
         row.innerHTML = `
-           <td style="text-align:center; vertical-align: middle;">${userName}</td>
+           <td style="text-align:center; vertical-align: middle;" data-scheduleId="${scheduleId}" data-authorityuserid="${userId}">${userName}</td>
             <td style="text-align:center;vertical-align: middle">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" data-authority-id="1" ${authorityCategoryIds.includes(1) ? 'checked' : ''}>

@@ -162,7 +162,7 @@
 
 
 <div class="container">
-    @*#region:新增行程btn*@
+    @*#region 新增行程btn *@
         <div class="container search_container pb-1">
         <div class="row">
             <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
@@ -178,7 +178,7 @@
     </div>
     @*#endregion*@
             
-    @*#region:顯示schedule-*@
+    @*#region 顯示schedule*@
     <div class="row">
         @*tabs*@
         <div class="tab-wrap">
@@ -258,7 +258,7 @@
     </div>
     @*#endregion*@
             
-    @*-#region:新增行程Modal-*@
+    @*#region 新增行程Modal*@
     <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -304,7 +304,7 @@
     </div>
     @*#endregion*@
 
-    @*-#region:成員管理Modal-*@
+    @*#region 成員管理Modal*@
     <div class="modal fade" id="scheduleauthority_modal" tabindex="-1" aria-labelledby="scheduleauthority_modal"
             aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
@@ -340,7 +340,7 @@
     </div>
     @*#endregion*@
 
-    @*#region 邀請成員Modal-*@
+    @*#region 邀請成員Modal*@
     <div class="modal fade" id="invitemember_modal" tabindex="-1" aria-labelledby="invitemember_modal" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered ">
             <div class="modal-content">
@@ -361,6 +361,9 @@
     </div>
     @*#endregion*@
 
+    @*#region 查看成員*@
+        
+    @*#endregion*@
 
 <!--#region Scripts-->
     <script>
@@ -507,6 +510,7 @@
                 function clearModalContent() {
                     $('#authoritytable').empty(); 
                 }
+
                 $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
                     clearModalContent();
                 });
@@ -533,35 +537,79 @@
                     });
                     //#region 成員管理
                     async function handleMemberManager(schedule_id) {
-                    console.log(`schedule_id: ${schedule_id}`);
-                    try {
-                            clearModalContent();
-                            var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/${schedule_id}`, {
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            if (response.status === 204) {                           
-                                alert('群族無成員!');
-                                if ($('#scheduleauthority_modal').hasClass('show')) {
+                        //#region 讀成員權限
+                            try {
+                                clearModalContent();
+                                var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/${schedule_id}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                if (response.status === 204) {                           
+                                    alert('群族無成員!');
+                                    if ($('#scheduleauthority_modal').hasClass('show')) {
+                                        $('#scheduleauthority_modal').modal('hide');
+                                    }
+                                } else if (response.ok) {
+                                    var data = await response.json();
+                                    populateTable(data);                                    
+                                    $('#scheduleauthority_modal').modal('show');                                    
+                                } else {
+                                    console.error('Server error:', response.status);
                                     $('#scheduleauthority_modal').modal('hide');
                                 }
-                            } else if (response.ok) {
-                                var data = await response.json();
-                                populateTable(data);
-                                $('#scheduleauthority_modal').modal('show');
-                            } else {
-                                console.error('Server error:', response.status);
+                            } catch (error) {
+                                console.error('Fetch error:', error);
                                 $('#scheduleauthority_modal').modal('hide');
+                            }                        
+                        //#endregion
+
+                        //#region 修改權限
+                        $('#authright_save').on('click', async function () {
+                            var usersData = [];
+                            $('#schedule-authority-table tbody tr').each(function () {
+                                var UserId = $(this).find('[data-authorityuserid]').data('authorityuserid');
+                                var ScheduleId = $(this).find('[data-scheduleid]').data('scheduleid');
+                                var checkedCheckboxes = $(this).find('.form-check-input:checked');
+                                var AuthorityCategoryIds = checkedCheckboxes.map(function () {
+                                    return $(this).data('authority-id');
+                                }).get();
+
+                                var userData = {
+                                    'ScheduleId': ScheduleId,
+                                    'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [], // 确保 AuthorityCategoryIds 不为空
+                                    'UserId': UserId,
+                                };
+                                usersData.push(userData);
+                            });
+                            console.log(JSON.stringify(usersData));
+                            try {
+                                var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/Modified`, {
+                                    method: 'POST',
+                                    body: JSON.stringify(usersData),
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+
+                                if (!response.ok) {
+                                    alert('修改權限失敗');
+                                    const errorText = await response.text();
+                                    console.error(`Error response: ${errorText}`);
+                                } else {
+                                    const data = await response.json();
+                                    alert('成員權限修改成功');
+                                    location.reload();
+                                }
+                            } catch (error) {
+                                console.error(`Fetch error: ${error}`);
                             }
-                        } catch (error) {
-                            console.error('Fetch error:', error);
-                            $('#scheduleauthority_modal').modal('hide');
-                        }
+                        });
+                        //#endregion
                     }
-                    
                     //#endregion
                         
                     //#region 刪除行程
