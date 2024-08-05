@@ -1,4 +1,5 @@
-﻿<!-- CSS  -->
+﻿
+<!-- CSS  -->
 <link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/popular_courses_slider.css" rel="stylesheet" />
@@ -6,8 +7,7 @@
 <link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
 
-<!-- JS  -->
-<script src="https://kit.fontawesome.com/66638a3835.js" crossorigin="anonymous" asp-fallback-href="/lib/font-awesome/js/fontawesome.js"></script>
+<!-- JS  -->    
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
@@ -15,163 +15,181 @@
 <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyA6jgzT7BfCWc8yD6Co8Gn73pF4heRAOlI&loading=async&callback=initMap">
 </script>
-
-
-<!-- 其他特定页面需要的 JS  -->
 <script src="~/js/owl.carousel.js" type="text/javascript"></script>
+<script src="~/js/coursescard.js"  type="text/javascript"></script>
 <script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
-<script src="~/js/coursescard.js" type="text/javascript"></script>
 <script src="~/js/authoritytables.js" type="text/javascript"></script>
 
-<!--#<!-- #region Styles -->
-@section Styles{
-<style>
-body {
-    background: #FCF8F3;
-}
+<!--#region Styles  -->
+    <style>
+    body {
+        background: #FCF8F3;
+    }
 
-input:hover {
-    border: 1px solid #638889;
-    box-shadow: 0 4px 8px #638889;
-}
-
-.edit_btn{
-    z-index:1500;
-    text-decoration: none;
-}
+    .btn-custom {
+        background-color: #638889;
+        color: #F0F0F0; 
+        width: 100%;
+        text-align: center;
+    }
 
 
+    input:hover {
+        border: 1px solid #638889;
+        box-shadow: 0 4px 8px #638889;
+    }
 
-#createbtn, #newschbtn, #invited_member, #authright_save, #authright_cancel {
-background: #638889;
-color: #F0F0F0;
-}
+    .edit_btn{
+        z-index:1500;
+        text-decoration: none;
+    }
 
-#newschbtn:hover, #createbtn:hover, #invited_member:hover, #authright_save:hover, #authright_cancel:hover {
+    #createbtn, #newschbtn, #authright_save, #authright_cancel, #invite_btn {
+    background: #638889;
+    color: #F0F0F0;
+    }
+
+    #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
     background: #F0F0F0;
     color: #638889;
     border-bottom: 1px solid #7B7B7B;
-}
+    }
 
-.pac-container {
-    z-index: 9999 !important;
-}
+    .pac-container {
+        z-index: 9999 !important;
+    }
 
-.air-datepicker {
-    z-index: 9999 !important;
-    background-color: #f8f9fa;
-    border: 1px solid #ced4da; 
-}
+    .air-datepicker {
+        z-index: 9999 !important;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da; 
+    }
 
-#addnewcard {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 390px;
-    height: 451px;
-    transition: box-shadow 0.3s ease-in-out;
-    border-radius: 6px;
-}
-
-#addnewcard img {
-    width: 150px;
-    height: 255px;
-    object-fit: cover;
-}
-
-#addnewcard:hover {
-    box-shadow: 0 4px 8px #638889;
-}
-
-.header_search_container input {
-    margin-right: -3px;
-}
-
-.item course_card_owl_item:hover {
-    box-shadow: 0 4px 8px #638889;
-}
-
-
-
-.course_card_link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.3s ease; 
-    z-index:9999;
-}
-
-.course_card_link:hover {
-    box-shadow: 0px 8px 8px #638889; 
-    border-radius: 14px;
-}
-
-.swal2-popup .swal2-cancel {
-    color: #758694 !important; /* 设置取消按钮文字颜色 */
-}
-
-#loading {
-    display: none !important;
-}
-
-.table thead th {
-    font-size:12px;
-
-}
-
-.modal-footer{
-        justify-content: flex-start !important;
-        display: flex !important;
-        width: 100% !important;
+    #addnewcard {
+        display: flex;
+        justify-content: center;
         align-items: center;
-}
+        width: 390px;
+        height: 451px;
+        transition: box-shadow 0.3s ease-in-out;
+        border-radius: 6px;
+    }
 
-.modal-footer .row {
-    align-items: center; /* 使input和button垂直居中 */
-}
+    #addnewcard img {
+        width: 150px;
+        height: 255px;
+        object-fit: cover;
+    }
 
-#emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
-display:none;
-}
+    #addnewcard:hover {
+        box-shadow: 0 4px 8px #638889;
+    }
 
-#schedule_authority_modal th{
-    align-content:center;
-    justify-content:center;
-    text-align:center;
-}
-</style>
-}
-<!-- #endregion -->
+    .header_search_container input {
+        margin-right: -3px;
+    }
 
-@*Header End*@
+    .item course_card_owl_item:hover {
+        box-shadow: 0 4px 8px #638889;
+    }
 
-@*Body*@
-    <div class="container">
-        @*-新增行程-*@
-            <div class="container search_container pb-1">
-            <div class="row">
-                <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
-                    <div class="header_search_container position-relative">
-                            <div class="d-flex flex-row justify-content-end">
-                                <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
-                                    新增行程
-                                </button>
-                            </div>
-                    </div>
+    .course_card_link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease; 
+        z-index:9999;
+    }
+
+    .course_card_link:hover {
+        box-shadow: 0px 8px 8px #638889; 
+        border-radius: 14px;
+    }
+
+    .swal2-popup .swal2-cancel {
+        color: #758694 !important;
+    }
+
+    #loading {
+        display: none !important;
+    }
+
+    .table thead th {
+        font-size:12px;
+
+    }
+
+    .modal-footer{
+            justify-content: flex-start !important;
+            display: flex !important;
+            width: 100% !important;
+            align-items: center;
+    }
+
+    .modal-footer .row {
+        align-items: center;
+    }
+
+    #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
+    display:none;
+    }
+
+    #schedule-authority-table td, #schedule-authority-table th {
+        text-align: center; 
+        vertical-align: middle;
+    }
+
+    #schedule-authority-table .form-check {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .owl-carousel .owl-dots {
+        display: flex !important;
+    }
+
+    .owl-carousel .owl-dots.disabled {
+        display: flex !important;
+    }
+
+    .owl-dots {
+        justify-content: center;
+        margin-top: 10px;
+    }
+    </style>
+<!--#endregion-->
+
+
+<div class="container">
+    @*#region:新增行程btn*@
+        <div class="container search_container pb-1">
+        <div class="row">
+            <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
+                <div class="header_search_container position-relative">
+                        <div class="d-flex flex-row justify-content-end">
+                            <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
+                                新增行程
+                            </button>
+                        </div>
                 </div>
             </div>
         </div>
-        @*#region:顯示schedule-*@
-        <div class="row">
-            @*tabs*@
-            <div class="tab-wrap">
-                <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
-                <label for="tab1">我的行程</label>
-                <input type="radio" id="tab2" name="tabGroup1" class="tab">
-                <label for="tab2">旅遊群組</label>
-            @*#region:我的行程>*@
+    </div>
+    @*#endregion*@
+            
+    @*#region:顯示schedule-*@
+    <div class="row">
+        @*tabs*@
+        <div class="tab-wrap">
+            <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
+            <label for="tab1">我的行程</label>
+            <input type="radio" id="tab2" name="tabGroup1" class="tab">
+            <label for="tab2">旅遊群組</label>
+            
+        @*#region:我的行程>*@
             <div class="tab__content" id="tab1_content">
-                    @*#region:我的行程:沒有行程or錯誤訊息 *@
+                    @*我的行程:沒有行程or錯誤訊息 *@
                     <div style="color: rgb(102, 102, 102); text-align: center;" id="emptyschedule">
                     <div class="emptyschedule" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
                             <img src="~/images/emptyschedule.png" style="width: 300px ;height: 200px ; margin-top: 10px;" class="mt-5">
@@ -181,7 +199,7 @@ display:none;
                         </div>
                     </div>              
                     <div id="errmsg1" style="justify-content:center; align-items:center;"></div>
-                    @*region:行程輪播卡片*@
+                    @*行程輪播卡片*@
                     <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
                         <div class="row" style="margin-top:1px;margin-bottom:2px">
                             <div class="section_title_container mb-3">
@@ -202,359 +220,454 @@ display:none;
                         </div>
                     </div>
                 </div>
-                @*#region:旅遊群組*@
-                <div class="tab__content" id="tab2_content">
-                    @*#region:旅遊群組:沒有行程or錯誤訊息 *@
-                <div style="color: rgb(102, 102, 102); text-align: center;" id="emptygroup">
-                    <div class="emptygroup" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
-                            <img src="~/images/emptygroup.png" style="width:300px;height:200px; margin-top: 10px;" class="mt-5">
+        @*#endregion*@
+            
+        @*#region:旅遊群組*@
+        <div class="tab__content" id="tab2_content">
+            @*旅遊群組:沒有行程or錯誤訊息 *@
+            <div style="color: rgb(102, 102, 102); text-align: center;" id="emptygroup">
+                <div class="emptygroup" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
+                        <img src="~/images/emptygroup.png" style="width:300px;height:200px; margin-top: 10px;" class="mt-5">
+                    </div>
+                </div>                        
+            @*旅遊群組輪播卡片*@
+            <div id="errmsg2" style="justify-content:center; align-items:center;text-align:center"></div>
+            <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
+                <div class="row" style="margin-top:1px;margin-bottom:2px">
+                    <div class="section_title_container mb-3">
+                        <div class="d-flex flex-row align-items-center">
+                            <!-- Optional: Add title or content here -->
                         </div>
                     </div>
-                    @*region:旅遊群組輪播卡片*@
-                    <div id="errmsg2" style="justify-content:center; align-items:center;text-align:center"></div>
-                    <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
-                        <div class="row" style="margin-top:1px;margin-bottom:2px">
-                            <div class="section_title_container mb-3">
-                                <div class="d-flex flex-row align-items-center">
-                                    <!-- Optional: Add title or content here -->
+                </div>
+                <div class="row course_cards_container section_content_row">
+                    <div class="col">
+                        <div class="popular_courses_slider_container">
+                            <div class="owl-carousel owl-theme popular_courses_slider" id="group_course-container">
+                                <!-- foreach schedule Course Card -->
+                            </div>
+                            <div class="owl-dots"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>                      
+        </div>
+        @*#endregion*@
+                
+    </div>
+    </div>
+    @*#endregion*@
+            
+    @*-#region:新增行程Modal-*@
+    <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="container-fluid modal-body">
+                    <form id="newschdule" novalidate autocomplete="off">
+                        <!-- 行程 -->
+                        <div class="mb-3">
+                            <label for=""></label>
+                            <label for="Name" class="form-label mb-2">行程名稱</label>
+                            <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
+                            <label for="search_input" class="form-label mb-2">目的地</label>
+                            <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
+                            <input id="lat" type="hidden" name="lat">
+                            <input id="lng" type="hidden" name="lng">
+                            <input id="place_id" type="hidden" name="place_id">
+                            <input id="picture_url" type="hidden" name="picture_url">
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <label for="search_input" class="form-label mb-2">旅程日期</label>
+                                <div class="col-5">
+                                    <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" />
+                                </div>
+                                <div class="col-2 text-center align-center pt-1 pb-1">
+                                    <i class="fa-solid fa-arrow-right fa-xl"></i>
+                                </div>
+                                <div class="col-5">
+                                    <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" />
                                 </div>
                             </div>
                         </div>
-                        <div class="row course_cards_container section_content_row">
-                            <div class="col">
-                                <div class="popular_courses_slider_container">
-                                    <div class="owl-carousel owl-theme popular_courses_slider" id="group_course-container">
-                                        <!-- foreach schedule Course Card -->
-                                    </div>
-                                    <div class="owl-dots"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </di>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" id="createbtn">完成</button>
+                </div>
             </div>
         </div>
-        
+    </div>
+    @*#endregion*@
 
-        @*-#region:新增行程Modal-*@
-        <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title w-100 text-center" id="newschduleLabel">建立新行程</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="container-fluid modal-body">
-                        <form id="newschdule" class="needs-validation" method="post" novalidate autocomplete="off">
-                            <!-- 行程 -->
-                            <div class="mb-3">
-                                <label for=""></label>
-                                <label for="Name" class="form-label mb-2">行程名稱</label>
-                                <input id="Name" type="text" class="form-control mb-1" name="Name" placeholder="新的名稱" required>
-                                <label for="search_input" class="form-label mb-2">目的地</label>
-                                <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
-                                <input id="lat" type="hidden" name="lat">
-                                <input id="lng" type="hidden" name="lng">
-                                <input id="place_id" type="hidden" name="place_id">
-                                <input id="picture_url" type="hidden" name="picture_url">
-                            </div>
-                            <div class="mb-3">
-                                <div class="row">
-                                    <label for="search_input" class="form-label mb-2">旅程日期</label>
-                                    <div class="col-5">
-                                        <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" />
-                                    </div>
-                                    <div class="col-2 text-center align-center pt-1 pb-1">
-                                        <i class="fa-solid fa-arrow-right fa-xl"></i>
-                                    </div>
-                                    <div class="col-5">
-                                        <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" />
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn" id="createbtn">完成</button>
+    @*-#region:成員管理Modal-*@
+    <div class="modal fade" id="scheduleauthority_modal" tabindex="-1" aria-labelledby="scheduleauthority_modal"
+            aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header  d-flex justify-content-between">
+                    <p class="modal-title">權限設定</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <table class="table table-bordered-buttom table-bordered-light" id="schedule-authority-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center; vertical-align: middle;">成員</th>
+                                <th data-id="1" style="text-align:center; vertical-align: middle;">編輯行程</th>
+                                <th data-id="4" style="text-align:center; vertical-align: middle;">邀請成員</th>
+                                <th data-id="2" style="text-align:center; vertical-align: middle;">移除成員</th>
+                                <th data-id="5" style="text-align:center; vertical-align: middle;">聊天室<br />建立投票</th>
+                                <th data-id="3" style="text-align:center; vertical-align: middle;">聊天室<br />禁止發言</th>
+                                <th data-id="6" style="text-align:center; vertical-align: middle;">聊天室<br />刪除訊息</th>
+                            </tr>
+                        </thead>
+                        <tbody id="authoritytable">
+                                <!--foreach userid authright tables-->
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-sm" id="authright_save">修改</button>
+                        <button class="btn btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    @*#endregion*@
 
-
-        @*-#region:成員管理-*@
-        <div class="modal fade" id="schedule_authority_modal" tabindex="-1" aria-labelledby="schedule_authority_modal"
-             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header  d-flex justify-content-between">
-                        <p class="modal-title">權限設定</p>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-bordered-buttom table-bordered-light">
-                            <thead>
-                                <tr>
-                                    <th>成員</th>
-                                    <th data-id="1">編輯行程<br /></th>
-                                    <th data-id="4">邀請成員<br /></th>
-                                    <th data-id="2">移除成員<br /></th>
-                                    <th data-id="5">聊天室<br />建立投票</th>
-                                    <th data-id="3">聊天室<br />禁止發言</th>
-                                    <th data-id="6">聊天室<br />刪除訊息</th>
-                                </tr>
-                            </thead>
-                            <tbody id="authoritytable">
-                                    <!--foreach userid authright tables-->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer" style="display: flex; justify-content: flex-end; width: 100%; align-items: center;">
-                        <button class="btn btn-sm" id="authright_save" style="margin-left: 10px;">修改</button>
-                        <button class="btn btn-sm" id="authright_cancel" style="margin-left: 10px;">取消</button>
-                    </div>
-
+    @*#region 邀請成員Modal-*@
+    <div class="modal fade" id="invitemember_modal" tabindex="-1" aria-labelledby="invitemember_modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered ">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title">邀請好友 <i class="fa-solid fa-user-group"></i></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="checkmail" class="form-group needs-validation" novalidate autocomplete="off">
+                        <div class="d-flex align-items-start needs-validation mt-2 mb-2 ">
+                            <input type="email" class="form-control mx-1" name="Email" style="width:80%;border-radius:14px;" id="txtMail" required pattern="^[\w-\.]+@("@")([\w-]+\.)+[\w-]{2,4}$">
+                            <button type="submit" class="form-control" id="invite_btn" style="width:auto;border-radius:14px;">加入</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
+    @*#endregion*@
 
 
-<!-- #region Scripts -->
-        @section Scripts {
+<!--#region Scripts-->
+    <script>
+        $(document).ready(async function () {
+            var baseAddress = "https://localhost:7280";
+            var token = localStorage.getItem('token');
+                    
+            try {
+                //#region 呼叫後台資料
+                var [mainSchedulesResponse, schedulesGroupResponse] = await Promise.all([
+                    fetch(`${baseAddress}/api/Schedules/MainSchedules`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch(`${baseAddress}/api/Schedules/SchedulesGroup`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                ]);    
 
-            <script>
-                $(document).ready(async function () {
-                    var baseAddress = "https://localhost:7280";
-                    var token = localStorage.getItem('token');
+                    //#region user創建群組loading
+                    if (mainSchedulesResponse.status === 401) {
+                        $('#course-container').hide();
+                        alert('gologin');
+                        return;
+                    } else if (mainSchedulesResponse.status === 204) {
+                        $('#course-container').hide();
+                        $('#emptyschedule').show();
+                    } else if (mainSchedulesResponse.ok) {
+                        $('#emptyschedule').hide();
+                        var data = await mainSchedulesResponse.json();
+                        renderCourses(data);
+                    }
+                    //#endregion
+
+                    //#region 旅遊群組loading
+                    if (schedulesGroupResponse.status === 401) {
+                        $('#result_container').hide();
+                        alert('gologin');
+                        return;
+                    } else if (schedulesGroupResponse.status === 204) {
+                        $('#course-container').hide();
+                        $('#emptygroup').show();
+                    } else if (schedulesGroupResponse.ok) {
+                        $('#emptygroup').hide();
+                        var data2 = await schedulesGroupResponse.json();
+                        groupCourses(data2);
+                    }
+                    //#endregion
+                setTimeout(() => {
+                    console.log('Calling initPopularCoursesSlider');
+                    initPopularCoursesSlider();
+                }, 500);
+            } 
+            catch (error) {
+                console.log(error);
+                $('#course-container').hide();
+                $('#group_course-container').hide();
+                $('#emptygroup').hide();
+                $('#emptyschedule').hide();
+            }
+            //#endregion
+
+                //#region 切換標籤
+                $('input[name="tabGroup1"]').on('change', function () {
+                    $('.popular_courses_slider').trigger('destroy.owl.carousel');
+                    initPopularCoursesSlider();
+                });
+                //#endregion
+
+                //#region 編輯詳細行程
+                $(document).on('click', '.edit_btn', function (event) {
+                    event.preventDefault();
+                    var fun = $(this).data('fun');
+                    var editId = $(this).data('id');
+                    if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
+                        alert(`$Fun_${fun}:Id$_${editId}`);
+                        console.log(`$Fun_${fun}:Id$_${editId}`);
+                    }
+                    alert('go schedule detail');
+                });
+                //#endregion
+
+                //#region 新增行程窗口初始化
+                $('#newschdule').on('shown.bs.modal', function () {
+                    initMap();
+                    initAirDatepicker();
+                });
+                //#endregion
+
+                //#region 新增行程
+                $('#createbtn').on('click', async function () {
+                    $('#newschdule').modal('hide');
                     try {
-                        //#region呼叫後台資料
-                        var [mainSchedulesResponse, schedulesGroupResponse] = await Promise.all([
-                            fetch(`${baseAddress}/api/Schedules/MainSchedules`, {
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            }),
-                            fetch(`${baseAddress}/api/Schedules/SchedulesGroup`, {
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                        ]);
-                        //#endregion
+                        var name = $('#Name').val();
+                        var startTime = $('#el1').val();
+                        var endTime = $('#el2').val();
+                        var lat = $('#Lat').val();
+                        var lng = $('#Lng').val();
+                        var picture_url = $('#picture_url').val();
+                        var place_id = $('#place_id').val();
+                        var body = {
+                            "Name": name,
+                            "StartTime": startTime,
+                            "EndTime": endTime,
+                            "Lat": lat,
+                            "Lng": lng,
+                            "PlaceId": place_id,
+                            "PictureUrl": picture_url
+                        };
 
-                        //#region user創建群組loading
-                        if (mainSchedulesResponse.status === 401) {
-                            $('#course-container').hide();
-                            alert('gologin');
-                            return;
-                        } else if (mainSchedulesResponse.status === 204) {
-                            $('#course-container').hide();
-                            $('#emptyschedule').show();
-                        } else if (mainSchedulesResponse.ok) {
-                            $('#emptyschedule').hide();
-                            var data = await mainSchedulesResponse.json();
-                            renderCourses(data);
+                        console.log(JSON.stringify(body));
+                        var response = await fetch(`${baseAddress}/api/Schedules`, {
+                            method: "POST",
+                            body: JSON.stringify(body),
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
-                        //#endregion
 
-                        // #region 旅遊群組loading
-                        if (schedulesGroupResponse.status === 401) {
-                            $('#result_container').hide();
-                            alert('gologin');
-                            return;
-                        } else if (schedulesGroupResponse.status === 204) {
-                            $('#course-container').hide();
-                            $('#emptygroup').show();
-                        } else if (schedulesGroupResponse.ok) {
-                            $('#emptygroup').hide();
-                            var data2 = await schedulesGroupResponse.json();
-                            groupCourses(data2);
-                        }
-                        //#endregion
+                        alert('行程已成功新增');
 
-                        console.log('Calling initPopularCoursesSlider');
-                        initPopularCoursesSlider();
+                        // 成功提示后重新加载页面
+                        location.reload();
 
                     } catch (error) {
-                        console.log(error);
-                        $('#course-container').hide();
-                        $('#group_course-container').hide();
-                        $('#emptygroup').hide();
-                        $('#emptyschedule').hide();
-                        $('#errmsg1').show().text('Error: ' + error.message);
-                        $('#errmsg2').show().text('Error: ' + error.message);
+                        console.error('Error:', error);
                     }
+                });
+                //#endregion
 
-                    //#region 切換標籤
-                    $('input[name="tabGroup1"]').on('change', function () {
-                        $('.popular_courses_slider').trigger('destroy.owl.carousel');
-                        initPopularCoursesSlider();
-                    });
-                    //#endregion
+                //#region cards下拉式選單
+                function clearModalContent() {
+                    $('#authoritytable').empty(); 
+                }
+                $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
+                    clearModalContent();
+                });
+                $(document).on('click', '.dropdown-item', async function (event) {
+                    event.preventDefault();
+                    var fun = $(this).data('fun');
+                    var sch_name = $(this).data('name');
+                    var schedule_id = $(this).data('id');
 
-                    //#region 編輯詳細行程
-                    $(document).on('click', '.edit_btn', function () {
-                        event.preventDefault();
-                        var fun = $(this).data('fun');
-                        var editId = $(this).data('id');
-                        if (fun === 'EditGroupSch') {
-                            alert(`$Fun_${fun}:Id$_${editId}`);
-                            console.log(`$Fun_${fun}:Id$_${editId}`);
+                        switch (fun) {
+                            case 'MemberManager':
+                                console.log(`fun:${fun}_schedule_id: ${schedule_id}`);
+                                await handleMemberManager(schedule_id);
+                                break;
+                            case 'Delete':
+                                await handleDelete(schedule_id);
+                                break;
+                            case 'InviteMember':
+                            await handleInviteMember(schedule_id);
+                                break;
+                            default:
+                                console.warn(`Unknown function: ${fun}`);
                         }
-                        else if (fun === 'EditMainSch') {
-                            alert(`$Fun_${fun}:Id$_${editId}`);
-                            console.log(`$Fun_${fun}:Id$_${editId}`);
-                        }
-                        alert('go schedule detail');
                     });
-                    //#endregion
-
-                    //#region 新增行程窗口初始化
-                    $('#newschdule').on('shown.bs.modal', function () {
-                        initMap();
-                        initAirDatepicker();
-                    });
-                    //#endregion
-
-                    //#region 新增行程
-                    $('#createbtn').on('click', async function () {
-                        $('#newschdule').modal('hide');
-                        try {
-                            var name = $('#Name').val();
-                            var startTime = $('#el1').val();
-                            var endTime = $('#el2').val();
-                            var lat = $('#Lat').val();
-                            var lng = $('#Lng').val();
-                            var picture_url = $('#picture_url').val();
-                            var place_id = $('#place_id').val();
-                            var body = {
-                                "Name": name,
-                                "StartTime": startTime,
-                                "EndTime": endTime,
-                                "Lat": lat,
-                                "Lng": lng,
-                                "PlaceId": place_id,
-                                "PictureUrl": picture_url
-                            };
-
-                            console.log(JSON.stringify(body));
-                            var response = await fetch(`${baseAddress}/api/Schedules`, {
-                                method: "POST",
-                                body: JSON.stringify(body),
+                    //#region 成員管理
+                    async function handleMemberManager(schedule_id) {
+                    console.log(`schedule_id: ${schedule_id}`);
+                    try {
+                            clearModalContent();
+                            var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/${schedule_id}`, {
+                                method: 'GET',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,
                                     'Content-Type': 'application/json'
                                 }
                             });
-
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-
-                            alert('行程已成功新增');
-
-                            // 成功提示后重新加载页面
-                            location.reload();
-
-                        } catch (error) {
-                            console.error('Error:', error);
-                        }
-                    });
-                    //#endregion
-                    
-                    //#region 下拉式選單
-                    $(document).on('click', '.dropdown-item', async function (event) {
-                        event.preventDefault(); 
-                        var fun = $(this).data('fun');
-                        var sch_name = $(this).data('name');
-                        var schedule_id = $(this).data('id');
-                        console.log(`fun: ${fun}, id: ${schedule_id}, schname: ${sch_name}`);
-                        //#region 成員管理
-                            if (fun === 'MemberManager') {
-                            try {
-                                const response = await fetch(`${baseAddress}/api/ScheduleAuthorities/${schedule_id}`, {
-                                    method: 'GET',
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    }
-                                });
-                                if (response.status === 204) {
-                                    alert('無群組成員');
-                                    return; // 终止函数执行
+                            if (response.status === 204) {                           
+                                alert('群族無成員!');
+                                if ($('#scheduleauthority_modal').hasClass('show')) {
+                                    $('#scheduleauthority_modal').modal('hide');
                                 }
-
-                                const data = await response.json();
+                            } else if (response.ok) {
+                                var data = await response.json();
                                 populateTable(data);
-                            } catch (error) {
-                                console.error('Fetch error:', error);
+                                $('#scheduleauthority_modal').modal('show');
+                            } else {
+                                console.error('Server error:', response.status);
+                                $('#scheduleauthority_modal').modal('hide');
                             }
+                        } catch (error) {
+                            console.error('Fetch error:', error);
+                            $('#scheduleauthority_modal').modal('hide');
                         }
-                        //#endregion
-                        //#region 刪除行程
-                        if (fun === 'Delete') {
-                            Swal.fire({
+                    }
+                    
+                    //#endregion
+                        
+                    //#region 刪除行程
+                        async function handleDelete(schedule_id) {
+                        try {
+                            var result = await Swal.fire({
                                 title: "Are you sure?",
                                 html: `
-                            您確認要刪除此行程?<br>
-                            當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
-                            也會一併刪除!
-                                `,
+                                您確認要刪除此行程?<br>
+                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                                也會一併刪除!
+                            `,
                                 icon: "warning",
                                 iconColor: '#E4003A',
                                 showCancelButton: true,
                                 confirmButtonColor: "#405D72",
                                 cancelButtonColor: "#F9E0BB",
                                 confirmButtonText: "確認刪除"
-                            }).then(async (result) => {
-                                if (result.isConfirmed) {
-                                    try {
-                                        var response = await fetch(`${baseAddress}/api/Schedules/${schedule_id}`, {
-                                            method: 'DELETE',
-                                            headers: {
-                                                'Authorization': `Bearer ${token}`,
-                                                'Content-Type': 'application/json'
-                                            }
-                                        });
-                                        if (!response.ok) {
-                                            throw new Error('行程刪除失敗');
-                                        }
-                                        Swal.fire({
-                                            title: "已刪除!",
-                                            text: `行程已刪除`,
-                                            icon: "success"
-                                        }).then(() => {
-                                            location.reload();
-                                        });
+                            });
 
-                                    } catch (error) {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "刪除失敗",
-                                            text: `行程刪除失敗: ${error.message}`
-                                        });
+                            if (result.isConfirmed) {
+                                var response = await fetch(`${baseAddress}/api/Schedules/${schedule_id}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
                                     }
-                                }
-                            }).catch(error => {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "刪除失敗",
-                                    text: `行程刪除失敗: ${error.message}`
                                 });
+
+                                if (!response.ok) {
+                                    throw new Error('行程刪除失敗');
+                                }
+
+                                await Swal.fire({
+                                    title: "已刪除!",
+                                    text: `行程已刪除`,
+                                    icon: "success"
+                                });
+
+                                location.reload();
+                            }
+                        } catch (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "刪除失敗",
+                                text: `行程刪除失敗: ${error.message}`
                             });
                         }
-                        //#endregion
-                    });
-                    
+                    }
+                    //#endregion
+                        
+                    //#region 邀請成員
+                    async function handleInviteMember(schedule_id) {
+                        $('#checkmail').off('submit').on('submit', async function (event) {
+                            event.preventDefault();
+                            var Email = document.getElementById('txtMail');
+                            if (!Email.checkValidity()) {
+                                alert('請確認user的帳號');
+                                return;
+                            }
 
-                @*function*@
-                        //#region Google Autocomplete
-                        let debounceTimer;
-                        function initMap() {
+                            try {
+                                var Body = {
+                                    "Email": Email.value.toString(),
+                                    "ScheduleId": schedule_id
+                                };
+                                console.log(JSON.stringify(Body));
+
+                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
+                                    method: "POST",
+                                    body: JSON.stringify(Body),
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+
+                                if (!response.ok) {
+                                    console.log('Error:', await response.text());
+                                } else {
+                                    alert('已成功邀請好友進入群組!')
+                                    location.reload();
+                                }
+                            } catch (error) {
+                                console.log('Caught error:', error);
+                                alert('新增成員失敗');
+                            }
+                        });
+                    }
+                    //#endregion
+                        
+                    //#region 查看成員
+                        
+                    //#endregion
+                        
+                    //#region 離開群組
+                
+                    //#endregion
+                
+                //#endregion
+
+                //#region Function area
+
+                    //#region Google Autocomplete
+                    let debounceTimer;
+                    function initMap() {
                         var options = {
                             types: ['geocode'],
                             fields: ['place_id', 'geometry', 'name', 'photos']
@@ -575,37 +688,33 @@ display:none;
                                 let lng = place.geometry.location.lng();
                                 let placeId = place.place_id;
 
-                                // 提取照片 URL
                                 let photos = place.photos;
                                 let photoUrl = '';
                                 if (photos && photos.length > 0) {
                                     photoUrl = photos[0].getUrl({ maxWidth: 340, maxHeight: 255 });
                                 }
 
-                                // 更新输入框的值
                                 $('#Lat').val(lat);
                                 $('#Lng').val(lng);
                                 $('#place_id').val(placeId);
                                 $('#picture_url').val(photoUrl);
 
-                                // 输出调试信息
                                 console.log('Place ID:', placeId);
                                 console.log('Latitude:', lat);
                                 console.log('Longitude:', lng);
                                 console.log('Photo URL:', photoUrl);
                             });
 
-                            // 使用 debounce 处理输入事件
                             $('#search_input').on('input', function () {
                                 clearTimeout(debounceTimer);
                                 debounceTimer = setTimeout(function () {
-                                    // 触发 place_changed 事件
                                     google.maps.event.trigger(input, 'focus', {});
-                                }, 1000); // 延迟1秒
+                                }, 500);
                             });
                         }
                     }
                         //#endregion
+                        
                     //#region Air Datepicker
                     function initAirDatepicker() {
                         try {
@@ -648,11 +757,12 @@ display:none;
                         }
                     }
                     //#endregion
-                    
+                
+                //#endregion
+                
+        });
+    </script>
+<!--#endregion  -->
 
-                //document end
-                });
-            </script>
-        }
-<!-- #endregion -->
+
 

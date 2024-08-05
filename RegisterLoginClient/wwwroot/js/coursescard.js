@@ -4,8 +4,7 @@ function createCourseCard(course, isGroup = false) {
     courseItem.className = 'item course_card_owl_item';
     var pictureUrl = course.pictureUrl ? course.pictureUrl : '/images/course/course_01.jpg';
     
-    courseItem.innerHTML = `
-    
+    courseItem.innerHTML = `    
         <div class="course_card">
             <div class="course_card_container">
                  <div class="course_card_top">
@@ -26,8 +25,8 @@ function createCourseCard(course, isGroup = false) {
                             <i class="fa fa-ellipsis"></i>
                         </div>
                         <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}" >
-                             <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#schedule_authority_modal">成員管理</a></li>
-                             <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#schedule_authority_modal">邀請成員</a></li>
+                             <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" data-name="${course.name}">成員管理</a></li>
+                             <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>
                             <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
                         </ul>
                     </div>

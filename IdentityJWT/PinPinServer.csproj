@@ -10,6 +10,7 @@
     <Compile Remove="Controllers\LocationCategoryController.cs" />
     <Compile Remove="Controllers\Schedules2Controller.cs" />
     <Compile Remove="GetuserId.cs" />
+    <Compile Remove="Partials\ScheduleAuthority.cs" />
     <Compile Remove="Services\GetuserIdBase.cs" />
   </ItemGroup>
 
