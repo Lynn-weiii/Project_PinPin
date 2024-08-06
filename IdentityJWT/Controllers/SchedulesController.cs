@@ -47,7 +47,7 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
-                    PictureUrl = s.Pictureurl,
+                    PictureUrl = s.Picture,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups.Select(s => (string?)s.User.Name).Distinct().ToList(),
                 }).ToListAsync();
@@ -81,33 +81,35 @@ namespace PinPinServer.Controllers
                 int userID = _getUserId.PinGetUserId(User).Value;
 
                 scheduleIds = await _context.ScheduleGroups
-                    .Where(sg => sg.UserId == userID && sg.IsHoster == false)
-                    .Select(sg => sg.ScheduleId)
-                    .Distinct()
-                    .ToListAsync();
+                 .Where(sg => sg.UserId == userID && sg.IsHoster == false && !sg.LeftDate.HasValue)
+                 .Select(sg => sg.ScheduleId)
+                 .Distinct()
+                 .ToListAsync();
 
                 gschedules = await _context.Schedules
-                .Where(s => scheduleIds.Contains(s.Id))
-                .Include(s => s.User)
-                .Include(s => s.ScheduleGroups)
-                .ThenInclude(sg => sg.User)
-                .Select(s => new ScheduleDTO
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    StartTime = s.StartTime,
-                    EndTime = s.EndTime,
-                    CreatedAt = s.CreatedAt,
-                    UserName = s.User.Name,
-                    PictureUrl = s.Pictureurl,
-                    SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
-                    SharedUserNames = s.ScheduleGroups
-                        .Where(sg => sg.UserId != userID)
-                        .Select(sg => (string?)sg.User.Name)
-                        .Distinct()
-                        .ToList(),
-                })
-                .ToListAsync();
+                    .Where(s => scheduleIds.Contains(s.Id))
+                    .Include(s => s.User)
+                    .Include(s => s.ScheduleGroups)
+                    .ThenInclude(sg => sg.User)
+                    .Where(s => !s.ScheduleGroups.Any(sg => sg.LeftDate.HasValue))
+                    .Select(s => new ScheduleDTO
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        StartTime = s.StartTime,
+                        EndTime = s.EndTime,
+                        CreatedAt = s.CreatedAt,
+                        UserName = s.User.Name,
+                        PictureUrl = s.Picture,
+                        UserId = userID,
+                        SharedUserIDs = s.ScheduleGroups.Select(sg => (int?)sg.UserId).ToList(),
+                        SharedUserNames = s.ScheduleGroups
+                            .Where(sg => sg.UserId != userID)
+                            .Select(sg => (string?)sg.User.Name)
+                            .Distinct()
+                            .ToList(),
+                    })
+                    .ToListAsync();
 
                 if (gschedules == null || !gschedules.Any())
                 {
@@ -197,6 +199,8 @@ namespace PinPinServer.Controllers
                 return Ok("行程修改成功!");
             }
             //這段是啥?
+            //EF存取併發衝突發生時
+            //為了避免併發衝突，通常會使用以下機制之一或組合：
             catch (DbUpdateConcurrencyException)
             {
                 if (!ScheduleExists(id))
@@ -227,7 +231,7 @@ namespace PinPinServer.Controllers
                 Lng = editschDTO.lng,
                 Lat = editschDTO.lat,
                 PlaceId = editschDTO.PlaceId,
-                Pictureurl = editschDTO.Pictureurl,
+                Picture = editschDTO.Pictureurl,
             };
             _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();

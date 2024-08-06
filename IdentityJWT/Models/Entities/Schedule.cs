@@ -23,7 +23,7 @@ public partial class Schedule
 
     public decimal? Lat { get; set; }
 
-    public string Pictureurl { get; set; }
+    public string Picture { get; set; }
 
     public string PlaceId { get; set; }
 

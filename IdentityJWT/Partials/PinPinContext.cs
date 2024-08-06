@@ -18,7 +18,6 @@ public partial class PinPinContext : DbContext
                 );
         }
     }
-
 }
 
 

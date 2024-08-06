@@ -12,41 +12,51 @@ namespace PinPinServer.Controllers
     [ApiController]
     public class ScheduleAuthoritiesController : ControllerBase
     {
+        private readonly ILogger<ScheduleAuthoritiesController> _logger;
         PinPinContext _context;
         AuthGetuserId _getUserId;
-        public ScheduleAuthoritiesController(PinPinContext context, AuthGetuserId getuserId)
+        public ScheduleAuthoritiesController(PinPinContext context, AuthGetuserId getuserId, ILogger<ScheduleAuthoritiesController> logger)
         {
             _context = context;
             _getUserId = getuserId;
+            _logger = logger;
         }
 
         // GET: api/ScheduleAuthorities/{schedule_id}
         [HttpGet("{schedule_id}")]
         public async Task<ActionResult<ScheduleAuthority>> GetScheduleAuthority(int schedule_id)
         {
-            int userID = _getUserId.PinGetUserId(User).Value;
+            int jwtuserid = _getUserId.PinGetUserId(User).Value;
+            var groupMemberIds = await _context.ScheduleGroups
+            .Where(sg => sg.ScheduleId == schedule_id && sg.IsHoster == false && sg.LeftDate == null
+            && sg.UserId != jwtuserid)
+            .Select(sg => sg.UserId)
+            .ToListAsync();
 
-            var scheduleAuthorities = await _context.ScheduleAuthorities
-                .Where(sa => sa.ScheduleId == schedule_id && sa.UserId != userID)
-                .Include(sa => sa.AuthorityCategory)
-                .Include(sa => sa.User)
-                .GroupBy(sa => new { sa.UserId, sa.User.Name })
-                .Select(g => new ScheduleAuthorityDTO
-                {
-                    Id = schedule_id,
-                    UserId = g.Key.UserId,
-                    UserName = g.Key.Name,
-                    ScheduleId = schedule_id,
-                    AuthorityCategoryIds = g.Select(sa => sa.AuthorityCategoryId).Distinct().ToList(),
+            if (groupMemberIds.Count == 0)
+            {
+                return NotFound(new { Message = "群組沒有成員!" });
+            }
 
-                }).ToListAsync();
+            var filteredAuthorities = await _context.ScheduleAuthorities
+            .Where(sa => groupMemberIds.Contains(sa.UserId) && sa.ScheduleId == schedule_id)
+            .GroupBy(sa => new { sa.UserId, sa.User.Name, sa.ScheduleId })
+            .Select(g => new ScheduleAuthorityDTO
+            {
+                Id = g.First().Id,
+                UserName = g.Key.Name,
+                ScheduleId = g.Key.ScheduleId,
+                AuthorityCategoryIds = g.Select(sa => sa.AuthorityCategoryId).Distinct().ToList(),
+                UserId = g.Key.UserId,
+            })
+            .ToListAsync();
 
-            if (!scheduleAuthorities.Any())
+            if (!filteredAuthorities.Any())
             {
                 return NoContent(); // Return 204 No Content if no data is available
             }
 
-            return Ok(scheduleAuthorities); // Return 200 OK with the data
+            return Ok(filteredAuthorities); // Return 200 OK with the data
         }
 
         // POST: api/ScheduleAuthorities/Modified
@@ -56,74 +66,95 @@ namespace PinPinServer.Controllers
         {
             if (saDTOs == null || !saDTOs.Any())
             {
-                return BadRequest("Invalid data.");
+                return BadRequest(new { message = "Invalid data." });
             }
 
-            bool hasChanges = false; // 标志用于跟踪是否有变化
+            var messages = new List<string>();
 
-            foreach (var saDTO in saDTOs)
+            try
             {
-                if (saDTO.AuthorityCategoryIds == null || !saDTO.AuthorityCategoryIds.Any())
+                foreach (var saDTO in saDTOs)
                 {
-                    return BadRequest("AuthorityCategoryIds cannot be empty.");
-                }
-
-                var existingAuthorities = await _context.ScheduleAuthorities
-                    .Where(sa => sa.ScheduleId == saDTO.ScheduleId && sa.UserId == saDTO.UserId)
-                    .ToListAsync();
-
-                var existingAuthorityIds = existingAuthorities.Select(ea => ea.AuthorityCategoryId).ToHashSet();
-                var newAuthorityIds = saDTO.AuthorityCategoryIds.ToHashSet();
-
-                bool isSame = existingAuthorityIds.SetEquals(newAuthorityIds);
-
-                // 如果权限未变化，跳过当前 saDTO
-                if (isSame)
-                {
-                    continue;
-                }
-
-                // 权限有变化，标记有变化
-                hasChanges = true;
-
-                // 删除现有权限并添加新权限
-                if (existingAuthorities.Any())
-                {
-                    _context.ScheduleAuthorities.RemoveRange(existingAuthorities);
-                }
-
-                var addedAuthorities = new List<ScheduleAuthority>();
-                foreach (var authorityCategoryId in saDTO.AuthorityCategoryIds)
-                {
-                    var adduserauthority = new ScheduleAuthority
+                    if (saDTO.AuthorityCategoryIds == null || !saDTO.AuthorityCategoryIds.Any())
                     {
-                        ScheduleId = saDTO.ScheduleId,
-                        UserId = saDTO.UserId,
-                        AuthorityCategoryId = authorityCategoryId
-                    };
+                        return BadRequest(new { message = "Invalid data." });
+                    }
 
-                    _context.ScheduleAuthorities.Add(adduserauthority);
-                    addedAuthorities.Add(adduserauthority);
+                    var existingAuthorities = await _context.ScheduleAuthorities
+                        .Where(sa => sa.ScheduleId == saDTO.ScheduleId && sa.UserId == saDTO.UserId)
+                        .ToListAsync();
+
+                    var existingAuthorityIds = existingAuthorities.Select(ea => ea.AuthorityCategoryId).ToHashSet();
+                    var newAuthorityIds = saDTO.AuthorityCategoryIds.ToHashSet();
+
+                    bool isSame = existingAuthorityIds.SetEquals(newAuthorityIds);
+
+                    if (isSame)
+                    {
+                        continue;
+                    }
+
+                    var userName = await _context.Users
+                        .Where(u => u.Id == saDTO.UserId)
+                        .Select(u => u.Name)
+                        .FirstOrDefaultAsync();
+
+                    // Add a single message for this user
+                    messages.Add($"{userName} 的權限已修改");
+
+                    if (existingAuthorities.Any())
+                    {
+                        _context.ScheduleAuthorities.RemoveRange(existingAuthorities);
+                    }
+
+                    foreach (var authorityCategoryId in saDTO.AuthorityCategoryIds)
+                    {
+                        var adduserauthority = new ScheduleAuthority
+                        {
+                            ScheduleId = saDTO.ScheduleId,
+                            UserId = saDTO.UserId,
+                            AuthorityCategoryId = authorityCategoryId,
+                        };
+
+                        _context.ScheduleAuthorities.Add(adduserauthority);
+                    }
                 }
 
                 await _context.SaveChangesAsync();
 
-                var resultDTOs = addedAuthorities.Select(a => new ScheduleAuthorityDTO
+                if (messages.Count == 0)
                 {
-                    ScheduleId = a.ScheduleId,
-                    UserId = a.UserId,
-                    AuthorityCategoryIds = new List<int> { a.AuthorityCategoryId },
-                }).ToList();
-                return Ok(resultDTOs);
-            }
+                    return Ok(new { message = "目前沒有成員權限變更，因此無需進行修改。" });
+                }
 
-            // 如果没有任何变化，返回 OK
-            if (!hasChanges)
+                return Ok(new { message = string.Join("; ", messages) });
+            }
+            catch (DbUpdateConcurrencyException ex)
             {
-                return Ok(new { message = "No changes detected" });
+                var entry = ex.Entries.Single();
+                var clientValues = (ScheduleAuthority)entry.Entity;
+                var databaseEntry = entry.GetDatabaseValues();
+                if (databaseEntry == null)
+                {
+                    //舊資料已經更新成新版本了
+                    return Ok();
+                }
+                else
+                {
+                    var databaseValues = (ScheduleAuthority)databaseEntry.ToObject();
+                    return StatusCode(409, new
+                    {
+                        message = "發生並發衝突，數據已被其他用戶修改。",
+                        clientValues = clientValues,
+                        databaseValues = databaseValues
+                    });
+                }
             }
-
-            return Ok(); // 有变化时的默认返回
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "發生未預期的錯誤。");
+                return StatusCode(500, new { message = "內部伺服器錯誤。", error = ex.Message });
+            }
         }
     }
 }
