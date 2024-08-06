@@ -16,12 +16,10 @@ namespace PinPinServer.Controllers
     {
         private readonly PinPinContext _context;
         private readonly AuthGetuserId _getUserId;
-        private readonly ExpenseCalculatorService _calculatorService;
-        public SplitExpensesController(PinPinContext context, AuthGetuserId getuserId, ExpenseCalculatorService calculatorService)
+        public SplitExpensesController(PinPinContext context, AuthGetuserId getuserId)
         {
             _context = context;
             _getUserId = getuserId;
-            _calculatorService = calculatorService;
         }
 
         //POST:api/SplitExpenses/GetAllExpense
@@ -135,47 +133,6 @@ namespace PinPinServer.Controllers
 
 
                 return Ok(ExpenseDTOs);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// 獲取某個行程的使用者與所有團員之間的分帳關西
-        /// </summary>
-        //Get:api/SplitExpenses/GetBalance{scheduleId}
-        [HttpGet("GetBalance{scheduleId}")]
-        public async Task<ActionResult<IEnumerable<ExpenseBalanceDTO>>> GetBalance(int scheduleId)
-        {
-            int? userID = _getUserId.PinGetUserId(User).Value;
-            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
-
-            //檢查有無此行程表
-            bool hasSchedule = await _context.Schedules.AnyAsync(sc => sc.Id == scheduleId);
-            if (!hasSchedule) return NotFound("Not found schedule");
-
-            //檢查使用者有無在此行程
-            bool isInSchedule = await _context.ScheduleGroups.AnyAsync(sg => sg.ScheduleId == scheduleId && sg.UserId == userID);
-            if (!isInSchedule) return Forbid("You can't search not your group");
-
-            try
-            {
-                List<SplitExpense> expenseList = await _context.SplitExpenses.Where(se => se.ScheduleId == scheduleId)
-                                                                             .Include(se => se.SplitExpenseParticipants)
-                                                                             .AsNoTracking()
-                                                                             .ToListAsync();
-                List<ExpenseBalanceDTO> members = await _context.ScheduleGroups.Where(sg => sg.ScheduleId == scheduleId)
-                                                                               .Include(sg => sg.User)
-                                                                               .Select(sg => new ExpenseBalanceDTO
-                                                                               {
-                                                                                   UserName = sg.User.Name,
-                                                                                   UserId = sg.UserId,
-                                                                               }).ToListAsync();
-                members.Remove(members.First(m => m.UserId == userID));
-                var balanceDTOs = _calculatorService.CalculateBalance(expenseList, members, (int)userID);
-                return Ok(balanceDTOs);
             }
             catch (Exception ex)
             {

@@ -25,9 +25,6 @@ builder.Services.AddSingleton<WeatherService>(provider =>
     return new WeatherService(builder.Configuration["AppSettings:WeatherApiKey"], httpClient);
 });
 
-//註冊計算服務
-builder.Services.AddSingleton<ExpenseCalculatorService>();
-
 //註冊匯率服務
 builder.Services.AddHttpClient<ChangeRateService>(client =>
 {
