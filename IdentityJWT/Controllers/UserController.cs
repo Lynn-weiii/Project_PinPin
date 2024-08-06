@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using PinPinServer.Models;
 using PinPinServer.Models.DTO;
+using PinPinServer.Services;
 
 namespace PinPinTest.Controllers
 {
@@ -10,10 +12,12 @@ namespace PinPinTest.Controllers
     public class userController : ControllerBase
     {
         private PinPinContext _context;
+        private AuthGetuserId _getUserId;
 
-        public userController(PinPinContext context)
+        public userController(PinPinContext context, AuthGetuserId getuserId)
         {
             _context = context;
+            _getUserId = getuserId;
         }
 
         //POST:api/user/GetAllUser
@@ -62,6 +66,21 @@ namespace PinPinTest.Controllers
             }).ToList();
 
             return Ok(userDTOs);
+        }
+
+        //GET:api/user/GetUserIdName
+        [HttpGet("GetUserIdName")]
+        public async Task<ActionResult> GetUserIdName()
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+            var user = await _context.Users.FirstAsync(user => user.Id == userID.Value);
+
+            return Ok(new
+            {
+                id= user.Id,
+                name= user.Name,
+            });
         }
     }
 }

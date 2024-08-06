@@ -1,7 +1,8 @@
 export function initExpenseModal() {
-  const { createApp, ref, onMounted, nextTick, computed } = Vue;
+  const { createApp, ref, onMounted, nextTick, computed, watch } = Vue;
   createApp({
     setup() {
+      const userData = ref(0);
       const schedules = ref([]);
       const expenses = ref([]);
       const userExpenses = ref([]);
@@ -12,6 +13,7 @@ export function initExpenseModal() {
       const scheduleName = ref("");
       const userName = ref("");
       const modalStack = ref([]);
+      const codeIcons = ref([]);
       //編輯分帳表用
       const mainForm = ref(null);
       const editExpenseId = ref(0);
@@ -22,6 +24,7 @@ export function initExpenseModal() {
       const editCurrency = ref(null);
       const editPayer = ref(null);
       const editBorrowers = ref([]);
+      const selectedEditCurrencyIcon = ref("");
 
       const payers = ref([]);
       const borrowers = ref([]);
@@ -31,7 +34,14 @@ export function initExpenseModal() {
       const borrowerData = ref([]);
       const decimalPlaces = ref(0);
       const isAvg = ref(false);
-      //------------------------------------------燈箱操控----------------------------------------------------
+
+      const selectedCurrency = ref("TWD");
+      const selectedCurrencyIcon = ref("fa-solid fa-dollar-sign");
+      //計算總結用
+      const balanceData = ref([]);
+      const changeRateExpense = ref([]);
+      const userChangeRateExpense = ref([]);
+      //------------------------------------------燈箱操控---------------------------------------------------
       const getCurrentModalId = () => {
         return modalStack.value.length
           ? modalStack.value[modalStack.value.length - 1]
@@ -60,7 +70,7 @@ export function initExpenseModal() {
         showModal(modalId);
       };
 
-      const showModalWithData = async (modalId, dataFunction) => {
+      const showModalWithData = async (modalId, dataFunction = () => {}) => {
         SwitchModal(modalId);
         loading.value = true;
         try {
@@ -94,7 +104,86 @@ export function initExpenseModal() {
         showModal(PmodalId);
       };
 
+      const scheduleBalance = async () => {
+        balanceData.value = [];
+        const expensesList = changeRateExpense.value;
+        const { payYourselfData, otherData } = expensesList.reduce(
+          (acc, expense) => {
+            if (expense.payer === userData.value.name) {
+              acc.payYourselfData.push(expense);
+            } else {
+              acc.otherData.push(expense);
+            }
+            return acc;
+          },
+          { payYourselfData: [], otherData: [] }
+        );
+
+        payYourselfData.forEach((expense) => {
+          expense.expenseParticipants.forEach((ep) => {
+            if (ep.userId !== userData.value.id) {
+              const existingBalance = balanceData.value.find(
+                (b) => b.name === ep.userName
+              );
+              if (existingBalance) {
+                existingBalance.balance += ep.amount;
+                if (ep.isPaid == false) {
+                  existingBalance.isPaidBalance += ep.amount;
+                }
+              } else {
+                balanceData.value.push({
+                  id: ep.userId,
+                  name: ep.userName,
+                  balance: ep.amount,
+                  isPaidBalance: ep.isPaid == false ? ep.amount : 0,
+                });
+              }
+            }
+          });
+        });
+
+        otherData.forEach((expense) => {
+          const ep = expense.expenseParticipants.find(
+            (ep) => ep.userId === userData.value.id
+          );
+          if (ep) {
+            const existingBalance = balanceData.value.find(
+              (b) => b.name === expense.payer
+            );
+            if (existingBalance) {
+              existingBalance.balance -= ep.amount;
+              if (ep.isPaid == false) {
+                existingBalance.isPaidBalance -= ep.amount;
+              }
+            } else {
+              balanceData.value.push({
+                id: expense.payerId,
+                name: expense.payer,
+                balance: -ep.amount,
+                isPaidBalance: ep.isPaid == false ? -ep.amount : 0,
+              });
+            }
+          }
+        });
+      };
+
       //------------------------------------------獲取資料----------------------------------------------------
+      const getUserData = async () => {
+        try {
+          let response = await axios.get(
+            `${baseAddress}/api/user/GetUserIdName`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          userData.value = response.data;
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
       //獲取使用者有加入的行程
       const getSchedules = async () => {
         try {
@@ -112,27 +201,10 @@ export function initExpenseModal() {
         }
       };
 
-      //獲取某行程的結算表
-      const getScheduleBalance = async (id, name) => {
-        scheduleId.value = id;
-        scheduleName.value = name;
+      const getAllScheduleExpenses = async (id, name) => {
         try {
-          let response = await axios.get(
-            `${baseAddress}/api/SplitExpenses/GetBalance${scheduleId.value}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          schedulebalances.value = response.data;
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-      const getAllScheduleExpenses = async () => {
-        try {
+          scheduleId.value = id;
+          scheduleName.value = name;
           let response = await axios.get(
             `${baseAddress}/api/SplitExpenses/GetScheduleIdExpense${scheduleId.value}`,
             {
@@ -142,6 +214,7 @@ export function initExpenseModal() {
             }
           );
           expenses.value = response.data;
+          changeRates();
         } catch (error) {
           console.log(error);
         }
@@ -160,6 +233,7 @@ export function initExpenseModal() {
             }
           );
           userExpenses.value = response.data;
+          changeRates();
         } catch (error) {
           console.log(error);
         }
@@ -505,13 +579,16 @@ export function initExpenseModal() {
       };
 
       //------------------------------------------存緩存IndexedDB----------------------------------------------------
-      const initDatabase = (code) => {
+      const initDatabase = () => {
         return new Promise((resolve, reject) => {
           const request = indexedDB.open("ExchangeRatesDB", 1);
 
           request.onupgradeneeded = (event) => {
             const db = event.target.result;
-            const metaStore = db.createObjectStore("meta", { keyPath: "key" });
+            const rateStore = db.createObjectStore("rates", {
+              keyPath: "code",
+            });
+            rateStore.createIndex("currency", "code", { unique: true });
           };
 
           request.onsuccess = (event) => {
@@ -524,55 +601,21 @@ export function initExpenseModal() {
         });
       };
 
-      function createObjectStore(db, storeName) {
-        return new Promise((resolve, reject) => {
-          if (!db.objectStoreNames.contains(storeName)) {
-            const version = db.version + 1;
-            db.close();
-            const request = indexedDB.open(db.name, version);
-
-            request.onupgradeneeded = (event) => {
-              const upgradeDb = event.target.result;
-              if (!upgradeDb.objectStoreNames.contains(storeName)) {
-                const store = upgradeDb.createObjectStore(storeName, {
-                  keyPath: "id",
-                });
-                store.createIndex("currency", "code", { unique: false });
-              }
-            };
-
-            request.onsuccess = (event) => {
-              resolve(event.target.result);
-            };
-
-            request.onerror = (event) => {
-              reject(event.target.error);
-            };
-          } else {
-            resolve(db);
-          }
-        });
-      }
-
-      const storeExchangeRates = async (code, data) => {
+      const storeExchangeRates = async (code, ratedata) => {
         try {
           const db = await initDatabase();
-          const updatedDb = await createObjectStore(db, `${code}rates`);
-
-          const transaction = updatedDb.transaction(
-            [`${code}rates`, "meta"],
-            "readwrite"
-          );
-          const rateStore = transaction.objectStore(`${code}rates`);
-          const metaStore = transaction.objectStore("meta");
+          const transaction = db.transaction(["rates"], "readwrite");
+          const rateStore = transaction.objectStore("rates");
 
           const today = new Date().toISOString().split("T")[0];
 
-          data.forEach((item) => {
-            rateStore.put(item);
-          });
+          const data = {
+            code: code,
+            lastUpdate: today,
+            data: ratedata,
+          };
 
-          metaStore.put({ key: `${code}lastUpdate`, date: today });
+          rateStore.put(data);
 
           transaction.oncomplete = () => {
             console.log("All data and update time inserted successfully!");
@@ -586,82 +629,185 @@ export function initExpenseModal() {
         }
       };
 
-      async function getExchangeRates(code) {
+      const getExchangeRatesb = async (code) => {
         try {
           const db = await initDatabase();
-          const transaction = db.transaction(
-            [`${code}rates`, "meta"],
-            "readonly"
-          );
-          const rateStore = transaction.objectStore(`${code}rates`);
-          const metaStore = transaction.objectStore("meta");
-
-          const lastUpdateRequest = metaStore.get("lastUpdate");
-          const ratesRequest = rateStore.getAll();
+          const transaction = db.transaction(["rates"], "readonly");
+          const rateStore = transaction.objectStore("rates");
 
           return new Promise((resolve, reject) => {
-            transaction.oncomplete = () => {
-              const lastUpdate = lastUpdateRequest.result;
-              const rates = ratesRequest.result;
-              resolve({ lastUpdate, rates });
+            const request = rateStore.get(code);
+            request.onsuccess = async (event) => {
+              const today = new Date().toISOString().split("T")[0];
+              const result = event.target.result;
+              if (result) {
+                if (result.lastUpdate === today) {
+                  resolve(result);
+                } else {
+                  const response = await axios.get(
+                    `${baseAddress}/api/ChangeRate/${code}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
+                  if (response.status === 200) {
+                    const rates = response.data;
+                    await storeExchangeRates(code, rates);
+                    resolve({
+                      code: code,
+                      lastUpdate: today,
+                      data: rates,
+                    });
+                  } else
+                    reject(
+                      new Error("Failed to fetch exchange rates from API")
+                    );
+                }
+              } else {
+                const response = await axios.get(
+                  `${baseAddress}/api/ChangeRate/${code}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+                if (response.status === 200) {
+                  const rates = response.data;
+                  await storeExchangeRates(code, rates);
+                  resolve({
+                    code: code,
+                    lastUpdate: today,
+                    data: rates,
+                  });
+                } else
+                  reject(new Error("Failed to fetch exchange rates from API"));
+              }
             };
-
-            transaction.onerror = (event) => {
-              console.error("Transaction error:", event.target.error);
+            request.onerror = (event) => {
               reject(event.target.error);
             };
           });
         } catch (error) {
-          console.error("Failed to retrieve exchange rates:", error);
-        }
-      }
-
-      const ensureExchangeRates = async (code) => {
-        try {
-          const today = new Date().toISOString().split("T")[0];
-          const { lastUpdate, rates } = await getExchangeRates(code);
-          if (!rates || rates.length === 0 || lastUpdate != today) {
-            console.log(`No rates found for code ${code}, storing data...`);
-            const response = await axios.get(
-              `${baseAddress}/api/ChangeRate/${code}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            const data = await response.data;
-            await storeExchangeRates(code, data);
-            return data;
-          } else {
-            console.log(`Rates found for code ${code}`);
-            return rates;
-          }
-        } catch (error) {
-          console.error("Error ensuring exchange rates:", error);
+          console.error("Failed to get exchange rates:", error);
+          return [];
         }
       };
 
+      const calculateChangeRateExpense = (ratedata) => {
+        changeRateExpense.value = [];
+        expenses.value.forEach((expens) => {
+          const rate = ratedata.find(
+            (data) => data.code === expens.currency
+          ).rate;
+          let RateExpenseParticipants = [];
+          expens.expenseParticipants.forEach((ep) => {
+            let rateep = {
+              userId: ep.userId,
+              userName: ep.userName,
+              amount: parseFloat(ep.amount / rate),
+              isPaid: ep.isPaid,
+            };
+            RateExpenseParticipants.push(rateep);
+          });
+
+          let RateExpense = {
+            id: expens.id,
+            name: expens.name,
+            payerId: expens.payerId,
+            payer: expens.payer,
+            category: expens.category,
+            amount: parseFloat(expens.amount / rate),
+            expenseParticipants: RateExpenseParticipants,
+          };
+
+          changeRateExpense.value.push(RateExpense);
+        });
+      };
+
+      const calculateUserChangeRateExpense = (ratedata) => {
+        userChangeRateExpense.value = [];
+        userExpenses.value.forEach((expens) => {
+          const rate = ratedata.find(
+            (data) => data.code === expens.costCategory
+          ).rate;
+          let userExpense = {
+            expenseId: expens.expenseId,
+            expenseName: expens.expenseName,
+            expenseCategory: expens.expenseCategory,
+            amount: parseFloat(expens.amount / rate),
+            costCategory: expens.costCategory,
+            isPaid: expens.isPaid,
+          };
+          userChangeRateExpense.value.push(userExpense);
+        });
+      };
+
+      const setIcon = (data) => {
+        codeIcons.value = [];
+        data.forEach((data) => {
+          let codeIcon = {
+            code: data.code,
+            icon: data.icon,
+          };
+          codeIcons.value.push(codeIcon);
+        });
+      };
+
+      const changeRates = async () => {
+        const ratedata = await getExchangeRatesb(selectedCurrency.value);
+
+        setIcon(ratedata.data);
+        calculateChangeRateExpense(ratedata.data);
+        calculateUserChangeRateExpense(ratedata.data);
+        nextTick(() => {
+          scheduleBalance();
+        });
+      };
+
       const totalBalance = computed(() => {
-        return schedulebalances.value.reduce(
-          (sum, balance) => sum + balance.isPaidBalance,
-          0
-        );
+        return balanceData.value
+          .reduce((sum, balance) => sum + balance.isPaidBalance, 0)
+          .toFixed(2);
       });
 
       const totalExpensAmount = computed(() => {
-        return expenses.value.reduce((sum, amount) => sum + amount.amount, 0);
+        return changeRateExpense.value
+          .reduce((sum, amount) => sum + amount.amount, 0)
+          .toFixed(2);
       });
 
       const totalUserBalance = computed(() => {
-        const userBalance = schedulebalances.value.find(
-          (sb) => sb.userName === userName.value
+        const userBalance = balanceData.value.find(
+          (sb) => sb.name === userName.value
         );
-        return userBalance?.isPaidBalance ?? 0;
+        return userBalance?.isPaidBalance.toFixed(2) ?? 0;
+      });
+
+      watch(selectedCurrency, (newValue) => {
+        if (newValue) {
+          const icon = codeIcons.value.find(
+            (code) => code.code === newValue
+          ).icon;
+          selectedCurrencyIcon.value = icon;
+        }
+      });
+
+      watch(editCurrency, (newValue) => {
+        if (newValue) {
+          const icon = codeIcons.value.find(
+            (code) => code.code === currencies.value[newValue]
+          ).icon;
+          selectedEditCurrencyIcon.value = icon;
+        }
       });
 
       onMounted(() => {
         showModalWithData("ScheduleModal", getSchedules);
+        getCurrencyCategory();
+        getUserData();
       });
 
       return {
@@ -670,7 +816,6 @@ export function initExpenseModal() {
         expenses,
         expense,
         schedulebalances,
-        userExpenses,
         userName,
         scheduleId,
         scheduleName,
@@ -679,11 +824,11 @@ export function initExpenseModal() {
         totalExpensAmount,
         loading,
         goBack,
-        getScheduleBalance,
         getUserExpense,
         getExpense,
         getAllScheduleExpenses,
         createExpense,
+        scheduleBalance,
         //編輯分帳表
         getEditExpenseData,
         editName,
@@ -692,6 +837,7 @@ export function initExpenseModal() {
         editCategory,
         editCurrency,
         editPayer,
+        selectedEditCurrencyIcon,
         payers,
         borrowers,
         currencies,
@@ -709,7 +855,12 @@ export function initExpenseModal() {
         mainForm,
         deleteExpense,
         //匯率蕭觀
-        ensureExchangeRates,
+        selectedCurrency,
+        changeRates,
+        balanceData,
+        changeRateExpense,
+        userChangeRateExpense,
+        selectedCurrencyIcon,
       };
     },
   }).mount("#vue-container");

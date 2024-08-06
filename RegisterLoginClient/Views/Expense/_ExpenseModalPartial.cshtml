@@ -21,7 +21,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(name, id) in schedules" :key="id" v-on:click="showModalWithData('SchedulExpenseModal',()=>getScheduleBalance(id, name))">
+                                    <tr v-for="(name, id) in schedules" :key="id" v-on:click="showModalWithData('SchedulExpenseModal',()=>getAllScheduleExpenses(id,name))">
                                         <td>{{ name }}</td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
@@ -59,7 +59,7 @@
                         <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
                     </div>
                     <div v-else>
-                        <div v-if="Object.keys(schedulebalances).length > 0">
+                        <div v-if="Object.keys(balanceData).length > 0">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -77,18 +77,25 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="expens in schedulebalances" :key="expens.userId" v-on:click="showModalWithData('UserDetailModal',()=>getUserExpense(expens.userName, expens.userId))">
-                                        <td>{{ expens.userName }}</td>
-                                        <td class="text-end">{{ expens.balance }}$</td>
-                                        <td class="text-end">{{ expens.isPaidBalance }}$</td>
+                                    <tr v-for="expens in balanceData" :key="expens.userId" v-on:click="showModalWithData('UserDetailModal',()=>getUserExpense(expens.name, expens.id))">
+                                        <td>{{ expens.name }}</td>
+                                        <td class="text-end">{{ expens.balance.toFixed(2) }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
+                                        <td class="text-end">{{ expens.isPaidBalance.toFixed(2) }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <div class="mt-3">
-                                <p class="text-end"><strong>總應收金額: {{ totalBalance }}$</strong></p>
+                            <div class="mt-3 d-flex justify-content-between">
+                                <p class="text-start mb-0 d-flex align-items-center">
+                                    <i class="fa-solid fa-coins me-2"></i>
+                                    <strong class="me-2">幣別:</strong>
+                                    <select class="form-select" v-model="selectedCurrency" v-on:change="changeRates" id="currencyRate" style="width: auto;">
+                                        <option v-for="(name, id) in currencies" :key="id" :value="name">{{ name }}</option>
+                                    </select>
+                                </p>
+                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: {{ totalBalance }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></strong></p>
                             </div>
                         </div>
                         <div v-else>
@@ -97,17 +104,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="ensureExchangeRates('TWD')">
-                        <i class="fa-solid fa-plus me-1"></i> 測試
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" v-on:click="showModalWithData('SchedulDetailModal',()=>getAllScheduleExpenses())">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" v-on:click="showModalWithData('SchedulDetailModal')">
                         <i class="fa-solid fa-list me-1"></i> 詳細
                     </button>
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="createExpense">
                         <i class="fa-solid fa-plus me-1"></i> 新增
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -126,7 +129,7 @@
                         <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
                     </div>
                     <div v-else>
-                        <div v-if="Object.keys(userExpenses).length > 0">
+                        <div v-if="Object.keys(userChangeRateExpense).length > 0">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -138,13 +141,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="expens in userExpenses" :key="expens.expenseId" v-on:click="showModalWithData('ExpenseModal',()=>getExpense(expens.expenseId))">
+                                    <tr v-for="expens in userChangeRateExpense" :key="expens.expenseId" v-on:click="showModalWithData('ExpenseModal',()=>getExpense(expens.expenseId))">
                                         <td>{{expens.expenseName}}</td>
                                         <td class="text-end">{{expens.expenseCategory}}</td>
                                         <td class="text-center">
                                             <i :class="expens.isPaid ? 'fa-regular fa-square-check text-success' : 'fa-regular fa-square text-danger'"></i>
                                         </td>
-                                        <td class="text-end">{{expens.amount}}$</td>
+                                        <td class="text-end">{{expens.amount.toFixed(2)}} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
                                         </td>
@@ -152,8 +155,14 @@
                                 </tbody>
                             </table>
                             <div class="mt-3 d-flex justify-content-between">
-                                <p class="text-start mb-0"><strong><i class="fa-solid fa-coins"></i> 幣別: 暫無</strong></p>
-                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 待收付金額: {{ totalUserBalance }}$</strong></p>
+                                <p class="text-start mb-0 d-flex align-items-center">
+                                    <i class="fa-solid fa-coins me-2"></i>
+                                    <strong class="me-2">幣別:</strong>
+                                    <select class="form-select" v-model="selectedCurrency" v-on:change="changeRates" id="currencyRate" style="width: auto;">
+                                        <option v-for="(name, id) in currencies" :key="id" :value="name">{{ name }}</option>
+                                    </select>
+                                </p>
+                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: {{ totalUserBalance }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></strong></p>
                             </div>
                         </div>
                         <div v-else>
@@ -198,11 +207,11 @@
                                     <p><strong><i class="fa-solid fa-calendar"></i> 行程名稱</strong>: {{ expense.schedule }}</p>
                                     <p><strong><i class="fa-solid fa-clock"></i> 建立時間</strong>: {{ expense.createdAt }}</p>
                                 </div>
- 
+
                                 <div class="fs-5">
                                     <div class="d-flex justify-content-between fs-2">
                                         <p class="mb-0"><strong><i class="fa-solid fa-money-bill"></i> 總金額</strong>:</p>
-                                        <p class="mb-0">{{ expense.amount }} 元</p>
+                                        <p class="mb-0">{{ expense.amount }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></p>
                                     </div>
                                 </div>
                             </div>
@@ -229,7 +238,7 @@
                                                 <td v-else class="text-center">
                                                     <i class="fa-solid fa-hand-holding-dollar"></i>
                                                 </td>
-                                                <td class="text-end">{{ expenseParticipant.amount }} 元</td>
+                                                <td class="text-end">{{ expenseParticipant.amount }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -273,7 +282,7 @@
                                     <input type="text" class="form-control" id="editName" v-model="editName" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="amount" class="form-label fw-bold"><i class="fa-solid fa-dollar-sign me-2"></i>金額</label>
+                                    <label for="amount" class="form-label fw-bold"><i :class="['fa-solid', selectedEditCurrencyIcon, 'me-2']"></i>金額</label>
                                     <input type="number" class="form-control" id="editAmount" v-model="editAmount" required>
                                 </div>
                             </div>
@@ -361,8 +370,12 @@
                                             <input type="checkbox" class="form-check-input align-middle" :id="'lockAmount-' + borrower.id" v-model="borrower.lockAmount" v-on:change="avgTotal" />
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="number" class="form-control" :step="stepValue" :id="'amount-' + borrower" v-model="borrower.amount" v-on:input="handleAmountInput(borrower)" required>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" :step="stepValue" :id="'amount-' + borrower" v-model="borrower.amount" v-on:input="handleAmountInput(borrower)" required>
+                                                <span class="input-group-text"><i :class="['fa-solid', selectedEditCurrencyIcon]"></i></span>
+                                            </div>
                                         </div>
+
                                         <div class="col-md-2">
                                             <select class="form-select" :id="'isPaid-' + borrower" v-model="borrower.isPaid">
                                                 <option :value="true">已付款</option>
@@ -407,7 +420,7 @@
                         <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
                     </div>
                     <div v-else>
-                        <div v-if="Object.keys(expenses).length > 0">
+                        <div v-if="Object.keys(changeRateExpense).length > 0">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -419,11 +432,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="expens in expenses" :key="expens.id" v-on:click="showModalWithData('ExpenseModal',()=>getExpense(expens.id))">
+                                    <tr v-for="expens in changeRateExpense" :key="expens.id" v-on:click="showModalWithData('ExpenseModal',()=>getExpense(expens.id))">
                                         <td>{{expens.name}}</td>
                                         <td class="text-end">{{expens.category}}</td>
                                         <td class="text-end">{{expens.payer}}</td>
-                                        <td class="text-end">{{expens.amount}}$</td>
+                                        <td class="text-end">{{expens.amount.toFixed(2)}} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
                                         </td>
@@ -431,8 +444,14 @@
                                 </tbody>
                             </table>
                             <div class="mt-3 d-flex justify-content-between">
-                                <p class="text-start mb-0"><strong><i class="fa-solid fa-coins"></i> 幣別: 暫無</strong></p>
-                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總分帳金額: {{ totalExpensAmount }}$</strong></p>
+                                <p class="text-start mb-0 d-flex align-items-center">
+                                    <i class="fa-solid fa-coins me-2"></i>
+                                    <strong class="me-2">幣別:</strong>
+                                    <select class="form-select" v-model="selectedCurrency" v-on:change="changeRates" id="currencyRate" style="width: auto;">
+                                        <option v-for="(name, id) in currencies" :key="id" :value="name">{{ name }}</option>
+                                    </select>
+                                </p>
+                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: {{ totalExpensAmount }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></strong></p>
                             </div>
                         </div>
                         <div v-else>

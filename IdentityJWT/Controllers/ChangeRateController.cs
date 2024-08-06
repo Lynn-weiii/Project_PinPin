@@ -39,7 +39,9 @@ namespace PinPinServer.Controllers
 
             if (!dtos.Any(dto => dto.Code == code)) return BadRequest("Not has this Code");
 
-            return Ok(await _rateService.GetChangeRate(code, dtos));
+            var result = await _rateService.GetChangeRate(code, dtos);
+            if (result.Count>=0) return Ok(await _rateService.GetChangeRate(code, dtos));
+            else return NotFound("Not support this code");
         }
     }
 }

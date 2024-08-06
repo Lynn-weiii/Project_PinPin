@@ -8,10 +8,13 @@
 
         public string? Schedule { get; set; }
 
+        public int PayerId { get; set; }
+
         public string? Payer { get; set; }
 
         public string? Category { get; set; }
 
+        //Code
         public string? Currency { get; set; }
 
         public float Amount { get; set; }

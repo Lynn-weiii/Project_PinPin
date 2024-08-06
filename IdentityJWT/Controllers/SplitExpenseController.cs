@@ -38,7 +38,7 @@ namespace PinPinServer.Controllers
                         Name = expens.Name,
                         Schedule = expens.Schedule.Name,
                         Payer = expens.Payer.Name,
-                        Currency = expens.Currency.Name,
+                        Currency = expens.Currency.Code,
                         Category = expens.SplitCategory.Category,
                         Amount = expens.Amount,
                         Remark = expens.Remark,
@@ -74,7 +74,7 @@ namespace PinPinServer.Controllers
                         Name = expens.Name,
                         Schedule = expens.Schedule.Name,
                         Payer = expens.Payer.Name,
-                        Currency = expens.Currency.Name,
+                        Currency = expens.Currency.Code,
                         Category = expens.SplitCategory.Category,
                         Amount = expens.Amount,
                         Remark = expens.Remark,
@@ -110,6 +110,7 @@ namespace PinPinServer.Controllers
             try
             {
                 List<ExpenseDTO> ExpenseDTOs = await _context.SplitExpenses
+                    .Include(sp=>sp.SplitExpenseParticipants)
                     .AsNoTracking()
                     .Where(expens => expens.ScheduleId == scheduleId)
                     .Select(expens => new ExpenseDTO
@@ -117,11 +118,19 @@ namespace PinPinServer.Controllers
                         Id = expens.Id,
                         Name = expens.Name,
                         Schedule = expens.Schedule.Name,
+                        PayerId = expens.PayerId,
                         Payer = expens.Payer.Name,
-                        Currency = expens.Currency.Name,
+                        Currency = expens.Currency.Code,
                         Category = expens.SplitCategory.Category,
                         Amount = expens.Amount,
                         Remark = expens.Remark,
+                        ExpenseParticipants = expens.SplitExpenseParticipants.Select(sep=>new ExpenseParticipantDTO
+                        {
+                            UserId=sep.UserId,
+                            UserName = sep.User.Name,
+                            IsPaid = sep.IsPaid,
+                            Amount=sep.Amount,
+                        }).ToList(),
                     }).ToListAsync();
 
 
@@ -207,6 +216,7 @@ namespace PinPinServer.Controllers
                                         .Where(se => se.PayerId == userID && se.SplitExpenseParticipants.Any(sep => sep.UserId == memberId) || (se.PayerId == memberId && se.SplitExpenseParticipants.Any(sep => sep.UserId == userID)))
                                         .Include(se => se.SplitExpenseParticipants)
                                         .Include(se => se.SplitCategory)
+                                        .Include(se=>se.Currency)
                                         .AsNoTracking()
                                         .ToListAsync();
 
@@ -219,7 +229,7 @@ namespace PinPinServer.Controllers
                     {
                         dto.ExpenseName = expense.Name;
                         dto.ExpenseCategory = expense.SplitCategory.Category;
-                        //!!!!!!!!!!!!!代辦幣別
+                        dto.CostCategory = expense.Currency.Code;
                         dto.Amount = expense.SplitExpenseParticipants.First(sep => sep.UserId == memberId).Amount;
                         dto.IsPaid = expense.SplitExpenseParticipants.First(sep => sep.UserId == memberId).IsPaid;
                     }
@@ -227,7 +237,7 @@ namespace PinPinServer.Controllers
                     {
                         dto.ExpenseName = expense.Name;
                         dto.ExpenseCategory = expense.SplitCategory.Category;
-                        //!!!!!!!!!!!!!代辦幣別
+                        dto.CostCategory = expense.Currency.Code;
                         dto.Amount = expense.SplitExpenseParticipants.First(sep => sep.UserId == userID).Amount;
                         dto.Amount = dto.Amount > 0 ? dto.Amount * -1 : throw new Exception("LogicError");
                         dto.IsPaid = expense.SplitExpenseParticipants.First(sep => sep.UserId == userID).IsPaid;
