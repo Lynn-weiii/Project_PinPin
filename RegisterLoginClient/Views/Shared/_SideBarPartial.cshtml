@@ -1,125 +1,205 @@
-﻿ <!-- 聊天室側邊欄 offcanvas start -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="sideBarOffcanvas" aria-labelledby="sideBarOffcanvasLabel">
-    <div class="offcanvas-header">
-        <!-- 側邊欄頁籤Navs and tabs start -->
-        <ul class="nav nav-tabs" id="sideBarOffcanvasLabel">
-            <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" aria-current="page" href="#wishlistTab">願望清單</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#chatRoomTab">聊天室</a>
-                @* <a class="nav-link text-dark" asp-area="" asp-controller="ChatRoom" asp-action="Index">聊天室</a> *@
-            </li>
-        </ul>
-        <!-- 側邊欄頁籤Navs and tabs end -->
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body tab-content">
-        <!--願望清單內容 start-->
-        <div id="wishlistTab" class="tab-pane fade show active">
-            <!-- accordion start -->
-            <div class="accordion accordion-flush" id="wishlist_accordionFlush">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="flush-headingOne">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                            願望清單＃1
-                        </button>
-                    </h2>
-                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
-                         data-bs-parent="#wishlist_accordionFlush">
-                        <div class="accordion-body d-flex">
-                            <!-- 行程卡片start -->
-                            <div class="card m-1" style="width: 10rem;">
-                                <img src="" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">行程1</h5>
-                                    <p class="card-text">地址</p>
-                                    <a href="#" class="btn btn-primary">加入行程</a>
-                                </div>
-                            </div>
-                            <div class="card m-1" style="width: 10rem;">
-                                <img src="" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">行程2</h5>
-                                    <p class="card-text">地址</p>
-                                    <a href="#" class="btn btn-primary">加入行程</a>
-                                </div>
-                            </div>
-                            <!-- 行程卡片end -->
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="flush-headingTwo">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                            願望清單＃2
-                        </button>
-                    </h2>
-                    <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo"
-                         data-bs-parent="#wishlist_accordionFlush">
-                        <div class="accordion-body d-flex">
-                            <div class="card m-1" style="width: 10rem;">
-                                <img src="" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">行程1</h5>
-                                    <p class="card-text">地址</p>
-                                    <a href="#" class="btn btn-primary">加入行程</a>
-                                </div>
-                            </div>
-                            <div class="card m-1" style="width: 10rem;">
-                                <img src="" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">行程2</h5>
-                                    <p class="card-text">地址</p>
-                                    <a href="#" class="btn btn-primary">加入行程</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="flush-headingThree">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#flush-collapseThree" aria-expanded="false"
-                                aria-controls="flush-collapseThree">
-                            願望清單＃3
-                        </button>
-                    </h2>
-                    <div id="flush-collapseThree" class="accordion-collapse collapse"
-                         aria-labelledby="flush-headingThree" data-bs-parent="#wishlist_accordionFlush">
-                        <div class="accordion-body d-flex">
-                            <div class="card m-1" style="width: 10rem;">
-                                <img src="" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">行程1</h5>
-                                    <p class="card-text">地址</p>
-                                    <a href="#" class="btn btn-primary">加入行程</a>
-                                </div>
-                            </div>
-                            <div class="card m-1" style="width: 10rem;">
-                                <img src="" class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">行程2</h5>
-                                    <p class="card-text">地址</p>
-                                    <a href="#" class="btn btn-primary">加入行程</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- accordion end -->
+﻿<!-- 聊天室側邊欄 offcanvas start -->
+<div id="appSidebar">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="sideBarOffcanvas" aria-labelledby="sideBarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <!-- 側邊欄頁籤Navs and tabs start -->
+            <ul class="nav nav-tabs" id="sideBarOffcanvasLabel">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" aria-current="page" href="#wishlistTab" v-on:click="fetchWishlists">願望清單</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#chatRoomTab">聊天室</a>
+                </li>
+            </ul>
+            <!-- 側邊欄頁籤Navs and tabs end -->
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <!--願望清單內容 end-->
-        <div id="chatRoomTab" class="tab-pane fade">
-            @await Html.PartialAsync("../Chatroom/_ChatRoomPartial")
-            @* <!--聊天室群組按鈕start-->
-            <div id="groupList" class="list-group">
-            <!-- 群組按鈕將在這裡動態生成 -->
+        <div class="offcanvas-body tab-content">
+            <!--願望清單內容 start-->
+            <div id="wishlistTab" class="tab-pane fade show active">
+                <!-- accordion start -->
+                <div class="accordion accordion-flush" id="wishlistAccordionFlush">
+                    <div class="accordion-item" v-for="(wishlist, index) in wishlists" :key="wishlist.id">
+                        <h2 class="accordion-header" :id="'flush-heading' + index">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    :data-bs-target="'#flush-collapse' + index" aria-expanded="false"
+                                    :aria-controls="'flush-collapse' + index">
+                                {{wishlist.name}}
+                            </button>
+                        </h2>
+                        <div :id="'flush-collapse' + index" class="accordion-collapse collapse"
+                             :aria-labelledby="'flush-heading' + index" data-bs-parent="#wishlistAccordionFlush">
+                            <div class="accordion-body d-flex flex-column" v-for="(locationCategory, lcIndex) in wishlist.locationCategories" :key="locationCategory.id">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary" type="button" v-on:click="setSelectedCategory(wishlist.id, locationCategory.id)">{{locationCategory.name}}</button>
+                                </div>
+                                <!--行程卡片-->
+                                <div v-for="detail in getFilteredDetails(wishlist.id)" class="card m-1" style="width: 10rem;">
+                                    <img :src="detail.photoUrl" class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ detail.name }}</h5>
+                                        <p class="card-text">{{ detail.address }}</p>
+                                        <a href="#" class="btn btn-primary">加入行程</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- accordion end -->
             </div>
-            <!--聊天室群組按鈕end--> *@
+            <!--願望清單內容 end-->
+            <div id="chatRoomTab" class="tab-pane fade">
+                @await Html.PartialAsync("../Chatroom/_ChatRoomPartial")
+                @* <!--聊天室群組按鈕start-->
+                <div id="groupList" class="list-group">
+                <!-- 群組按鈕將在這裡動態生成 -->
+                </div>
+                <!--聊天室群組按鈕end--> *@
+            </div>
         </div>
     </div>
 </div>
+
+
+<!-- Include this script section in your view where you already have your other scripts -->
+<script src="https://unpkg.com/vue@3.4.31/dist/vue.global.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
+        integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    var baseAddress = "https://localhost:7280"; // Change this to your actual server address
+
+    //解密token取得ID 
+    function base64UrlDecode(base64Url) {
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
+    function parseJwt(token) {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            throw new Error('Invalid token');
+        }
+        const payload = parts[1];
+        return JSON.parse(base64UrlDecode(payload));
+    }
+
+    function getUserIdFromToken() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken = parseJwt(token);
+                return decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+            } catch (error) {
+                console.error('Failed to decode token:', error);
+            }
+        }
+        return null;
+    }
+    //解密token取得ID END
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const vueApp = {
+            data() {
+                return {
+                    wishlists: [],
+                    selectedWishlistId: null,
+                    selectedLocationCategoryId: null,
+                };
+            },
+            mounted: function () {
+                console.log('Vue instance mounted!');
+                this.fetchWishlists();
+            },
+            methods: {
+                fetchWishlists: function () {
+                    const userId = getUserIdFromToken();
+                    if (!userId) {
+                        console.error('User ID not found');
+                        return;
+                    }
+
+                    const _this = this;
+                    axios.get(`${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`)
+                        .then(function (response) {
+                            const wishlistDTOs = response.data;
+
+                            // 保留 wishlistDetails 和 locationCategories
+                            wishlistDTOs.forEach(function (wishlist) {
+                                wishlist.wishlistDetails = wishlist.wishlistDetails || [];
+                                wishlist.locationCategories = wishlist.locationCategories || [];
+                            });
+
+                            
+                            _this.wishlists = wishlistDTOs;
+                            console.log(_this.wishlists);
+                        })
+                        .catch(function (error) {
+                            console.error('Error fetching wishlists:', error);
+                        });
+                },
+                setSelectedCategory: function (wishlistId, locationCategoryId) { 
+                    this.selectedWishlistId = wishlistId;
+                    this.selectedLocationCategoryId = locationCategoryId;
+                    this.fetchDetailsForCategory(wishlistId, locationCategoryId);
+                },
+                getFilteredDetails: function (wishlistId) {
+                    if (this.selectedWishlistId !== wishlistId) return [];
+
+                    const selectedWishlist = this.wishlists.find(wishlist => wishlist.id === wishlistId);
+                    if (!selectedWishlist) return [];
+
+                    return selectedWishlist.wishlistDetails.filter(detail => detail.locationCategoryId === this.selectedLocationCategoryId);
+                },
+                fetchDetailsForCategory: function (wishlistId, locationCategoryId) {
+                    const selectedWishlist = this.wishlists.find(wishlist => wishlist.id === wishlistId);
+                    if (!selectedWishlist) return;
+
+                    const details = selectedWishlist.wishlistDetails.filter(detail => detail.locationCategoryId === locationCategoryId);
+
+                    details.forEach(detail => {
+                        this.fetchPhoto(detail.googlePlaceId, photoUrl => {
+                            detail.photoUrl = photoUrl;
+                        });
+                        this.fetchPlaceDetails(detail.googlePlaceId, placeDetails => {
+                            detail.address = placeDetails.formatted_address;
+                        });
+                    });
+                },
+                fetchPhoto: function (photoReference, callback) {
+                    axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
+                        params: {
+                            photoReference: photoReference
+                        }
+                    })
+                        .then(function (response) {
+                            callback(response.data.url);
+                        })
+                        .catch(function (error) {
+                            console.error('Error fetching photo:', error);
+                        });
+                },
+                fetchPlaceDetails: function (placeId, callback) {
+                    axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
+                        params: {
+                            placeId: placeId
+                        }
+                    })
+                        .then(function (response) {
+                            callback(response.data.result);
+                        })
+                        .catch(function (error) {
+                            console.error('Error fetching place details:', error);
+                        });
+                }
+                
+            }
+        };
+        Vue.createApp(vueApp).mount('#appSidebar');
+    });
+
+</script>
