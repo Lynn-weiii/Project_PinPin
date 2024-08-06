@@ -4,5 +4,6 @@
     {
         public int ScheduleId { get; set; }
         public string? Email { get; set; }
+        public int AuthorityCategoryId { get; set; }
     }
 }

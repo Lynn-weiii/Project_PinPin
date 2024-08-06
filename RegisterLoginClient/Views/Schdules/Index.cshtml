@@ -346,9 +346,13 @@
                 </div>
                 <div class="modal-body">
                     <form id="checkmail" class="form-group needs-validation" novalidate autocomplete="off">
-                        <div class="d-flex align-items-start needs-validation mt-2 mb-2 ">
+                        <div class="form-row d-flex align-items-start needs-validation mt-2 mb-2 ">
                             <input type="email" class="form-control mx-1" name="Email" style="width:80%;border-radius:14px;" id="txtMail" required pattern="^[\w-\.]+@("@")([\w-]+\.)+[\w-]{2,4}$" autocomplete="off">
                             <button type="submit" class="form-control" id="invite_btn" style="width:auto;border-radius:14px;">加入</button>
+                        </div>
+                        <div class="form-row d-flex align-items-center mt-2 mb-2 mx-2">
+                            <input type="checkbox" class="form-check-input" data-AuthorityCategoryId="2" id="defalutauthority" />
+                            <label class="form-check-label mx-1">可編輯</label>
                         </div>
                     </form>
                 </div>
@@ -377,6 +381,7 @@
 <!-- Scripts-->
     <script>
         $(document).ready(async function () {
+            
             var baseAddress = "https://localhost:7280";
             var token = localStorage.getItem('token');
             try {
@@ -522,13 +527,14 @@
                 $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
                     clearModalContent();
                 });
+
                 $(document).on('click', '.dropdown-item', async function (event) {
                         event.preventDefault();
                         var fun = $(this).data('fun');
                         var sch_name = $(this).data('name');
-                        var schedule_id = $(document.querySelector('[data-sche]')).data('sche');
+                        var schedule_id = $(this).closest('.course_card').find('[data-sche]').data('sche');
                         var userId = $(this).data('exitid')
-                        var gschedule_id = $(document.querySelector('[data-gsche]')).data('gsche');
+                        var gschedule_id = $(this).closest('.course_card').find('[data-gsche]').data('gsche');
                         switch (fun) {
                             //Main
                             case 'MemberManager':
@@ -569,7 +575,7 @@
                                     'Content-Type': 'application/json'
                                 }
                             });
-                            if (response.status === 204) {
+                            if (response.status === 204 || response.status === 404) {
                                 alert('無群組成員!');
                                 if ($('#scheduleauthority_modal').hasClass('show')) {
                                     $('#scheduleauthority_modal').modal('hide');
@@ -648,7 +654,6 @@
                                 'ScheduleId': schedule_id,
                                 'UserId': userId
                             };
-
                             try {
                             var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
                                     method: "PUT",
@@ -727,22 +732,27 @@
                         
                     //#region 邀請成員
                     async function handleInviteMember(schedule_id) {
-                        $('#checkmail').off('submit').on('submit', async function (event) {
+                        $('#checkmail').on('submit', async function (event) {
                             event.preventDefault();
+
                             var Email = document.getElementById('txtMail');
                             if (!Email.checkValidity()) {
                                 alert('請確認使用者的帳號');
                                 return;
                             }
 
+                            var checkbox = document.getElementById('defalutauthority');
+                            var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
+                        
                             try {
                                 var Body = {
                                     "Email": Email.value.trim(),
-                                    "ScheduleId": schedule_id
+                                    "ScheduleId": schedule_id,
+                                    "AuthorityCategoryId": AuthorityCategoryId,
                                 };
                                 console.log(JSON.stringify(Body));
 
-                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
+                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
                                     method: "POST",
                                     body: JSON.stringify(Body),
                                     headers: {
@@ -754,7 +764,6 @@
                                 var responseData = await response.json();
 
                                 if (response.ok) {
-                                    // 处理不同的成功消息
                                     if (responseData.message === "主辦者不需加入群組") {
                                         alert('主辦者無需加入群組');
                                     } else if (responseData.message === "會員已加入此群組") {
@@ -764,7 +773,6 @@
                                     }
                                     location.reload();
                                 } else {
-                                    // 处理服务器返回的错误消息
                                     console.log('錯誤:', responseData.message || '未知錯誤');
                                     alert(responseData.message || '新增成員失敗');
                                     $('#invitemember_modal').modal('hide');
@@ -775,7 +783,7 @@
                                 $('#invitemember_modal').modal('hide');
                             }
                         });
-            }
+                    }
                     //#endregion
                         
                     //#region 查看成員

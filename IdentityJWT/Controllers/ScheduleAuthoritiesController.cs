@@ -15,11 +15,10 @@ namespace PinPinServer.Controllers
         private readonly ILogger<ScheduleAuthoritiesController> _logger;
         PinPinContext _context;
         AuthGetuserId _getUserId;
-        public ScheduleAuthoritiesController(PinPinContext context, AuthGetuserId getuserId, ILogger<ScheduleAuthoritiesController> logger)
+        public ScheduleAuthoritiesController(PinPinContext context, AuthGetuserId getuserId)
         {
             _context = context;
             _getUserId = getuserId;
-            _logger = logger;
         }
 
         // GET: api/ScheduleAuthorities/{schedule_id}
@@ -152,7 +151,7 @@ namespace PinPinServer.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "發生未預期的錯誤。");
+
                 return StatusCode(500, new { message = "內部伺服器錯誤。", error = ex.Message });
             }
         }

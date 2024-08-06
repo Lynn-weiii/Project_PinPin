@@ -272,6 +272,10 @@ public partial class PinPinContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("modified_time");
             entity.Property(e => e.Remark).HasColumnName("remark");
+            entity.Property(e => e.Rowversion)
+                .IsRowVersion()
+                .IsConcurrencyToken()
+                .HasColumnName("rowversion");
             entity.Property(e => e.ScheduleDayId).HasColumnName("schedule_day_id");
             entity.Property(e => e.StartTime)
                 .HasColumnType("datetime")
@@ -305,6 +309,10 @@ public partial class PinPinContext : DbContext
             entity.Property(e => e.LeftDate)
                 .HasColumnType("datetime")
                 .HasColumnName("left_date");
+            entity.Property(e => e.Rowversion)
+                .IsRowVersion()
+                .IsConcurrencyToken()
+                .HasColumnName("rowversion");
             entity.Property(e => e.ScheduleId).HasColumnName("schedule_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 

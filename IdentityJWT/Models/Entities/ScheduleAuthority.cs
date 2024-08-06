@@ -2,7 +2,6 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace PinPinServer.Models;
 
@@ -15,7 +14,7 @@ public partial class ScheduleAuthority
     public int UserId { get; set; }
 
     public int AuthorityCategoryId { get; set; }
-    [Timestamp]
+
     public byte[] Rowversion { get; set; }
 
     public virtual ScheduleAuthorityCategory AuthorityCategory { get; set; }

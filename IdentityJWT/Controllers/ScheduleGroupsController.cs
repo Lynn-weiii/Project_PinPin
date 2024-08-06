@@ -90,7 +90,7 @@ namespace PinPinTest.Controllers
                     {
                         ScheduleId = inviteMemeberDTO.ScheduleId,
                         UserId = member.Id,
-                        AuthorityCategoryId = 1,
+                        AuthorityCategoryId = inviteMemeberDTO.AuthorityCategoryId
                     };
                     _context.ScheduleAuthorities.Add(updateMemberAuthority);
                     await _context.SaveChangesAsync();
@@ -115,18 +115,35 @@ namespace PinPinTest.Controllers
                     Id = 0,
                     ScheduleId = inviteMemeberDTO.ScheduleId,
                     UserId = member.Id,
-                    AuthorityCategoryId = 1,
+                    AuthorityCategoryId = inviteMemeberDTO.AuthorityCategoryId
                 };
                 _context.ScheduleAuthorities.Add(newmemberauthority);
                 await _context.SaveChangesAsync();
 
                 return Ok(newmember);
             }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var entry = ex.Entries.Single();
+                var databaseEntry = entry.GetDatabaseValues();
+                if (databaseEntry == null)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    var updatedData = (ScheduleGroup)databaseEntry.ToObject();
+                    _context.Entry(updatedData).OriginalValues.SetValues(entry.OriginalValues);
+                    await _context.SaveChangesAsync();
+                    return Ok(new { message = "已新增成員!" });
+                }
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "伺服器錯誤", detail = ex.Message });
             }
         }
+
 
 
         //PUT:api/ScheduleGroups/Memberexit
@@ -158,13 +175,27 @@ namespace PinPinTest.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return Ok("退出成功");
+                return Ok(new { Message = "成員已退出" });
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var entry = ex.Entries.Single();
+                var databaseEntry = entry.GetDatabaseValues();
+                if (databaseEntry == null)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    var updatedData = (ScheduleGroup)databaseEntry.ToObject();
+                    _context.Entry(updatedData).OriginalValues.SetValues(entry.OriginalValues);
+                    await _context.SaveChangesAsync();
+                    return Ok(new { message = "已新增成員!" });
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"內部伺服器錯誤");
-                Console.WriteLine(ex);
-                return StatusCode(500, $"內部伺服器錯誤: {ex.Message}");
+                return StatusCode(500, new { message = "伺服器錯誤", detail = ex.Message });
             }
         }
     }

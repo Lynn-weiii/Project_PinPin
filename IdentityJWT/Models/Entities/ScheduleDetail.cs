@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PinPinServer.Models;
 
@@ -26,6 +27,8 @@ public partial class ScheduleDetail
     public bool? IsDeleted { get; set; }
 
     public DateTime? ModifiedTime { get; set; }
+    [Timestamp]
+    public byte[] Rowversion { get; set; }
 
     public virtual SchedulePreview ScheduleDay { get; set; }
 
