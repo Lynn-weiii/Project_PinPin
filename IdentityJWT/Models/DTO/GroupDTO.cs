@@ -7,5 +7,8 @@
         public string UserPhoto { get; set; }
         public List<int> AuthorityIds { get; set; }
         public bool CanRemove { get; set; }
+        public bool CanRemove { get; set; }
+
+        public int HostID { get; set; }
     }
 }

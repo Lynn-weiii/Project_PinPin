@@ -53,7 +53,6 @@ namespace PinPinTest.Controllers
         [HttpGet("GetGroupsMembers/{gschedule_id}")]
         public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int gschedule_id)
         {
-
             int? jwtuserID = _getUserId.PinGetUserId(User).Value;
             if (jwtuserID == null || jwtuserID == 0)
             {
