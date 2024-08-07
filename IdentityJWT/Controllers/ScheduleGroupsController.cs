@@ -49,7 +49,7 @@ namespace PinPinTest.Controllers
         }
 
 
-        //GET:api/ScheduleGroups/GetGropsMembers/${gschedule_id}
+        //GET:api/ScheduleGroups/GetGropsMembers
         [HttpGet("GetGroupsMembers/{gschedule_id}")]
         public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int gschedule_id)
         {
@@ -63,16 +63,15 @@ namespace PinPinTest.Controllers
             try
             {
                 var groupDTOs = await _context.ScheduleGroups
-                    .Where(g => g.ScheduleId == gschedule_id && g.LeftDate == null && g.UserId != jwtuserID) // 排除 JWT 用户
+                    .Where(g => g.ScheduleId == gschedule_id && g.LeftDate == null)
                     .Include(g => g.User)
                     .ThenInclude(u => u.ScheduleAuthorities)
-                    .GroupBy(g => g.UserId)
-                    .Select(g => new
+                    .Select(g => new GroupDTO
                     {
-                        UserId = g.Key,
-                        UserName = g.First().User.Name,
-                        UserPhoto = g.First().User.Photo,
-                        AuthorityIds = g.First().User.ScheduleAuthorities
+                        UserId = g.UserId,
+                        UserName = g.User.Name,
+                        UserPhoto = g.User.Photo,
+                        AuthorityIds = g.User.ScheduleAuthorities
                             .Where(a => a.ScheduleId == gschedule_id)
                             .Select(a => a.AuthorityCategoryId)
                             .ToList()
@@ -93,18 +92,11 @@ namespace PinPinTest.Controllers
                         UserName = member.UserName,
                         UserPhoto = member.UserPhoto,
                         AuthorityIds = member.AuthorityIds,
-                        CanRemove = userCanRemove && member.UserId != hostID // 只有具有移除权限且不是主办人的成员才能移除
+                        CanRemove = userCanRemove && member.UserId != hostID
                     })
                     .ToList();
 
-                if (finalGroupDTOs.Any())
-                {
-                    return Ok(finalGroupDTOs);
-                }
-                else
-                {
-                    return NoContent();
-                }
+                return Ok(groupDTOs);
             }
             catch (Exception ex)
             {

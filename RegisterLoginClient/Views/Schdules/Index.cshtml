@@ -108,11 +108,7 @@
 
     .swal2-popup .swal2-cancel {
         color: #758694 !important;
-    }
-
-    #loading {
-        display: none !important;
-    }
+    }    
 
     .modal-footer{
             justify-content: flex-start !important;
@@ -165,8 +161,8 @@
     .member-info {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        text-align: start;
+        align-items: center;
+        text-align: center;
         padding: 10px;
         border: none;
         background: transparent;
@@ -302,12 +298,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>                      
         </div>
     </div>
     @*#endregion*@
 </div>
-    @*#endregion*@
+@*#endregion*@
             
     @*#region 新增行程Modal*@
     <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
@@ -456,7 +452,8 @@
                             'Content-Type': 'application/json'
                         }
                     })
-                ]); 
+                ]);    
+
                     //#region user創建群組loading
                     if (mainSchedulesResponse.status === 401) {
                         $('#course-container').hide();
@@ -612,11 +609,6 @@
                                 console.log(`fun:${fun}_gschedule_id: ${gschedule_id}_userId:${userId}`);
                                 await ExitGroup(gschedule_id, userId);
                                 break;
-
-                            case 'CheckManager':
-                                console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
-                                await LoadGroupMembers(gschedule_id);
-                                break;
                             
                             default:
                                 console.warn(`Unknown function: ${fun}`);
@@ -726,24 +718,24 @@
                                 if (response.ok) {
                                     var result = await response.json();
                                     alert(result.message);
-                                    $('invitemember_modal').modal('hide');location.reload();
-                                    location.reload();
+                                    $('#invitemember_modal').modal('hide');
                                 } else {
                                     var error = await response.json();
-                                    alert(`錯誤: ${error.message}`); 
+                                    alert(`錯誤: ${error.message}`);
+                                     $('#invitemember_modal').modal('hide');
                                 }
                             } catch (error) {
                                 console.error('請求失敗:', error);
+                                $('#invitemember_modal').modal('hide');
                             }
                         });
                         //#endregion
                     }
                     //#endregion
 
-                        //#region 刪除行程
+                    //#region 刪除行程
                         async function handleDelete(schedule_id) {
                         try {
-                            clearModalContent();
                             var result = await Swal.fire({
                                 title: "Are you sure?",
                                 html: `
@@ -777,8 +769,7 @@
                                     text: `行程已刪除`,
                                     icon: "success"
                                 });
-
-                                location.reload();
+                                
                             }
                         } catch (error) {
                             Swal.fire({
@@ -788,50 +779,53 @@
                             });
                         }
                     }
-                    //#endregion
+                        //#endregion
                         
-                        //#region 邀請成員
-                        async function handleInviteMember(schedule_id) {
-                            $('#checkmail').on('submit', async function (event) {
-                                event.preventDefault();
+                    //#region 邀請成員
+                    async function handleInviteMember(schedule_id) {
+                        $('#checkmail').on('submit', async function (event) {
+                            event.preventDefault();
 
-                                var Email = document.getElementById('txtMail');
-                                if (!Email.checkValidity()) {
-                                    alert('請確認使用者的帳號');
-                                    return;
-                                }
+                            var Email = document.getElementById('txtMail');
+                            if (!Email.checkValidity()) {
+                                alert('請確認使用者的帳號');
+                                return;
+                            }
 
-                                var checkbox = document.getElementById('defalutauthority');
-                                var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
+                            var checkbox = document.getElementById('defalutauthority');
+                            var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
                         
-                                try {
-                                    var Body = {
-                                        "Email": Email.value.trim(),
-                                        "ScheduleId": schedule_id,
-                                        "AuthorityCategoryId": AuthorityCategoryId,
-                                    };
-                                    console.log(JSON.stringify(Body));
+                            try {
+                                var Body = {
+                                    "Email": Email.value.trim(),
+                                    "ScheduleId": schedule_id,
+                                    "AuthorityCategoryId": AuthorityCategoryId,
+                                };
+                                console.log(JSON.stringify(Body));
 
-                                    var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
-                                        method: "POST",
-                                        body: JSON.stringify(Body),
-                                        headers: {
-                                            'Authorization': `Bearer ${token}`,
-                                            'Content-Type': 'application/json'
-                                        }
-                                    });
+                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
+                                    method: "POST",
+                                    body: JSON.stringify(Body),
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
 
-                                    var responseData = await response.json();
+                                var responseData = await response.json();
 
                                     if (response.ok) {
                                         if (responseData.message === "主辦者不需加入群組") {
                                             alert('主辦者無需加入群組');
+                                            $('#invitemember_modal').modal('hide');
                                         } else if (responseData.message === "會員已加入此群組") {
                                             alert('該會員已是群組會員');
+                                            $('#invitemember_modal').modal('hide');
                                         } else {
                                             alert('已成功邀請好友進入群組!');
+                                            $('#invitemember_modal').modal('hide');
                                         }
-                                        location.reload();
+                                        
                                     } else {
                                         console.log('錯誤:', responseData.message || '未知錯誤');
                                         alert(responseData.message || '新增成員失敗');
@@ -846,12 +840,38 @@
                         }
                         //#endregion
                         
-                        //#region 查看成員
-                        async function LoadGroupMembers(gschedule_id) {
-                            try {
-                                $('#groupmembers_modal').modal('show');
-                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/GetGroupsMembers/${gschedule_id}`, {
-                                    method: 'GET',
+                    //#region 查看成員
+                        
+                    //#endregion
+                        
+                    //#region 離開群組
+                    async function ExitGroup(gschedule_id, userId) {
+                        try {
+                            var body = {
+                                'ScheduleID': gschedule_id,
+                                'UserID': userId
+                            };
+                            var result = await Swal.fire({
+                                title: "Are you sure?",
+                                html: `
+                                您確認要離開此行程?<br>
+                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                                也會一併刪除!
+                                        `,
+                                icon: "warning",
+                                iconColor: '#E4003A',
+                                showCancelButton: true,
+                                confirmButtonColor: "#405D72",
+                                cancelButtonColor: "#F9E0BB",
+                                confirmButtonText: "確認刪除"
+                            });
+
+                            if (result.isConfirmed) {
+                                console.log(JSON.stringify(body)); // 修正此处
+
+                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
+                                    method: "PUT",
+                                    body: JSON.stringify(body),
                                     headers: {
                                         'Authorization': `Bearer ${token}`,
                                         'Content-Type': 'application/json'
@@ -859,104 +879,27 @@
                                 });
 
                                 if (!response.ok) {
-                                    throw new Error('網路回應不正常');
-                                    $('#groupmembers_modal').modal('hide');
+                                    throw new Error('行程刪除失敗');
                                 }
 
-                                if (response.status === 204) {
-                                    alert('查無其他成員');
-                                    $('#groupmembers_modal').modal('hide');
-                                }
-
-                                var groupMembers = await response.json();
-
-                                var modalBody = document.querySelector('#groupmembers_modal .modal-body');
-                                modalBody.innerHTML = '';
-
-                               
-                              var memberHTML = groupMembers.map(member => `
-                                    <div class="member-info">
-                                        <div class="member-photo">
-                                            <img
-                                                src="${member.userPhoto || '/images/userfill.png'}"
-                                                alt="${member.userName}"
-                                                onerror="this.onerror=null;this.src='/images/userfill.png';"
-                                            />
-                                        </div>
-                                        <p>
-                                            ${member.userName}
-                                            ${member.canRemove ?
-                                                    `<a class="button" id="removemember_btn" data-removememberid="${member.userId}"><i class="fa-solid fa-circle-xmark" style="color: #c60619;"></i></a>`
-                                                    : ''}
-                                        </p>
-                                    </div>
-                                `).join('');
-
-                               modalBody.innerHTML = `<div class="member-container">${memberHTML}</div>`;
-                            }
-                            catch (error) {
-                                $('#groupmembers_modal').modal('hide');
-                                console.error('載入成員資料時發生錯誤:', error);
-                            }
-                        }
-                        //#endregion
-                        
-                        //#region 離開群組
-                        async function ExitGroup(gschedule_id, userId) {
-                            try {
-                                var body = {
-                                    'ScheduleID': gschedule_id,
-                                    'UserID': userId
-                                };
-                                var result = await Swal.fire({
-                                    title: "Are you sure?",
-                                    html: `
-                                    您確認要離開此行程?<br>
-                                    當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
-                                    也會一併刪除!
-                                            `,
-                                    icon: "warning",
-                                    iconColor: '#E4003A',
-                                    showCancelButton: true,
-                                    confirmButtonColor: "#405D72",
-                                    cancelButtonColor: "#F9E0BB",
-                                    confirmButtonText: "確認刪除"
+                                await Swal.fire({
+                                    title: "已退出!",
+                                    text: `您已退出群組`,
+                                    icon: "success"
                                 });
 
-                                if (result.isConfirmed) {
-                                    console.log(JSON.stringify(body)); 
-
-                                    var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
-                                        method: "PUT",
-                                        body: JSON.stringify(body),
-                                        headers: {
-                                            'Authorization': `Bearer ${token}`,
-                                            'Content-Type': 'application/json'
-                                        }
-                                    });
-
-                                    if (!response.ok) {
-                                        throw new Error('行程刪除失敗');
-                                    }
-
-                                    await Swal.fire({
-                                        title: "已退出!",
-                                        text: `您已退出群組`,
-                                        icon: "success"
-                                    });
-
-                                    location.reload();
-                                }
-                            } catch (error) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "錯誤",
-                                    text: `請重新再試一次`
-                                });
-                                console.log(error.message);
+                                location.reload();
                             }
+                        } catch (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "錯誤",
+                                text: `請重新再試一次`
+                            });
+                            console.log(error.message);
                         }
-                    //#endregion
+                    }
+                //#endregion
                 
                 //#endregion
 

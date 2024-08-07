@@ -100,7 +100,7 @@ namespace PinPinServer.Controllers
                         EndTime = s.EndTime,
                         CreatedAt = s.CreatedAt,
                         UserName = s.User.Name,
-                        PictureUrl = s.Picture,
+                        PictureUrl = s.PictureUrl,
                         UserId = userID,
                         SharedUserIDs = s.ScheduleGroups.Select(sg => (int?)sg.UserId).ToList(),
                         SharedUserNames = s.ScheduleGroups
