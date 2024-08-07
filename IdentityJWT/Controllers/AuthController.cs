@@ -167,7 +167,7 @@ namespace PinPinServer.Controllers
 
             var token = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(30),
+                    expires: DateTime.Now.AddMinutes(1440),
                     signingCredentials: creds
                 );
 

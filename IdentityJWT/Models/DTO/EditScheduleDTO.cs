@@ -10,12 +10,16 @@ namespace PinPinServer.Models.DTO
         public string Name { get; set; } = string.Empty;
 
         [Display(Name = "出發日期")]
-        public DateOnly StartTime { get; set; }
+        [Required(ErrorMessage = "請選擇出發日期!")]
+        public DateOnly StartTime { get; set; } // 改为字符串以便处理
 
         [Display(Name = "結束日期")]
-        public DateOnly EndTime { get; set; }
+        [Required(ErrorMessage = "請選擇結束日期!")]
+        public DateOnly EndTime { get; set; } // 改为字符串以便处理
 
         public int UserId { get; set; }
+
+        public string PlaceId { get; set; }
 
 
 
@@ -25,5 +29,14 @@ namespace PinPinServer.Models.DTO
 
         [Display(Name = "創建日期")]
         public DateTime? CreatedAt { get; set; }
+
+        public int isHoster { get; set; }
+
+        public Decimal? lng { get; set; }
+
+        public Decimal? lat { get; set; }
+
+        public string? Pictureurl { get; set; }
+
     }
 }

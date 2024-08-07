@@ -7,6 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Schdules\Partials\**" />
+    <Compile Remove="wwwroot\image\**" />
+    <Compile Remove="wwwroot\lib\moment.js\**" />
+    <Content Remove="Views\Schdules\Partials\**" />
+    <Content Remove="wwwroot\image\**" />
+    <Content Remove="wwwroot\lib\moment.js\**" />
+    <EmbeddedResource Remove="Views\Schdules\Partials\**" />
+    <EmbeddedResource Remove="wwwroot\image\**" />
+    <EmbeddedResource Remove="wwwroot\lib\moment.js\**" />
+    <None Remove="Views\Schdules\Partials\**" />
+    <None Remove="wwwroot\image\**" />
+    <None Remove="wwwroot\lib\moment.js\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\Schdules\Index.cshtml.cs" />
     <Content Remove="Views\Home\Schedule.cshtml" />
     <Content Remove="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
@@ -16,15 +32,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
+    <Content Remove="Views\Home\Schedule.cshtml" />
+    <Content Remove="Views\Schdules\CreateNewSchdule.cshtml" />
+    <Content Remove="Views\Schdules\_ScheduleList.cshtml" />
+    <Content Remove="wwwroot\css\main_styles2.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IdentityJWT\PinPinServer.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\Schdules\Partials\" />
   </ItemGroup>
 
   <ItemGroup>

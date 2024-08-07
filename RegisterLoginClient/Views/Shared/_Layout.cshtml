@@ -6,10 +6,12 @@
     <title>@ViewData["Title"] - RegisterLoginClient</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/css/bootstrap.min.css" asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PinPinClient.styles.css" asp-append-version="true" />
-    <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
+
+    <script src="~/js/site.js"></script>
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -25,7 +27,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Expense" asp-action="Index">PoleEast</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Schdules">Schdules</a> <!--bao-->
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Schdules" asp-action="Index">Schdules</a> <!--bao-->
                         </li>
 
                     </ul>
@@ -64,18 +66,18 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/axios/axios.min.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/66638a3835.js" type="text/javascript" asp-fallback-href="/lib/font-awesome/js/fontawesome.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
 <script>
     $(document).ready(function () {
-        // 初始化導航欄狀態
+
         updateNavbar();
 
-        // 登出按鈕點擊事件
         $("#logout").on("click", function () {
             localStorage.removeItem('token');
-            updateNavbar(); // 更新導航欄狀態
+            updateNavbar(); 
         });
 
         function updateNavbar() {
@@ -94,3 +96,7 @@
         }
     });
 </script>
+
+ @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

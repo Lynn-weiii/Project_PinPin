@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using PinPinServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
