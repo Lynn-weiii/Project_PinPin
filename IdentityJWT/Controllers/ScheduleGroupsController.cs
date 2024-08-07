@@ -49,11 +49,10 @@ namespace PinPinTest.Controllers
         }
 
 
-        //GET:api/ScheduleGroups/GetGropsMembers/${gschedule_id}
-        [HttpGet("GetGroupsMembers/{gschedule_id}")]
-        public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int gschedule_id)
+        //GET:api/ScheduleGroups/GetGropsMembers
+        [HttpGet("GetGropsMembers")]
+        public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int schedule_id)
         {
-
             int? jwtuserID = _getUserId.PinGetUserId(User).Value;
             if (jwtuserID == null || jwtuserID == 0)
             {
@@ -66,14 +65,13 @@ namespace PinPinTest.Controllers
                     .Where(g => g.ScheduleId == gschedule_id && g.LeftDate == null) // 排除 JWT 用户
                     .Include(g => g.User)
                     .ThenInclude(u => u.ScheduleAuthorities)
-                    .GroupBy(g => g.UserId)
-                    .Select(g => new
+                    .Select(g => new GroupDTO
                     {
-                        UserId = g.Key,
-                        UserName = g.First().User.Name,
-                        UserPhoto = g.First().User.Photo,
-                        AuthorityIds = g.First().User.ScheduleAuthorities
-                            .Where(a => a.ScheduleId == gschedule_id)
+                        UserId = g.UserId,
+                        UserName = g.User.Name,
+                        UserPhoto = g.User.Photo,
+                        AuthorityIds = g.User.ScheduleAuthorities
+                            .Where(a => a.ScheduleId == schedule_id)
                             .Select(a => a.AuthorityCategoryId)
                             .ToList()
                     }).ToListAsync();
@@ -97,14 +95,7 @@ namespace PinPinTest.Controllers
                     })
                     .ToList();
 
-                if (finalGroupDTOs.Any())
-                {
-                    return Ok(finalGroupDTOs);
-                }
-                else
-                {
-                    return NoContent();
-                }
+                return Ok(groupDTOs);
             }
             catch (Exception ex)
             {
