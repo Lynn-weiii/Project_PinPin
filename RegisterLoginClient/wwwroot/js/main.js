@@ -145,13 +145,6 @@ Author:         Company Name
             slidesToScroll: 1,
             dots: true,
         });
-        //Date Time Picker 
-        $("#datepicker").datepicker({
-            autoclose: true,
-            todayHighlight: true
-        }).datepicker('update', new Date());
-        $("#datepicker-2").datepicker();
-        $("#datepicker-3").datepicker();
         /*====================================
             counter
         ======================================*/
