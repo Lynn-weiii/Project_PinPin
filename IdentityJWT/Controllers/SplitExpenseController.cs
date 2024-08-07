@@ -108,7 +108,7 @@ namespace PinPinServer.Controllers
             try
             {
                 List<ExpenseDTO> ExpenseDTOs = await _context.SplitExpenses
-                    .Include(sp=>sp.SplitExpenseParticipants)
+                    .Include(sp => sp.SplitExpenseParticipants)
                     .AsNoTracking()
                     .Where(expens => expens.ScheduleId == scheduleId)
                     .Select(expens => new ExpenseDTO
@@ -122,12 +122,12 @@ namespace PinPinServer.Controllers
                         Category = expens.SplitCategory.Category,
                         Amount = expens.Amount,
                         Remark = expens.Remark,
-                        ExpenseParticipants = expens.SplitExpenseParticipants.Select(sep=>new ExpenseParticipantDTO
+                        ExpenseParticipants = expens.SplitExpenseParticipants.Select(sep => new ExpenseParticipantDTO
                         {
-                            UserId=sep.UserId,
+                            UserId = sep.UserId,
                             UserName = sep.User.Name,
                             IsPaid = sep.IsPaid,
-                            Amount=sep.Amount,
+                            Amount = sep.Amount,
                         }).ToList(),
                     }).ToListAsync();
 
@@ -173,7 +173,7 @@ namespace PinPinServer.Controllers
                                         .Where(se => se.PayerId == userID && se.SplitExpenseParticipants.Any(sep => sep.UserId == memberId) || (se.PayerId == memberId && se.SplitExpenseParticipants.Any(sep => sep.UserId == userID)))
                                         .Include(se => se.SplitExpenseParticipants)
                                         .Include(se => se.SplitCategory)
-                                        .Include(se=>se.Currency)
+                                        .Include(se => se.Currency)
                                         .AsNoTracking()
                                         .ToListAsync();
 
