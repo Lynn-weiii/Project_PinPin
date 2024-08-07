@@ -63,7 +63,7 @@ namespace PinPinTest.Controllers
             try
             {
                 var groupDTOs = await _context.ScheduleGroups
-                    .Where(g => g.ScheduleId == gschedule_id && g.LeftDate == null && g.UserId != jwtuserID) // 排除 JWT 用户
+                    .Where(g => g.ScheduleId == gschedule_id && g.LeftDate == null) // 排除 JWT 用户
                     .Include(g => g.User)
                     .ThenInclude(u => u.ScheduleAuthorities)
                     .GroupBy(g => g.UserId)

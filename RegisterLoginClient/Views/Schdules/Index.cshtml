@@ -108,11 +108,7 @@
 
     .swal2-popup .swal2-cancel {
         color: #758694 !important;
-    }
-
-    #loading {
-        display: none !important;
-    }
+    }    
 
     .modal-footer{
             justify-content: flex-start !important;
@@ -165,8 +161,8 @@
     .member-info {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        text-align: start;
+        align-items: center;
+        text-align: center;
         padding: 10px;
         border: none;
         background: transparent;
@@ -726,14 +722,15 @@
                                 if (response.ok) {
                                     var result = await response.json();
                                     alert(result.message);
-                                    $('invitemember_modal').modal('hide');location.reload();
-                                    location.reload();
+                                    $('#invitemember_modal').modal('hide');
                                 } else {
                                     var error = await response.json();
-                                    alert(`錯誤: ${error.message}`); 
+                                    alert(`錯誤: ${error.message}`);
+                                     $('#invitemember_modal').modal('hide');
                                 }
                             } catch (error) {
                                 console.error('請求失敗:', error);
+                                $('#invitemember_modal').modal('hide');
                             }
                         });
                         //#endregion
@@ -777,8 +774,7 @@
                                     text: `行程已刪除`,
                                     icon: "success"
                                 });
-
-                                location.reload();
+                                
                             }
                         } catch (error) {
                             Swal.fire({
@@ -788,7 +784,7 @@
                             });
                         }
                     }
-                    //#endregion
+                        //#endregion
                         
                         //#region 邀請成員
                         async function handleInviteMember(schedule_id) {
@@ -826,12 +822,15 @@
                                     if (response.ok) {
                                         if (responseData.message === "主辦者不需加入群組") {
                                             alert('主辦者無需加入群組');
+                                            $('#invitemember_modal').modal('hide');
                                         } else if (responseData.message === "會員已加入此群組") {
                                             alert('該會員已是群組會員');
+                                            $('#invitemember_modal').modal('hide');
                                         } else {
                                             alert('已成功邀請好友進入群組!');
+                                            $('#invitemember_modal').modal('hide');
                                         }
-                                        location.reload();
+                                        
                                     } else {
                                         console.log('錯誤:', responseData.message || '未知錯誤');
                                         alert(responseData.message || '新增成員失敗');
