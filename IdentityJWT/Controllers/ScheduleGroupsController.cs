@@ -49,10 +49,11 @@ namespace PinPinTest.Controllers
         }
 
 
-        //GET:api/ScheduleGroups/GetGropsMembers
-        [HttpGet("GetGropsMembers")]
-        public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int schedule_id)
+        //GET:api/ScheduleGroups/GetGropsMembers/${gschedule_id}
+        [HttpGet("GetGroupsMembers/{gschedule_id}")]
+        public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int gschedule_id)
         {
+
             int? jwtuserID = _getUserId.PinGetUserId(User).Value;
             if (jwtuserID == null || jwtuserID == 0)
             {
@@ -62,22 +63,48 @@ namespace PinPinTest.Controllers
             try
             {
                 var groupDTOs = await _context.ScheduleGroups
-                    .Where(g => g.ScheduleId == schedule_id && g.LeftDate == null && g.UserId != jwtuserID)
+                    .Where(g => g.ScheduleId == gschedule_id && g.LeftDate == null && g.UserId != jwtuserID) // 排除 JWT 用户
                     .Include(g => g.User)
                     .ThenInclude(u => u.ScheduleAuthorities)
-                    .Select(g => new GroupDTO
+                    .GroupBy(g => g.UserId)
+                    .Select(g => new
                     {
-                        UserId = g.UserId,
-                        UserName = g.User.Name,
-                        UserPhoto = g.User.Photo,
-                        AuthorityIds = g.User.ScheduleAuthorities
-                            .Where(a => a.ScheduleId == schedule_id)
+                        UserId = g.Key,
+                        UserName = g.First().User.Name,
+                        UserPhoto = g.First().User.Photo,
+                        AuthorityIds = g.First().User.ScheduleAuthorities
+                            .Where(a => a.ScheduleId == gschedule_id)
                             .Select(a => a.AuthorityCategoryId)
                             .ToList()
-                    })
-                    .ToListAsync();
+                    }).ToListAsync();
 
-                return Ok(groupDTOs);
+                bool userCanRemove = await _context.ScheduleAuthorities
+                    .AnyAsync(sa => sa.ScheduleId == gschedule_id && sa.AuthorityCategoryId == 3 && sa.UserId == jwtuserID);
+
+                int hostID = await _context.Schedules
+                    .Where(s => s.Id == gschedule_id)
+                    .Select(s => s.UserId)
+                    .FirstOrDefaultAsync();
+
+                var finalGroupDTOs = groupDTOs
+                    .Select(member => new GroupDTO
+                    {
+                        UserId = member.UserId,
+                        UserName = member.UserName,
+                        UserPhoto = member.UserPhoto,
+                        AuthorityIds = member.AuthorityIds,
+                        CanRemove = userCanRemove && member.UserId != hostID // 只有具有移除权限且不是主办人的成员才能移除
+                    })
+                    .ToList();
+
+                if (finalGroupDTOs.Any())
+                {
+                    return Ok(finalGroupDTOs);
+                }
+                else
+                {
+                    return NoContent();
+                }
             }
             catch (Exception ex)
             {
