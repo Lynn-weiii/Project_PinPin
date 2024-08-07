@@ -15,7 +15,7 @@ public partial class SplitCategory
 
     public string Icon { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool? IsDeleted { get; set; }
 
     public virtual ICollection<SplitExpense> SplitExpenses { get; set; } = new List<SplitExpense>();
 }

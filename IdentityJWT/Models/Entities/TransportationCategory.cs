@@ -13,7 +13,7 @@ public partial class TransportationCategory
 
     public string Name { get; set; }
 
-    public string IconUrl { get; set; }
+    public string Icon { get; set; }
 
     public virtual ICollection<Transportation> Transportations { get; set; } = new List<Transportation>();
 

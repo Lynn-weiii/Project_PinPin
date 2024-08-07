@@ -15,9 +15,7 @@ public partial class CostCurrencyCategory
 
     public string Icon { get; set; }
 
-    public bool IsDeleted { get; set; }
-
-    public virtual ICollection<ScheduleDetail> ScheduleDetails { get; set; } = new List<ScheduleDetail>();
+    public bool? IsDeleted { get; set; }
 
     public virtual ICollection<SplitExpense> SplitExpenses { get; set; } = new List<SplitExpense>();
 

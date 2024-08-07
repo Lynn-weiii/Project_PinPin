@@ -9,13 +9,15 @@ public partial class LocationCategory
 {
     public int Id { get; set; }
 
-    public int UserId { get; set; }
+    public int WishlistId { get; set; }
 
     public string Name { get; set; }
 
     public string Color { get; set; }
 
-    public virtual User User { get; set; }
+    public string Icon { get; set; }
+
+    public virtual Wishlist Wishlist { get; set; }
 
     public virtual ICollection<WishlistDetail> WishlistDetails { get; set; } = new List<WishlistDetail>();
 }

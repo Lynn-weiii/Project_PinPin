@@ -15,6 +15,8 @@ public partial class ScheduleAuthority
 
     public int AuthorityCategoryId { get; set; }
 
+    public byte[] Rowversion { get; set; }
+
     public virtual ScheduleAuthorityCategory AuthorityCategory { get; set; }
 
     public virtual Schedule Schedule { get; set; }

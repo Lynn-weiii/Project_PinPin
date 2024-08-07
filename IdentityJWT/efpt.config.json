@@ -6,7 +6,7 @@
    "IncludeConnectionString": false,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Models",
+   "OutputPath": "Models\/Entities",
    "PreserveCasingWithRegex": true,
    "ProjectRootNamespace": "PinPinServer",
    "Schemas": null,

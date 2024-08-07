@@ -11,7 +11,11 @@ public partial class WishlistDetail
 
     public int WishlistId { get; set; }
 
-    public string Location { get; set; }
+    public decimal? LocationLng { get; set; }
+
+    public decimal? LocationLat { get; set; }
+
+    public string GooglePlaceId { get; set; }
 
     public string Name { get; set; }
 

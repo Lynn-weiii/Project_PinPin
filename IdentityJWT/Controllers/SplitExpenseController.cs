@@ -340,7 +340,7 @@ namespace PinPinServer.Controllers
             }
 
             //檢查明細金額相加是否等於總金額
-            float total = dto.Participants.Sum(participant => participant.Amount);
+            decimal total = dto.Participants.Sum(participant => participant.Amount);
             if (dto.Amount != total)
             {
                 return BadRequest("The total amount of participants does not match the main amount.");
@@ -500,7 +500,7 @@ namespace PinPinServer.Controllers
             }
 
             //檢查明細金額相加是否等於總金額
-            float total = dto.Participants.Sum(participant => participant.Amount);
+            decimal total = dto.Participants.Sum(participant => participant.Amount);
             if (dto.Amount != total)
             {
                 return BadRequest("The total amount of participants does not match the main amount.");

@@ -17,6 +17,10 @@ public partial class ScheduleGroup
 
     public DateTime? LeftDate { get; set; }
 
+    public bool IsHoster { get; set; }
+
+    public byte[] Rowversion { get; set; }
+
     public virtual Schedule Schedule { get; set; }
 
     public virtual User User { get; set; }

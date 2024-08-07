@@ -15,7 +15,6 @@ namespace PinPinServer.Controllers
     {
         PinPinContext _context;
         AuthGetuserId _getUserId;
-        private int userID;
         public SchedulesController(PinPinContext context, AuthGetuserId getuserId)
         {
             _context = context;

@@ -17,7 +17,7 @@
         //Code
         public string? Currency { get; set; }
 
-        public float Amount { get; set; }
+        public decimal Amount { get; set; }
 
         public string? Remark { get; set; }
 

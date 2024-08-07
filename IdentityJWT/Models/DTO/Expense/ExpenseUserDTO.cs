@@ -11,7 +11,7 @@
 
         public string? ExpenseCategory { get; set; }
 
-        public float Amount { get; set; }
+        public decimal Amount { get; set; }
 
         public string? CostCategory { get; set; }
 

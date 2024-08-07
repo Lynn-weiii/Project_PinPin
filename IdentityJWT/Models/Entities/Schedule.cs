@@ -19,6 +19,14 @@ public partial class Schedule
 
     public DateTime? CreatedAt { get; set; }
 
+    public decimal? Lng { get; set; }
+
+    public decimal? Lat { get; set; }
+
+    public string Picture { get; set; }
+
+    public string PlaceId { get; set; }
+
     public virtual ICollection<ChatroomChat> ChatroomChats { get; set; } = new List<ChatroomChat>();
 
     public virtual ICollection<ScheduleAuthority> ScheduleAuthorities { get; set; } = new List<ScheduleAuthority>();

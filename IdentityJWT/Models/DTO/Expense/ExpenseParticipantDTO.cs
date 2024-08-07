@@ -6,7 +6,7 @@
 
         public string UserName { get; set; } = string.Empty;
 
-        public float Amount { get; set; }
+        public decimal Amount { get; set; }
 
         public bool? IsPaid { get; set; } = false;
     }
