@@ -27,6 +27,8 @@ public partial class ScheduleDetail
 
     public DateTime? ModifiedTime { get; set; }
 
+    public byte[] Rowversion { get; set; }
+
     public virtual SchedulePreview ScheduleDay { get; set; }
 
     public virtual ICollection<Transportation> Transportations { get; set; } = new List<Transportation>();

@@ -47,6 +47,11 @@
                                     </div>
                                 </div>
                             </div>
+                            <div>
+                                <button class="btn btn-outline-primary" type="button" v-on:click="btnCreateWishlist"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn btn-outline-primary" type="button" v-on:click="btnEditWishlist"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-outline-primary" type="button" v-on:click="btnDeleteWishlist"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,7 +75,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
         integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 <script>
     var baseAddress = "https://localhost:7280"; // Change this to your actual server address
 
@@ -105,105 +109,208 @@
     }
     //解密token取得ID END
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         const vueApp = {
             data() {
                 return {
                     wishlists: [],
                 };
             },
-            mounted: function () {
+            async mounted() {
                 console.log('Vue instance mounted!');
-                this.fetchWishlists();
+                await this.fetchWishlists();
             },
             methods: {
-                fetchWishlists: function () {
+                async fetchWishlists() {
                     const userId = getUserIdFromToken();
                     if (!userId) {
                         console.error('User ID not found');
                         return;
                     }
 
-                    const _this = this;
-                    axios.get(`${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`)
-                        .then(function (response) {
-                            const wishlistDTOs = response.data;
+                    try {
+                        const response = await axios.get(`${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`);
+                        const wishlistDTOs = response.data;
 
-                            wishlistDTOs.forEach(function (wishlist) {
-                                wishlist.wishlistDetails = wishlist.wishlistDetails || [];
-                                wishlist.locationCategories = wishlist.locationCategories || [];
-                                wishlist.selectedCategoryId = null; // Add selectedCategoryId for each wishlist
-                            });
-
-                            _this.wishlists = wishlistDTOs;
-                            console.log(_this.wishlists);
-                        })
-                        .catch(function (error) {
-                            console.error('Error fetching wishlists:', error);
+                        wishlistDTOs.forEach(wishlist => {
+                            wishlist.wishlistDetails = wishlist.wishlistDetails || [];
+                            wishlist.locationCategories = wishlist.locationCategories || [];
+                            wishlist.selectedCategoryId = null; // Add selectedCategoryId for each wishlist
                         });
+
+                        this.wishlists = wishlistDTOs;
+                        console.log(this.wishlists);
+                    } catch (error) {
+                        console.error('Error fetching wishlists:', error);
+                    }
                 },
-                setSelectedCategory: function (wishlist, locationCategoryId) {
+                setSelectedCategory(wishlist, locationCategoryId) {
                     wishlist.selectedCategoryId = locationCategoryId;
                     this.fetchDetailsForCategory(wishlist, locationCategoryId);
                 },
-                getFilteredDetails: function (wishlist) {
+                getFilteredDetails(wishlist) {
                     if (!wishlist.selectedCategoryId) return [];
                     return wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === wishlist.selectedCategoryId);
                 },
-                fetchDetailsForCategory: async function (wishlist, locationCategoryId) {
+                async fetchDetailsForCategory(wishlist, locationCategoryId) {
                     const details = wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === locationCategoryId);
 
                     for (const detail of details) {
                         if (detail.googlePlaceId) {
-                            await this.fetchPlaceDetails(detail.googlePlaceId, async placeDetails => {
+                            try {
+                                const placeDetails = await this.fetchPlaceDetails(detail.googlePlaceId);
                                 if (placeDetails.photos && placeDetails.photos.length > 0) {
                                     const photoReference = placeDetails.photos[0].photo_reference;
-                                    await this.fetchPhoto(photoReference, photoUrl => {
-                                        detail.photoUrl = photoUrl;
-                                    });
+                                    const photoUrl = await this.fetchPhoto(photoReference);
+                                    detail.photoUrl = photoUrl;
                                 }
                                 detail.address = placeDetails.formatted_address;
-                            });
+                            } catch (error) {
+                                console.error('Error fetching place details or photo:', error);
+                            }
                         }
                     }
                 },
-                fetchPhoto: function (photoReference, callback) {
-                    axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
-                        params: {
-                            photoReference: photoReference
-                        }
-                    })
-                        .then(function (response) {
-                            if (response.data && response.data.url) {
-                                callback(response.data.url);
-                            } else {
-                                console.error('Error fetching photo: No URL returned');
+                async fetchPhoto(photoReference) {
+                    try {
+                        const response = await axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
+                            params: {
+                                photoReference: photoReference
                             }
-                        })
-                        .catch(function (error) {
-                            console.error('Error fetching photo:', error);
                         });
+                        if (response.data && response.data.url) {
+                            return response.data.url;
+                        } else {
+                            console.error('Error fetching photo: No URL returned');
+                            return null;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching photo:', error);
+                        return null;
+                    }
                 },
-                fetchPlaceDetails: function (placeId, callback) {
-                    axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
-                        params: {
-                            placeId: placeId
-                        }
-                    })
-                        .then(function (response) {
-                            if (response.data && response.data.result) {
-                                callback(response.data.result);
-                            } else {
-                                console.error('Error fetching place details: No details returned');
+                async fetchPlaceDetails(placeId) {
+                    try {
+                        const response = await axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
+                            params: {
+                                placeId: placeId
                             }
-                        })
-                        .catch(function (error) {
-                            console.error('Error fetching place details:', error);
                         });
+                        if (response.data && response.data.result) {
+                            return response.data.result;
+                        } else {
+                            console.error('Error fetching place details: No details returned');
+                            return null;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching place details:', error);
+                        return null;
+                    }
                 }
             }
         };
         Vue.createApp(vueApp).mount('#appSidebar');
     });
+
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     const vueApp = {
+    //         data() {
+    //             return {
+    //                 wishlists: [],
+    //             };
+    //         },
+    //         mounted: function () {
+    //             console.log('Vue instance mounted!');
+    //             this.fetchWishlists();
+    //         },
+    //         methods: {
+    //             fetchWishlists: function () {
+    //                 const userId = getUserIdFromToken();
+    //                 if (!userId) {
+    //                     console.error('User ID not found');
+    //                     return;
+    //                 }
+
+    //                 const _this = this;
+    //                 axios.get(`${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`)
+    //                     .then(function (response) {
+    //                         const wishlistDTOs = response.data;
+
+    //                         wishlistDTOs.forEach(function (wishlist) {
+    //                             wishlist.wishlistDetails = wishlist.wishlistDetails || [];
+    //                             wishlist.locationCategories = wishlist.locationCategories || [];
+    //                             wishlist.selectedCategoryId = null; // Add selectedCategoryId for each wishlist
+    //                         });
+
+    //                         _this.wishlists = wishlistDTOs;
+    //                         console.log(_this.wishlists);
+    //                     })
+    //                     .catch(function (error) {
+    //                         console.error('Error fetching wishlists:', error);
+    //                     });
+    //             },
+    //             setSelectedCategory: function (wishlist, locationCategoryId) {
+    //                 wishlist.selectedCategoryId = locationCategoryId;
+    //                 this.fetchDetailsForCategory(wishlist, locationCategoryId);
+    //             },
+    //             getFilteredDetails: function (wishlist) {
+    //                 if (!wishlist.selectedCategoryId) return [];
+    //                 return wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === wishlist.selectedCategoryId);
+    //             },
+    //             fetchDetailsForCategory: async function (wishlist, locationCategoryId) {
+    //                 const details = wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === locationCategoryId);
+
+    //                 for (const detail of details) {
+    //                     if (detail.googlePlaceId) {
+    //                         await this.fetchPlaceDetails(detail.googlePlaceId, async placeDetails => {
+    //                             if (placeDetails.photos && placeDetails.photos.length > 0) {
+    //                                 const photoReference = placeDetails.photos[0].photo_reference;
+    //                                 await this.fetchPhoto(photoReference, photoUrl => {
+    //                                     detail.photoUrl = photoUrl;
+    //                                 });
+    //                             }
+    //                             detail.address = placeDetails.formatted_address;
+    //                         });
+    //                     }
+    //                 }
+    //             },
+    //             fetchPhoto: function (photoReference, callback) {
+    //                 axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
+    //                     params: {
+    //                         photoReference: photoReference
+    //                     }
+    //                 })
+    //                     .then(function (response) {
+    //                         if (response.data && response.data.url) {
+    //                             callback(response.data.url);
+    //                         } else {
+    //                             console.error('Error fetching photo: No URL returned');
+    //                         }
+    //                     })
+    //                     .catch(function (error) {
+    //                         console.error('Error fetching photo:', error);
+    //                     });
+    //             },
+    //             fetchPlaceDetails: function (placeId, callback) {
+    //                 axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
+    //                     params: {
+    //                         placeId: placeId
+    //                     }
+    //                 })
+    //                     .then(function (response) {
+    //                         if (response.data && response.data.result) {
+    //                             callback(response.data.result);
+    //                         } else {
+    //                             console.error('Error fetching place details: No details returned');
+    //                         }
+    //                     })
+    //                     .catch(function (error) {
+    //                         console.error('Error fetching place details:', error);
+    //                     });
+    //             }
+    //         }
+    //     };
+    //     Vue.createApp(vueApp).mount('#appSidebar');
+    // });
 
 </script>

@@ -93,7 +93,7 @@ namespace PinPinServer.Controllers
                     // 執行資料庫儲存異動，將User實體寫入資料庫
                     await _context.SaveChangesAsync();
 
-                    //
+                    
                     if (userDTO.favor != null && userDTO.favor.Length > 0)
                     {
                         foreach (var favorCategoryId in userDTO.favor)

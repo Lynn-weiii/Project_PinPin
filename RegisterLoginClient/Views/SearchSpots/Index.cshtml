@@ -281,18 +281,18 @@
                     const card = document.createElement('div');
                     card.className = 'col-md-4 mb-3';
                     card.innerHTML = `
-                                                <div class="card">
-                                                    ${photoUrl ? `<img src="${photoUrl}" class="card-img-top" alt="${place.name}">` : '<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="No image available">'}
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">${place.name}</h5>
-                                                        <p class="card-text">${place.formatted_address}</p>
-                                                        <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
-                                                                                 <button type="button" class="btn btn-mantis wishlists" data-bs-toggle="modal" data-bs-target="#wishlistModal" onclick="setSelectedPlace('${place.place_id}')"><i class="fa-solid fa-heart"></i></button>
+                                                        <div class="card">
+                                                            ${photoUrl ? `<img src="${photoUrl}" class="card-img-top" alt="${place.name}">` : '<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="No image available">'}
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">${place.name}</h5>
+                                                                <p class="card-text">${place.formatted_address}</p>
+                                                                <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
+                                                                                         <button type="button" class="btn btn-mantis wishlists" data-bs-toggle="modal" data-bs-target="#wishlistModal" onclick="setSelectedPlace('${place.place_id}')"><i class="fa-solid fa-heart"></i></button>
 
-                                                                                <button type="button" class="btn btn-mantis btnDetail" data-bs-toggle="modal" data-bs-target="#detailModal" data-place-id="${place.place_id}"><i class="fa-solid fa-circle-info"></i></button>
-                                                    </div>
-                                                </div>
-                                            `;
+                                                                                        <button type="button" class="btn btn-mantis btnDetail" data-bs-toggle="modal" data-bs-target="#detailModal" data-place-id="${place.place_id}"><i class="fa-solid fa-circle-info"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    `;
                     resultsContainer.appendChild(card);
                 }
                 //  <button type="button" class="btn btn-primary wishlists" data-bs-toggle="modal" data-bs-target="#wishlistModal" onclick="setSelectedPlace('${place.place_id}')">加入願望清單</button>
@@ -328,20 +328,20 @@
 
                 if (details) {
                     detailContent.innerHTML = `
-                                          <div class="map-details">
-                                          <h5 class="map-details-title">${details.name}</h5>
-                                          <p class="map-details-address">${details.formatted_address}</p>
-                                          <p class="map-details-rating">評價: ${details.rating} (${details.user_ratings_total} reviews)</p>
-                                          <p class="map-details-hours"><strong>營業時間:</strong><br>
-                                          ${details.opening_hours ? details.opening_hours.weekday_text.join('<br>') : '未提供'}</p>
-                                           <h6 class="map-details-reviews-title">評論</h6>
-                                            <ul class="map-details-reviews">
-                                                ${details.reviews ? details.reviews.map(review => `
-                                                <li class="map-details-review">
-                                                <strong>${review.author_name}:</strong> ${review.text}
-                                                </li> `).join('') : '<li>無評論</li>'}
-                                            </ul>
-                                          </div>`;
+                                                  <div class="map-details">
+                                                  <h5 class="map-details-title">${details.name}</h5>
+                                                  <p class="map-details-address">${details.formatted_address}</p>
+                                                  <p class="map-details-rating">評價: ${details.rating} (${details.user_ratings_total} reviews)</p>
+                                                  <p class="map-details-hours"><strong>營業時間:</strong><br>
+                                                  ${details.opening_hours ? details.opening_hours.weekday_text.join('<br>') : '未提供'}</p>
+                                                   <h6 class="map-details-reviews-title">評論</h6>
+                                                    <ul class="map-details-reviews">
+                                                        ${details.reviews ? details.reviews.map(review => `
+                                                        <li class="map-details-review">
+                                                        <strong>${review.author_name}:</strong> ${review.text}
+                                                        </li> `).join('') : '<li>無評論</li>'}
+                                                    </ul>
+                                                  </div>`;
                 } else {
                     detailContent.innerHTML = '無法找到此地點的詳細資料。';
                 }
@@ -360,14 +360,14 @@
                     selectedLocationCategory: null,
                     wishlists: [],
                     locationCategories: [],
-                    allLocationCategories: []
+                    allLocationCategories: [],
                 };
             },
             methods: {
-                changeOption() {
+                changeOption: function () {
                     this.filterLocationCategories();
                 },
-                filterLocationCategories() {
+                filterLocationCategories: function () {
                     if (this.selectedWishlist !== null) {
                         // 根據選擇的願望清單過濾分類
                         this.locationCategories = this.allLocationCategories.filter(category => {
@@ -378,7 +378,7 @@
                         this.locationCategories = [];
                     }
                 },
-                addWishlistDetail() {
+                addWishlistDetail: function () {
                     const selectedPlace = getSelectedPlace(); // 获取当前选定的地点信息
                     if (!selectedPlace) {
                         console.error('請選擇地點!');
@@ -403,9 +403,17 @@
                         .then(response => {
                             console.log('Wishlist detail added:', response.data);
                             // 顯示成功訊息或進行其他操作
+                            Swal.fire({
+                                title: "已成功加入清單！",
+                                icon: "success"
+                            })
                         })
                         .catch(error => {
                             console.error('Error adding wishlist detail:', error);
+                            Swal.fire({
+                                title: "此行程已存在清單中！",
+                                icon: "error"
+                            })
                         });
                 }
             },

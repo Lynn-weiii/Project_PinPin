@@ -15,6 +15,8 @@ public partial class LocationCategory
 
     public string Color { get; set; }
 
+    public string Icon { get; set; }
+
     public virtual Wishlist Wishlist { get; set; }
 
     public virtual ICollection<WishlistDetail> WishlistDetails { get; set; } = new List<WishlistDetail>();

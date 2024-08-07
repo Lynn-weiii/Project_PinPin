@@ -83,6 +83,15 @@ namespace PinPinServer.Controllers
                 return BadRequest("Invalid data.");
             }
 
+            //判斷是否已存在清單
+            var existingDetail = await _context.WishlistDetails
+       .FirstOrDefaultAsync(wd => wd.WishlistId == wishlistDetailDTO.WishlistId && wd.GooglePlaceId == wishlistDetailDTO.GooglePlaceId);
+
+            if (existingDetail != null)
+            {
+                return BadRequest("This place is already in the wishlist.");
+            }
+
             var wishlistDetail = new WishlistDetail
             {
                 WishlistId = wishlistDetailDTO.WishlistId,
@@ -135,5 +144,152 @@ namespace PinPinServer.Controllers
             });
         }
 
+        //新增願望清單OK
+        //POST:api/Wishlist/CreateWishlist
+        [HttpPost("CreateWishlist")]
+        public async Task<ActionResult<Wishlist>> CreateWishlist(Wishlist wishlist)
+        {
+            _context.Wishlists.Add(wishlist);
+            await _context.SaveChangesAsync();
+
+            return Content("新增成功!");
+        }
+
+        //修改願望清單OK
+        /*"id","userId","name"*/
+        //PUT:api/Wishlist/UpdateWishlist/{id}
+        [HttpPut("UpdateWishlist/{id}")]
+        public async Task<IActionResult> UpdateWishlist(int id, Wishlist wishlist) 
+        {
+            if (id != wishlist.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(wishlist).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!WishlistExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Content("願望清單修改成功！");
+        }
+        private bool WishlistExists(int id)
+        {
+            return _context.Wishlists.Any(e => e.Id == id);
+        }
+
+
+        //刪除願望清單Ok
+        // DELETE:api/Wishlist/DeleteWishlist/{id}
+        [HttpDelete("DeleteWishlist/{id}")]
+        public async Task<IActionResult> DeleteWishlist(int id)
+        {
+            var wishlist = await _context.Wishlists.FindAsync(id);
+            if (wishlist == null)
+            {
+                return NotFound();
+            }
+
+            _context.Wishlists.Remove(wishlist);
+            await _context.SaveChangesAsync();
+
+            return Content("願望清單刪除成功!");
+        }
+
+
+        //新增locationCategory OK
+        //POST:api/Wishlist/CreateLocationCategory
+        [HttpPost("CreateLocationCategory")]
+        public async Task<ActionResult<LocationCategory>> CreateLocationCategory(LocationCategory locationCategory)
+        {
+            _context.LocationCategories.Add(locationCategory);
+            await _context.SaveChangesAsync();
+
+            return Content("標籤新增成功!");
+        }
+
+        //修改locationCategory OK
+        //"id","wishlistId","name","color","icon"
+        //PUT:api/Wishlist/UpdateLocationCategory/{id}
+        [HttpPut("UpdateLocationCategory/{id}")]
+        public async Task<IActionResult> UpdateLocationCategory(int id,[FromBody]LocationCategory locationCategory)
+        {
+            if (id != locationCategory.Id)
+            {
+                return BadRequest("ID mismatch.");
+            }
+
+            _context.Entry(locationCategory).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!LocationCategoryExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Content("修改成功！");
+        }
+        private bool LocationCategoryExists(int id)
+        {
+            return _context.LocationCategories.Any(e => e.Id == id);
+        }
+
+        //刪除locationCategory OK
+        //DELETE:api/Wishlist/DeleteLocationCategory/{id}
+        [HttpDelete("DeleteLocationCategory/{id}")]
+        public async Task<IActionResult> DeleteLocationCategory(int id)
+        {
+            var locationCategory = await _context.LocationCategories.FindAsync(id);
+            if (locationCategory == null)
+            {
+                return NotFound();
+            }
+
+            _context.LocationCategories.Remove(locationCategory);
+            await _context.SaveChangesAsync();
+
+            return Content("標籤刪除成功!");
+        }
+
+
+        //刪除願望清單的行程 OK
+        //DELETE: api/Wishlist/DeleteWishlistDetail/{id}
+        [HttpDelete("DeleteWishlistDetail/{id}")]
+        public async Task<IActionResult> DeleteWishlistDetail(int id)
+        {
+            var wishlistDetail = await _context.WishlistDetails.FindAsync(id);
+            if (wishlistDetail == null)
+            {
+                return NotFound();
+            }
+
+            _context.WishlistDetails.Remove(wishlistDetail);
+            await _context.SaveChangesAsync();
+
+            return Content("刪除成功！");
+        }
     }
 }

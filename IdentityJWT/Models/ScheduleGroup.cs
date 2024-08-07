@@ -19,6 +19,8 @@ public partial class ScheduleGroup
 
     public bool IsHoster { get; set; }
 
+    public byte[] Rowversion { get; set; }
+
     public virtual Schedule Schedule { get; set; }
 
     public virtual User User { get; set; }
