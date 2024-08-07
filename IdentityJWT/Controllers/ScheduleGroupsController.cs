@@ -48,6 +48,43 @@ namespace PinPinTest.Controllers
             }
         }
 
+
+        //GET:api/ScheduleGroups/GetGropsMembers
+        [HttpGet("GetGropsMembers")]
+        public async Task<ActionResult<List<GroupDTO>>> GetGroupsMembers(int schedule_id)
+        {
+            int? jwtuserID = _getUserId.PinGetUserId(User).Value;
+            if (jwtuserID == null || jwtuserID == 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var groupDTOs = await _context.ScheduleGroups
+                    .Where(g => g.ScheduleId == schedule_id && g.LeftDate == null && g.UserId != jwtuserID)
+                    .Include(g => g.User)
+                    .ThenInclude(u => u.ScheduleAuthorities)
+                    .Select(g => new GroupDTO
+                    {
+                        UserId = g.UserId,
+                        UserName = g.User.Name,
+                        UserPhoto = g.User.Photo,
+                        AuthorityIds = g.User.ScheduleAuthorities
+                            .Where(a => a.ScheduleId == schedule_id)
+                            .Select(a => a.AuthorityCategoryId)
+                            .ToList()
+                    })
+                    .ToListAsync();
+
+                return Ok(groupDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
         //POST:api/ScheduleGroups/Invitemember
         [HttpPost("Invitemember")]
         public async Task<IActionResult> Invitemember([FromBody] InviteMemeberDTO inviteMemeberDTO)

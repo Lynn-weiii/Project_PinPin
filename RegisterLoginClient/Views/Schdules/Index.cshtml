@@ -182,40 +182,40 @@
             <label for="tab1">我的行程</label>
             <input type="radio" id="tab2" name="tabGroup1" class="tab">
             <label for="tab2">旅遊群組</label>
-            
+        
         @*#region:我的行程>*@
             <div class="tab__content" id="tab1_content">
-                    @*我的行程:沒有行程or錯誤訊息 *@
-                    <div style="color: rgb(102, 102, 102); text-align: center;" id="emptyschedule">
-                    <div class="emptyschedule" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
-                            <img src="~/images/emptyschedule.png" style="width: 300px ;height: 200px ; margin-top: 10px;" class="mt-5">
-                            <button id="newschbtn" type="button" class="btn" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
-                                新增行程
-                            </button>
-                        </div>
-                    </div>              
-                    <div id="errmsg1" style="justify-content:center; align-items:center;"></div>
-                    @*行程輪播卡片*@
-                    <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
-                        <div class="row" style="margin-top:1px;margin-bottom:2px">
-                            <div class="section_title_container mb-3">
-                                <div class="d-flex flex-row align-items-center">
-                                    <!-- Optional: Add title or content here -->
-                                </div>
+                @*我的行程:沒有行程or錯誤訊息 *@
+                <div style="color: rgb(102, 102, 102); text-align: center;" id="emptyschedule">
+                <div class="emptyschedule" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
+                        <img src="~/images/emptyschedule.png" style="width: 300px ;height: 200px ; margin-top: 10px;" class="mt-5">
+                        <button id="newschbtn" type="button" class="btn" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
+                            新增行程
+                        </button>
+                    </div>
+                </div>              
+                <div id="errmsg1" style="justify-content:center; align-items:center;"></div>
+                @*行程輪播卡片*@
+                <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
+                    <div class="row" style="margin-top:1px;margin-bottom:2px">
+                        <div class="section_title_container mb-3">
+                            <div class="d-flex flex-row align-items-center">
+                                <!-- Optional: Add title or content here -->
                             </div>
                         </div>
-                        <div class="row course_cards_container section_content_row">
-                            <div class="col">
-                                <div class="popular_courses_slider_container">
-                                    <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
-                                        <!-- foreach schedule Course Card -->
-                                    </div>
-                                    <div class="owl-dots"></div>
+                    </div>
+                    <div class="row course_cards_container section_content_row">
+                        <div class="col">
+                            <div class="popular_courses_slider_container">
+                                <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
+                                    <!-- foreach schedule Course Card -->
                                 </div>
+                                <div class="owl-dots"></div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
         @*#endregion*@
             
         @*#region:旅遊群組*@
@@ -248,11 +248,10 @@
                 </div>
             </div>                      
         </div>
-        @*#endregion*@
-                
-    </div>
     </div>
     @*#endregion*@
+</div>
+@*#endregion*@
             
     @*#region 新增行程Modal*@
     <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
@@ -371,7 +370,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    
+                    <!--foreach in modalbody-->
                 </div>
             </div>
         </div>
