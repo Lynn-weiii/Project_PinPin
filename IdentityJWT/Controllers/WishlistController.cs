@@ -152,7 +152,13 @@ namespace PinPinServer.Controllers
             _context.Wishlists.Add(wishlist);
             await _context.SaveChangesAsync();
 
-            return Content("新增成功!");
+            return new JsonResult(new
+            {
+                id = wishlist.Id,
+                userId = wishlist.UserId,
+                name = wishlist.Name
+            });
+            //return Content("新增成功!");
         }
 
         //修改願望清單OK
@@ -215,10 +221,40 @@ namespace PinPinServer.Controllers
         [HttpPost("CreateLocationCategory")]
         public async Task<ActionResult<LocationCategory>> CreateLocationCategory(LocationCategory locationCategory)
         {
-            _context.LocationCategories.Add(locationCategory);
-            await _context.SaveChangesAsync();
+            if (locationCategory == null || string.IsNullOrWhiteSpace(locationCategory.Name) || string.IsNullOrWhiteSpace(locationCategory.Color))
+            {
+                return BadRequest("Invalid location category data.");
+            }
 
-            return Content("標籤新增成功!");
+            try
+            {
+                _context.LocationCategories.Add(locationCategory);
+                await _context.SaveChangesAsync();
+                return new JsonResult(new
+                {
+                    id = locationCategory.Id,
+                    wishlistId = locationCategory.WishlistId,
+                    name = locationCategory.Name,
+                    color = locationCategory.Color,
+                    icon = locationCategory.Icon
+                });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Log the exception details here
+                // For example, you can use a logging framework like Serilog, NLog, etc.
+                // Log.Error(dbEx, "A database update exception occurred while creating the location category.");
+
+                return StatusCode(500, "A database error occurred while creating the location category.");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details here
+                // Log.Error(ex, "An unexpected error occurred while creating the location category.");
+
+                return StatusCode(500, "An unexpected error occurred while creating the location category.");
+            }
+
         }
 
         //修改locationCategory OK

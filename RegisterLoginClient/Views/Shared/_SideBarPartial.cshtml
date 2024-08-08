@@ -1,4 +1,39 @@
-﻿<!-- 聊天室側邊欄 offcanvas start -->
+﻿<style>
+    #iconSelect {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+        #iconSelect input[type="radio"] {
+            display: none;
+        }
+
+        #iconSelect input:checked + .button {
+            background: #5e7380;
+            color: #fff;
+            cursor: default;
+        }
+
+        #iconSelect .button {
+            display: inline-block;
+            margin: 0 5px 10px 0;
+            padding: 5px 10px;
+            background: #f7f7f7;
+            color: #333;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+            #iconSelect .button:hover {
+                background: #bbb;
+                color: #fff;
+            }
+
+        #iconSelect .round {
+            border-radius: 5px;
+        }
+</style>
+<!-- 聊天室側邊欄 offcanvas start -->
 <div id="appSidebar">
     <div class="offcanvas offcanvas-end" tabindex="-1" id="sideBarOffcanvas" aria-labelledby="sideBarOffcanvasLabel">
         <div class="offcanvas-header">
@@ -41,16 +76,18 @@
                                             <div class="card-body">
                                                 <h5 class="card-title">{{ detail.name }}</h5>
                                                 <p class="card-text">{{ detail.address }}</p>
-                                                <a href="#" class="btn btn-primary">加入行程</a>
+                                                <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
+                                                <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <button class="btn btn-outline-primary" type="button" v-on:click="btnCreateWishlist"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn btn-outline-primary" type="button" v-on:click="btnEditWishlist"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-outline-primary" type="button" v-on:click="btnDeleteWishlist"><i class="fa-solid fa-trash-can"></i></button>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn btn-outline-primary" type="button" id="btnEditWishlist"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-outline-primary" type="button" id="btnDeleteWishlist"><i class="fa-solid fa-trash-can"></i></button>
+
                             </div>
                         </div>
                     </div>
@@ -68,6 +105,49 @@
             </div>
         </div>
     </div>
+    <!-- 新增wishlist及locationCategory的模態視窗 -->
+    <div class="modal fade" id="createWishlistModal" tabindex="-1" aria-labelledby="createWishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createWishlistModalLabel">新增願望清單及標籤</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form v-on:submit.prevent="createWishlistWithCategory">
+                        <div class="mb-3">
+                            <label for="wishlistName" class="form-label">願望清單名稱</label>
+                            <input type="text" class="form-control" id="wishlistName" v-model="newWishlistName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">標籤名稱</label>
+                            <input type="text" class="form-control" id="categoryName" v-model="newCategoryName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryColor" class="form-label">標籤顏色</label>
+                            <input type="color" class="form-control" id="categoryColor" v-model="newCategoryColor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryIcon" class="form-label">標籤圖示</label>
+                            <div id="iconSelect" class="d-flex flex-wrap">
+                                <div v-for="icon in icons" :key="icon.value" class="me-3 mb-2">
+                                    <label>
+                                        <input type="radio" name="categoryIcon" :value="icon.value" v-model="newCategoryIcon" :id="icon.value" required>
+                                        <span class="round button">
+                                            <i :class="icon.value" class="fs-4 me-2"></i> 
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">新增</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--確認要刪除的願望清單及標籤-->
 </div>
 
 <!-- Include this script section in your view where you already have your other scripts -->
@@ -114,6 +194,16 @@
             data() {
                 return {
                     wishlists: [],
+                    newWishlistName: '',
+                    newCategoryName: '',
+                    newCategoryColor: '',
+                    newCategoryIcon: 'fa-solid fa-bowl-food', // 初始選中的圖示
+                    icons: [
+                        { value: 'fa-solid fa-bowl-food'},
+                        { value: 'fa-solid fa-tree'},
+                        { value: 'fa-solid fa-person-swimming'},
+                        { value: 'fa-solid fa-house'}
+                    ]
                 };
             },
             async mounted() {
@@ -206,111 +296,54 @@
                         console.error('Error fetching place details:', error);
                         return null;
                     }
+                },
+                async createWishlistWithCategory() {
+                    const userId = getUserIdFromToken();
+                    if (!userId) {
+                        console.error('User ID not found');
+                        return;
+                    }
+
+                    try {
+                        // Create Wishlist
+                        const newWishlist = { id: 0, userId: userId, name: this.newWishlistName };
+                        const wishlistResponse = await axios.post(`${baseAddress}/api/Wishlist/CreateWishlist`, newWishlist);
+                        const createdWishlist = wishlistResponse.data;
+
+                        console.log(createdWishlist);
+                        // Create LocationCategory
+                        const newLocationCategory = {
+                            wishlistId: createdWishlist.id,
+                            name: this.newCategoryName,
+                            color: this.newCategoryColor || "Color",
+                            icon: this.newCategoryIcon || "Icon"
+                        };
+                        console.log('Creating LocationCategory with data:', newLocationCategory);
+
+                        const categoryResponse = await axios.post(`${baseAddress}/api/Wishlist/CreateLocationCategory`, newLocationCategory);
+                        const createdLocationCategory = categoryResponse.data;
+                        console.log('Created LocationCategory:', createdLocationCategory);
+
+
+                        // Fetch updated wishlists
+                        await this.fetchWishlists();
+
+                    } catch (error) {
+                        if (error.response) {
+                            console.error('Error response:', error.response.data);
+                            console.error('Error status:', error.response.status);
+                            console.error('Error headers:', error.response.headers);
+                        } else if (error.request) {
+                            console.error('Error request:', error.request);
+                        } else {
+                            console.error('Error message:', error.message);
+                        }
+                    }
                 }
             }
         };
         Vue.createApp(vueApp).mount('#appSidebar');
     });
 
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     const vueApp = {
-    //         data() {
-    //             return {
-    //                 wishlists: [],
-    //             };
-    //         },
-    //         mounted: function () {
-    //             console.log('Vue instance mounted!');
-    //             this.fetchWishlists();
-    //         },
-    //         methods: {
-    //             fetchWishlists: function () {
-    //                 const userId = getUserIdFromToken();
-    //                 if (!userId) {
-    //                     console.error('User ID not found');
-    //                     return;
-    //                 }
-
-    //                 const _this = this;
-    //                 axios.get(`${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`)
-    //                     .then(function (response) {
-    //                         const wishlistDTOs = response.data;
-
-    //                         wishlistDTOs.forEach(function (wishlist) {
-    //                             wishlist.wishlistDetails = wishlist.wishlistDetails || [];
-    //                             wishlist.locationCategories = wishlist.locationCategories || [];
-    //                             wishlist.selectedCategoryId = null; // Add selectedCategoryId for each wishlist
-    //                         });
-
-    //                         _this.wishlists = wishlistDTOs;
-    //                         console.log(_this.wishlists);
-    //                     })
-    //                     .catch(function (error) {
-    //                         console.error('Error fetching wishlists:', error);
-    //                     });
-    //             },
-    //             setSelectedCategory: function (wishlist, locationCategoryId) {
-    //                 wishlist.selectedCategoryId = locationCategoryId;
-    //                 this.fetchDetailsForCategory(wishlist, locationCategoryId);
-    //             },
-    //             getFilteredDetails: function (wishlist) {
-    //                 if (!wishlist.selectedCategoryId) return [];
-    //                 return wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === wishlist.selectedCategoryId);
-    //             },
-    //             fetchDetailsForCategory: async function (wishlist, locationCategoryId) {
-    //                 const details = wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === locationCategoryId);
-
-    //                 for (const detail of details) {
-    //                     if (detail.googlePlaceId) {
-    //                         await this.fetchPlaceDetails(detail.googlePlaceId, async placeDetails => {
-    //                             if (placeDetails.photos && placeDetails.photos.length > 0) {
-    //                                 const photoReference = placeDetails.photos[0].photo_reference;
-    //                                 await this.fetchPhoto(photoReference, photoUrl => {
-    //                                     detail.photoUrl = photoUrl;
-    //                                 });
-    //                             }
-    //                             detail.address = placeDetails.formatted_address;
-    //                         });
-    //                     }
-    //                 }
-    //             },
-    //             fetchPhoto: function (photoReference, callback) {
-    //                 axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
-    //                     params: {
-    //                         photoReference: photoReference
-    //                     }
-    //                 })
-    //                     .then(function (response) {
-    //                         if (response.data && response.data.url) {
-    //                             callback(response.data.url);
-    //                         } else {
-    //                             console.error('Error fetching photo: No URL returned');
-    //                         }
-    //                     })
-    //                     .catch(function (error) {
-    //                         console.error('Error fetching photo:', error);
-    //                     });
-    //             },
-    //             fetchPlaceDetails: function (placeId, callback) {
-    //                 axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
-    //                     params: {
-    //                         placeId: placeId
-    //                     }
-    //                 })
-    //                     .then(function (response) {
-    //                         if (response.data && response.data.result) {
-    //                             callback(response.data.result);
-    //                         } else {
-    //                             console.error('Error fetching place details: No details returned');
-    //                         }
-    //                     })
-    //                     .catch(function (error) {
-    //                         console.error('Error fetching place details:', error);
-    //                     });
-    //             }
-    //         }
-    //     };
-    //     Vue.createApp(vueApp).mount('#appSidebar');
-    // });
 
 </script>
