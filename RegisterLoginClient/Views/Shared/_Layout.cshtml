@@ -4,23 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RegisterLoginClient</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/css/bootstrap.min.css" asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/bootstrap/test/css/custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" asp-fallback-src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/js/bootstrap.bundle.min.js" asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/axios/axios.min.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://kit.fontawesome.com/66638a3835.js" type="text/javascript" asp-fallback-href="/lib/font-awesome/js/fontawesome.js"></script>
     <script src="~/js/site.js"></script>
-    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PinPinClient</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -55,7 +54,7 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class=".container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -67,31 +66,31 @@
         </div>
     </footer>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function () {
+
+            updateNavbar();
+
+            $("#logout").on("click", function () {
+                localStorage.removeItem('token');
+                updateNavbar();
+            });
+
+            function updateNavbar() {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    $("#register").show();
+                    $("#login").show();
+                    $("#logout").hide();
+                    $("#MemberInfo").hide();
+                } else {
+                    $("#register").hide();
+                    $("#login").hide();
+                    $("#logout").show();
+                    $("#MemberInfo").show();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
-<script>
-    $(document).ready(function () {
-
-        updateNavbar();
-
-        $("#logout").on("click", function () {
-            localStorage.removeItem('token');
-            updateNavbar(); 
-        });
-
-        function updateNavbar() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                $("#register").show();
-                $("#login").show();
-                $("#logout").hide();
-                $("#MemberInfo").hide();
-            } else {
-                $("#register").hide();
-                $("#login").hide();
-                $("#logout").show();
-                $("#MemberInfo").show();
-            }
-        }
-    });
-</script>

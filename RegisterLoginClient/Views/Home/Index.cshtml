@@ -1,102 +1,76 @@
 ﻿@section Styles {
     <link href="~/css/animate.css" rel="stylesheet" />
-    <link href="~/css/slicknav.min.css" rel="stylesheet" />
-    <link href="~/css/slick-theme.css" rel="stylesheet" />
-    <link href="~/css/slick.css" rel="stylesheet" />
-    <link href="~/css/lity.min.css" rel="stylesheet" />
-    <link href="~/css/style.css" rel="stylesheet" />
-    <link href="~/css/responsive.css" rel="stylesheet" />
+    <style>
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("images/3.1.jpg");
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            animation: zoomIn 20s infinite;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .hero-section > div {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-section .btn {
+            margin: 0 10px;
+        }
+
+        @@keyframes zoomIn {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
 }
 
-<main class="hero-slide-three">
-    <div class="item">
-        <img src="images/3.1.jpg" alt="hero-1" />
-        <div class="hero-slider__content-wrapper">
-            <div class="container">
-                <div class="row justify-content-lg-center">
-                    <div class="col-lg-10 text-center">
-                        <div class="hero-slider__content">
-                            <h2 class="hero-slider__title">Take Your Dream</h2>
-                            <p class="hero-slider__text">
-                                Et ea invidunt magna dolores ut et magna eos sit erat. Dolor
-                                et kasd takimata no duo gubergren justo ut nonumy, voluptua
-                                accusam at clita ut. Rebum clita accusam nonumy.
-                            </p>
-                            <a class="hero-slider__btn active mr-2" href="about.html">
-                                Get Start
-                            </a>
-                            <a class="hero-slider__btn" href="contact.html">
-                                Contact Us
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="item">
-        <img src="images/3.2.jpg" alt="hero-1" />
-        <div class="hero-slider__content-wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-7 col-md-12">
-                        <div class="hero-slider__content">
-                            <h2 class="hero-slider__title">
-                                Choose The Best Tour Package
-                            </h2>
-                            <p class="hero-slider__text">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit sed
-                                do eiusm tempor incididunt ut labore et dolore.
-                            </p>
-                            <a class="hero-slider__btn active mr-2" href="about.html">
-                                Get Start
-                            </a>
-                            <a class="hero-slider__btn" href="contact.html">
-                                Contact Us
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="item">
-        <img src="images/3.3.jpg" alt="hero-1" />
-        <div class="hero-slider__content-wrapper">
-            <div class="container">
-                <div class="row justify-content-lg-center">
-                    <div class="col-lg-10 text-center">
-                        <div class="hero-slider__content">
-                            <h2 class="hero-slider__title">
-                                Travel To The Best Beautiful Place
-                            </h2>
-                            <p class="hero-slider__text">
-                                Sed ipsum et eos clita elitr vero invidunt et sanctus. Et
-                                takimata ipsum consetetur dolores consetetur amet lorem
-                                magna. Justo eos eirmod diam et invidunt dolor amet rebum..
-                            </p>
-                            <a class="hero-slider__btn active mr-2" href="about.html">
-                                Get Start
-                            </a>
-                            <a class="hero-slider__btn" href="contact.html">
-                                Contact Us
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<main class="hero-section">
+    <div>
+        <h1 class="display-4">Take Your Dream</h1>
+        <p class="lead">
+            Et ea invidunt magna dolores ut et magna eos sit erat. Dolor et kasd
+            takimata no duo gubergren justo ut nonumy, voluptua accusam at clita
+            ut. Rebum clita accusam nonumy.
+        </p>
+        <div>
+            <a href="#" class="btn btn-success btn-lg">Get Start</a>
+            <a href="#" class="btn btn-outline-light btn-lg">Contact Us</a>
         </div>
     </div>
 </main>
-@section Scripts {
-    <script src="~/js/popper.min.js"></script>
-    <script src="~/js/jquery.slicknav.min.js"></script>
-    <script src="~/js/slick.min.js"></script>
-    <script src="~/js/waypoints.min.js"></script>
-    <script src="~/js/jquery.counterup.min.js"></script>
-    <script src="~/js/lity.min.js"></script>
-    <script src="~/js/isotope.pkgd.min.js"></script>
-    <script src="~/js/imagesloaded.js"></script>
-    <script src="~/js/main.js"></script>
- }
