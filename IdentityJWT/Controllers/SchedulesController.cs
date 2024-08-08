@@ -309,9 +309,7 @@ namespace PinPinServer.Controllers
                     .Where(group => group.UserId == userID)
                     .Include(group => group.Schedule)
                     .ToDictionaryAsync(group => group.ScheduleId, group => group.Schedule.Name);
-
                 if (scheduleDictionary.Count == 0) return NotFound("Not found about your schedles");
-
                 return Ok(scheduleDictionary);
             }
             catch (Exception ex)

@@ -23,7 +23,7 @@ namespace PinPinTest.Controllers
 
         #region 待確認有沒有要使用 2024/8/8
         //GET:api/ScheduleGroups
-        [HttpGet]
+        [HttpGet("GetScheduleGroups{schedule_id}")]
         public async Task<ActionResult<Dictionary<int, string>>> GetScheduleGroups(int schedule_id)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;

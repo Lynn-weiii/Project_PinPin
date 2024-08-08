@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PinPinServer.Models.DTO.Expense;
+using System.ComponentModel.DataAnnotations;
 
 namespace PinPinServer.Models.DTO
 {
@@ -21,7 +22,7 @@ namespace PinPinServer.Models.DTO
         public int CurrencyId { get; set; }
 
         [Required(ErrorMessage = "Amount is required.")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        [Range(0.01, float.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
         public decimal Amount { get; set; }
 
         public string Remark { get; set; } = string.Empty;

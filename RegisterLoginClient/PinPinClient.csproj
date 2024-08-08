@@ -23,6 +23,12 @@
 
   <ItemGroup>
     <Compile Remove="Views\Schdules\Index.cshtml.cs" />
+    <Content Remove="Views\Home\Schedule.cshtml" />
+    <Content Remove="wwwroot\js\ExpenseMain.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +45,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IdentityJWT\PinPinServer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
 
 </Project>

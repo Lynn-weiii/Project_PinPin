@@ -63,7 +63,7 @@ namespace PinPinServer.Controllers
                            {
                                Id = tc.Id,
                                Name = tc.Name,
-                               IconUrl = tc.IconUrl,
+                               Icon = tc.Icon,
                            }).ToListAsync();
 
                 categories.AddRange(_defaultCategories.Value.Select(dc => new TransportationCategoryDTO
@@ -98,7 +98,7 @@ namespace PinPinServer.Controllers
             {
                 Id = c.Id,
                 Name = c.Name,
-                IconUrl = c.IconUrl,
+                Icon = c.Icon,
             }).ToList();
 
             return Ok(categoryDTOs);
@@ -125,9 +125,9 @@ namespace PinPinServer.Controllers
 
             //檢查有無重複值或顏色
             List<TransportationCategory> categories = await _context.TransportationCategories.Where(tr => tr.UserId == userID).AsNoTracking().ToListAsync();
-            if (categories.Any(tr => tr.Name == dto.Name || tr.IconUrl == tr.IconUrl)) return BadRequest("Category or color is duplicated");
+            if (categories.Any(tr => tr.Name == dto.Name || tr.Icon == tr.Icon)) return BadRequest("Category or color is duplicated");
 
-            TransportationCategory category = new TransportationCategory { Name = dto.Name, IconUrl = dto.IconUrl, UserId = (int)userID };
+            TransportationCategory category = new TransportationCategory { Name = dto.Name, Icon = dto.Icon, UserId = (int)userID };
             try
             {
                 _context.TransportationCategories.Add(category);
@@ -137,7 +137,7 @@ namespace PinPinServer.Controllers
                 {
                     Id = category.Id,
                     Name = category.Name,
-                    IconUrl = category.IconUrl,
+                    Icon = category.Icon,
                 });
             }
             catch

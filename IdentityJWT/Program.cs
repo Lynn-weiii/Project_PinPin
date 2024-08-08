@@ -26,6 +26,17 @@ builder.Services.AddSingleton<WeatherService>(provider =>
     return new WeatherService(builder.Configuration["AppSettings:WeatherApiKey"], httpClient);
 });
 
+//µù¥U¶×²vªA°È
+builder.Services.AddHttpClient<ChangeRateService>(client =>
+{
+    client.BaseAddress = new Uri("https://v6.exchangerate-api.com");
+});
+builder.Services.AddSingleton<ChangeRateService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(ChangeRateService));
+    return new ChangeRateService(builder.Configuration["AppSettings:ExChangeRateApiKey"], httpClient);
+});
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

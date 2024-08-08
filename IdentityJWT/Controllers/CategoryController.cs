@@ -13,7 +13,6 @@ namespace PinPinTest.Controllers
     /// 目前還沒有設修改權限
     /// </summary>
     [Route("api/[controller]")]
-    [ApiController]
     public class categoryController : ControllerBase
     {
         private readonly PinPinContext _context;
@@ -377,6 +376,7 @@ namespace PinPinTest.Controllers
             {
                 costCurrency.Code = dto.Code;
                 costCurrency.Name = dto.Name;
+                costCurrency.Icon = dto.Icon;
 
                 _context.Update(costCurrency);
                 await _context.SaveChangesAsync();
@@ -385,6 +385,7 @@ namespace PinPinTest.Controllers
                 {
                     costCurrency.Code,
                     costCurrency.Name,
+                    costCurrency.Icon,
                 });
             }
             catch

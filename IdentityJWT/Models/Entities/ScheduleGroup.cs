@@ -19,7 +19,7 @@ public partial class ScheduleGroup
     public DateTime? LeftDate { get; set; }
 
     public bool IsHoster { get; set; }
-    [Timestamp]
+
     public byte[] Rowversion { get; set; }
 
     public virtual Schedule Schedule { get; set; }
