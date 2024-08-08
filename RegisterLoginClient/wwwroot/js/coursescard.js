@@ -3,45 +3,45 @@ function createCourseCard(course, isGroup = false) {
     var courseItem = document.createElement('div');
     courseItem.className = 'item course_card_owl_item';
     var picture = course.picture ? course.picture : '/images/course/course_01.jpg';
-    
+    var detailsUrl = `https://localhost:7215/Schdules/ScduleDetials/${course.id}`;
     courseItem.innerHTML = `    
-        <div class="course_card">
-            <div class="course_card_container">
-                 <div class="course_card_top">
-                    <div class="course_menu_section">                     
-                    <div class="dropdown">
-                        <div class="course_card_category trans_200" type="button" id="courseDropdown-${course.id}" data-sche="${course.id}" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa fa-ellipsis"></i>
-                        </div>
-                        <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}" >
-                             <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" onclick="" data-name="${course.name}">成員管理</a></li>
-                             <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>
-                            <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
-                        </ul>
+    <div class="course_card">
+    <div class="course_card_container">
+        <div class="course_card_top">
+            <div class="course_menu_section">
+                <div class="dropdown">
+                    <div class="course_card_category trans_200" type="button" id="courseDropdown-${course.id}" data-sche="${course.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-ellipsis"></i>
                     </div>
+                    <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}">
+                        <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" onclick="" data-name="${course.name}">成員管理</a></li>
+                        <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>
+                        <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
+                    </ul>
+                </div>
+            </div>            
+                <a href="${detailsUrl}" type="buttom" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}">
+                <div class="course_card_pic">
+                    <img src="${picture}" style="width:430px;height:286px">
+                </div>
+                <div class="course_card_content">
+                    <div class="course_card_meta d-flex flex-row align-items-center"></div>
+                    <div class="course_card_title">
+                        <h3>${course.name}</h3>
                     </div>
-                    <a href="#" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}">
-                    <div class="course_card_pic">
-                        <img src="${picture}" style="width:430px;height:286px">
+                    <div class="course_card_author">
+                        <span>by ${course.userName}</span>
                     </div>
-                    <div class="course_card_content">
-                        <div class="course_card_meta d-flex flex-row align-items-center"></div>
-                        <div class="course_card_title">
-                            <h3>${course.name}</h3>
-                        </div>
-                        <div class="course_card_author">
-                            <span>by ${course.userName}</span>
-                        </div>
-                        <div class="course_card_rating d-flex flex-row align-items-center">
-                            <h5>${course.startTime}</h5>
-                            <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
-                            <h5>${course.endTime}</h5>
-                        </div>
+                    <div class="course_card_rating d-flex flex-row align-items-center">
+                        <h5>${course.startTime}</h5>
+                        <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
+                        <h5>${course.endTime}</h5>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-    </a>
+    </div>
+</div>
     `;
     return courseItem;
 }

@@ -10,6 +10,11 @@ namespace PinPinClient.Controllers
             return View();
         }
 
+        public IActionResult ScduleDetials(int id)
+        {
+            ViewBag.ScheduleId = id;
+            return View();
+        }
 
     }
 }

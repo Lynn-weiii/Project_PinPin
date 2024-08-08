@@ -501,13 +501,13 @@ $(document).ready(async function () {
         //#endregion
 
         //#region 編輯詳細行程
-        $(document).on('click', '.edit_btn', function (event) {
-            event.preventDefault();
+        $(document).off('click').on('click', '.edit_btn', function (event) {
             var fun = $(this).data('fun');
             var editId = $(this).data('id');
             if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
                 alert(`$Fun_${fun}:Id$_${editId}`);
                 console.log(`$Fun_${fun}:Id$_${editId}`);
+                    window.location.href = `/Schdules/ScduleDetials/${course.id}`;
             }
             alert('go schedule detail');
         });
