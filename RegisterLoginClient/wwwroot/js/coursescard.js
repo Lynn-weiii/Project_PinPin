@@ -2,7 +2,7 @@
 function createCourseCard(course, isGroup = false) {
     var courseItem = document.createElement('div');
     courseItem.className = 'item course_card_owl_item';
-    var pictureUrl = course.pictureUrl ? course.pictureUrl : '/images/course/course_01.jpg';
+    var picture = course.picture ? course.picture : '/images/course/course_01.jpg';
     
     courseItem.innerHTML = `    
         <div class="course_card">
@@ -14,7 +14,7 @@ function createCourseCard(course, isGroup = false) {
                             <i class="fa fa-ellipsis"></i>
                         </div>
                         <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}" >
-                             <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" data-name="${course.name}">成員管理</a></li>
+                             <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" onclick="" data-name="${course.name}">成員管理</a></li>
                              <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>
                             <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
                         </ul>
@@ -22,7 +22,7 @@ function createCourseCard(course, isGroup = false) {
                     </div>
                     <a href="#" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}">
                     <div class="course_card_pic">
-                        <img src="${pictureUrl}" style="width:430px;height:286px">
+                        <img src="${picture}" style="width:430px;height:286px">
                     </div>
                     <div class="course_card_content">
                         <div class="course_card_meta d-flex flex-row align-items-center"></div>
@@ -50,7 +50,7 @@ function createCourseCard(course, isGroup = false) {
 function createGroupCourseCard(gcourse) {
     var gcourseItem = document.createElement('div');
     gcourseItem.className = 'item course_card_owl_item';
-    var pictureUrl = gcourse.pictureUrl ? gcourse.pictureUrl : '/images/course/course_01.jpg';
+    var gpicture = gcourse.picture ? gcourse.picture : '/images/course/course_01.jpg';
     
     gcourseItem.innerHTML = `
         <div class="course_card">
@@ -69,7 +69,7 @@ function createGroupCourseCard(gcourse) {
                     </div>
                     <a href="#" class="course_card_link edit_btn" data-fun="EditGroupSch" data-id="${gcourse.id}">
                         <div class="course_card_pic">
-                            <img src="${pictureUrl}" style="width:430px;height:286px">
+                            <img src="${gpicture}" style="width:430px;height:286px">
                         </div>
                         <div class="course_card_content">
                             <div class="course_card_meta d-flex flex-row align-items-center"></div>

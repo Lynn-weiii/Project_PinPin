@@ -22,10 +22,6 @@
 
 <!-- Styles  -->
     <style>
-    body {
-        background: #FCF8F3;
-    }
-
     .btn-custom {
         background-color: #638889;
         color: #F0F0F0; 
@@ -192,7 +188,7 @@
     }
     /*#endregion*/
 
-    
+    /*查看成員modal css*/
     #groupmembers_modal .modal-content {
         background-color: #FCF8F3; /* 设置背景色 */
     }
@@ -206,6 +202,7 @@
         background-color: #638889;
         color: #FCF8F3;
     }
+    /*#endregion*/
     </style>
 
 
@@ -234,20 +231,50 @@
             <label for="tab1">我的行程</label>
             <input type="radio" id="tab2" name="tabGroup1" class="tab">
             <label for="tab2">旅遊群組</label>
-        
-        @*#region:我的行程>*@
-            <div class="tab__content" id="tab1_content">
-                @*我的行程:沒有行程or錯誤訊息 *@
-                <div style="color: rgb(102, 102, 102); text-align: center;" id="emptyschedule">
-                <div class="emptyschedule" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
-                        <img src="~/images/emptyschedule.png" style="width: 300px ;height: 200px ; margin-top: 10px;" class="mt-5">
-                        <button id="newschbtn" type="button" class="btn" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
-                            新增行程
-                        </button>
+            @*#region:我的行程>*@
+                <div class="tab__content" id="tab1_content">
+                    @*我的行程:沒有行程or錯誤訊息 *@
+                    <div style="color: rgb(102, 102, 102); text-align: center;" id="emptyschedule">
+                    <div class="emptyschedule" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
+                            <img src="~/images/emptyschedule.png" style="width: 300px ;height: 200px ; margin-top: 10px;" class="mt-5">
+                            <button id="newschbtn" type="button" class="btn" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
+                                新增行程
+                            </button>
+                        </div>
+                    </div>              
+                    <div id="errmsg1" style="justify-content:center; align-items:center;"></div>
+                    @*行程輪播卡片*@
+                    <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
+                        <div class="row" style="margin-top:1px;margin-bottom:2px">
+                            <div class="section_title_container mb-3">
+                                <div class="d-flex flex-row align-items-center">
+                                    <!-- Optional: Add title or content here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row course_cards_container section_content_row">
+                            <div class="col">
+                                <div class="popular_courses_slider_container">
+                                    <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
+                                        <!-- foreach schedule Course Card -->
+                                    </div>
+                                    <div class="owl-dots"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>              
-                <div id="errmsg1" style="justify-content:center; align-items:center;"></div>
-                @*行程輪播卡片*@
+                </div>
+            @*#endregion*@
+            @*#region:旅遊群組*@
+            <div class="tab__content" id="tab2_content">
+                @*旅遊群組:沒有行程or錯誤訊息 *@
+                <div style="color: rgb(102, 102, 102); text-align: center;" id="emptygroup">
+                    <div class="emptygroup" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
+                            <img src="~/images/emptygroup.png" style="width:300px;height:200px; margin-top: 10px;" class="mt-5">
+                        </div>
+                    </div>                        
+                @*旅遊群組輪播卡片*@
+                <div id="errmsg2" style="justify-content:center; align-items:center;text-align:center"></div>
                 <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
                     <div class="row" style="margin-top:1px;margin-bottom:2px">
                         <div class="section_title_container mb-3">
@@ -259,51 +286,20 @@
                     <div class="row course_cards_container section_content_row">
                         <div class="col">
                             <div class="popular_courses_slider_container">
-                                <div class="owl-carousel owl-theme popular_courses_slider" id="course-container">
+                                <div class="owl-carousel owl-theme popular_courses_slider" id="group_course-container">
                                     <!-- foreach schedule Course Card -->
                                 </div>
                                 <div class="owl-dots"></div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>                
             </div>
-        @*#endregion*@
-            
-        @*#region:旅遊群組*@
-        <div class="tab__content" id="tab2_content">
-            @*旅遊群組:沒有行程or錯誤訊息 *@
-            <div style="color: rgb(102, 102, 102); text-align: center;" id="emptygroup">
-                <div class="emptygroup" style="display: flex; align-items: center; justify-content: center; flex-direction: column;margin-bottom:5px">
-                        <img src="~/images/emptygroup.png" style="width:300px;height:200px; margin-top: 10px;" class="mt-5">
-                    </div>
-                </div>                        
-            @*旅遊群組輪播卡片*@
-            <div id="errmsg2" style="justify-content:center; align-items:center;text-align:center"></div>
-            <div class="popular" id="result_container" style="justify-content:center; align-items:center;">
-                <div class="row" style="margin-top:1px;margin-bottom:2px">
-                    <div class="section_title_container mb-3">
-                        <div class="d-flex flex-row align-items-center">
-                            <!-- Optional: Add title or content here -->
-                        </div>
-                    </div>
-                </div>
-                <div class="row course_cards_container section_content_row">
-                    <div class="col">
-                        <div class="popular_courses_slider_container">
-                            <div class="owl-carousel owl-theme popular_courses_slider" id="group_course-container">
-                                <!-- foreach schedule Course Card -->
-                            </div>
-                            <div class="owl-dots"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>                      
-        </div>
+            @*#endregion*@
+        </div>      
+        
     </div>
     @*#endregion*@
-</div>
-@*#endregion*@
             
     @*#region 新增行程Modal*@
     <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
@@ -398,7 +394,7 @@
                 <div class="modal-body">
                     <form id="checkmail" class="form-group needs-validation" novalidate autocomplete="off">
                         <div class="form-row d-flex align-items-start needs-validation mt-2 mb-2 ">
-                            <input type="email" class="form-control mx-1" name="Email" style="width:80%;border-radius:14px;" id="txtMail" required pattern="^[\w-\.]+@("@")([\w-]+\.)+[\w-]{2,4}$" autocomplete="off">
+                            <input type="email" class="form-control mx-1" id="txtMail" style="width:80%;border-radius:14px;"  autocomplete="off" required-pattern="^[\w-\.]+@("@")([\w-]+\.)+[\w-]{2,4}$">
                             <button type="submit" class="form-control" id="invite_btn" style="width:auto;border-radius:14px;">加入</button>
                         </div>
                         <div class="form-row d-flex align-items-center mt-2 mb-2 mx-2">
@@ -430,124 +426,321 @@
     @*#endregion*@
 
 <!-- Scripts-->
-    <script>
-        $(document).ready(async function () {
-            
-            var baseAddress = "https://localhost:7280";
-            var token = localStorage.getItem('token');
-            try {
-                //#region 呼叫後台資料
-                var [mainSchedulesResponse, schedulesGroupResponse] = await Promise.all([
-                    fetch(`${baseAddress}/api/Schedules/MainSchedules`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }),
-                    fetch(`${baseAddress}/api/Schedules/SchedulesGroup`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                ]);    
+<script>
+$(document).ready(async function () {
 
-                    //#region user創建群組loading
-                    if (mainSchedulesResponse.status === 401) {
-                        $('#course-container').hide();
-                        alert('gologin');
-                        return;
-                    } else if (mainSchedulesResponse.status === 204) {
-                        $('#course-container').hide();
-                        $('#emptyschedule').show();
-                    } else if (mainSchedulesResponse.ok) {
-                        $('#course-container').show();
-                        var data = await mainSchedulesResponse.json();
-                        renderCourses(data);
-                    }
-                    //#endregion
+    var baseAddress = "https://localhost:7280";
+    var token = localStorage.getItem('token');
+    try {
+        //#region 呼叫後台資料
+        var [mainSchedulesResponse, schedulesGroupResponse] = await Promise.all([
+            fetch(`${baseAddress}/api/Schedules/MainSchedules`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }),
+            fetch(`${baseAddress}/api/Schedules/SchedulesGroup`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+        ]);
 
-                    //#region 旅遊群組loading
-                    if (schedulesGroupResponse.status === 401) {
-                        $('#result_container').hide();
-                        alert('gologin');
-                        return;
-                    } else if (schedulesGroupResponse.status === 204) {
-                    $   ('#gcourse-container').show();
-                        $('#emptygroup').show();
-                    } else if (schedulesGroupResponse.ok) {
-                        $('#group_course-container').show();
-                        var data2 = await schedulesGroupResponse.json();
-                        groupCourses(data2);
-                    }
-                    //#endregion
-                setTimeout(() => {
-                    console.log('Calling initPopularCoursesSlider');
-                    initPopularCoursesSlider();
-                }, 500);
-            } 
-            catch (error) {
-                console.log(error);
+            //#region user創建群組loading
+            if (mainSchedulesResponse.status === 401) {
                 $('#course-container').hide();
-                $('#group_course-container').hide();
-                $('#emptygroup').hide();
-                $('#emptyschedule').hide();
+                alert('gologin');
+                return;
+            } else if (mainSchedulesResponse.status === 204) {
+                $('#course-container').hide();
+                $('#emptyschedule').show();
+            } else if (mainSchedulesResponse.ok) {
+                $('#course-container').show();
+                var data = await mainSchedulesResponse.json();
+                renderCourses(data);
             }
             //#endregion
 
-                //#region 切換標籤
-                $('input[name="tabGroup1"]').on('change', function () {
-                    $('.popular_courses_slider').trigger('destroy.owl.carousel');
-                    initPopularCoursesSlider();
-                });
-                //#endregion
+            //#region 旅遊群組loading
+            if (schedulesGroupResponse.status === 401) {
+                $('#result_container').hide();
+                alert('gologin');
+                return;
+            } else if (schedulesGroupResponse.status === 204) {
+                $('#gcourse-container').show();
+                $('#emptygroup').show();
+            } else if (schedulesGroupResponse.ok) {
+                $('#group_course-container').show();
+                var data2 = await schedulesGroupResponse.json();
+                groupCourses(data2);
+            }
+            //#endregion    
+        }
+        catch (error) {
+            console.log(error);
+            $('#course-container').hide();
+            $('#group_course-container').hide();
+            $('#emptygroup').hide();
+            $('#emptyschedule').hide();
+        }
+        finally {
+            console.log('Calling initPopularCoursesSlider');
+            initPopularCoursesSlider();
+        }
+        //#endregion
 
-                //#region 編輯詳細行程
-                $(document).on('click', '.edit_btn', function (event) {
-                    event.preventDefault();
-                    var fun = $(this).data('fun');
-                    var editId = $(this).data('id');
-                    if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
-                        alert(`$Fun_${fun}:Id$_${editId}`);
-                        console.log(`$Fun_${fun}:Id$_${editId}`);
+        //#region 切換標籤
+        $('input[name="tabGroup1"]').on('change', function () {
+            $('.popular_courses_slider').trigger('destroy.owl.carousel');
+            initPopularCoursesSlider();
+        });
+        //#endregion
+
+        //#region 編輯詳細行程
+        $(document).on('click', '.edit_btn', function (event) {
+            event.preventDefault();
+            var fun = $(this).data('fun');
+            var editId = $(this).data('id');
+            if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
+                alert(`$Fun_${fun}:Id$_${editId}`);
+                console.log(`$Fun_${fun}:Id$_${editId}`);
+            }
+            alert('go schedule detail');
+        });
+        //#endregion
+
+        //#region 新增行程窗口初始化
+        $('#newschdule').on('shown.bs.modal', function () {
+            initMap();
+            initAirDatepicker();
+        });
+        //#endregion
+
+        //#region 新增行程
+        $('#createbtn').on('click', async function () {
+            $('#newschdule').modal('hide');
+            try {
+                var name = $('#Name').val();
+                var startTime = $('#el1').val();
+                var endTime = $('#el2').val();
+                var lat = $('#Lat').val();
+                var lng = $('#Lng').val();
+                var picture_url = $('#picture_url').val();
+                var place_id = $('#place_id').val();
+                var body = {
+                    "Name": name,
+                    "StartTime": startTime,
+                    "EndTime": endTime,
+                    "Lat": lat,
+                    "Lng": lng,
+                    "PlaceId": place_id,
+                    "PictureUrl": picture_url
+                };
+
+                console.log(JSON.stringify(body));
+                var response = await fetch(`${baseAddress}/api/Schedules`, {
+                    method: "POST",
+                    body: JSON.stringify(body),
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
-                    alert('go schedule detail');
                 });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                await Swal.fire({
+                    icon: "success",
+                    title: '行程已成功新增',
+                    timer: 1500
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+        //#endregion
+
+        //#region cards下拉式選單
+        function clearModalContent() {
+            $('#authoritytable').empty();
+        }
+
+        $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
+            clearModalContent();
+        });
+
+        $(document).off('click', '.dropdown-item').on('click', '.dropdown-item', async function (event) {
+            event.preventDefault();
+            var fun = $(this).data('fun');
+            var sch_name = $(this).data('name');
+            var schedule_id = $(this).closest('.course_card').find('[data-sche]').data('sche');
+            var userId = $(this).data('exitid');
+            var gschedule_id = $(this).closest('.course_card').find('[data-gsche]').data('gsche');
+
+            switch (fun) {
+                // Main
+                case 'MemberManager':
+                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
+                    await handleMemberManager(schedule_id);
+                    break;
+
+                case 'Delete':
+                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
+                    await handleDelete(schedule_id);
+                    break;
+
+                case 'InviteMember':
+                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
+                    await handleInviteMember(schedule_id);
+                    break;
+
+                // group
+                case 'RemoveMemeber':
+                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
+                    await ExitGroup(gschedule_id);
+                    break;
+
+                case 'Exit':
+                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}_userId:${userId}`);
+                    await ExitGroup(gschedule_id, userId);
+                    break;
+
+                case 'CheckManager':
+                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
+                    await LoadGroupMembers(gschedule_id);
+                    break;
+
+                default:
+                    console.warn(`Unknown function: ${fun}`);
+            }
+        });
+            //#region 成員權限管理
+            async function handleMemberManager(schedule_id) {
+                //#region 讀成員權限
+                try {
+                    clearModalContent();
+                    var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/${schedule_id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    var statusCode = response.status;
+                    console.log('Status Code:', statusCode);
+                    if (statusCode === 200) {
+                        var data = await response.json();
+                        $('#scheduleauthority_modal').modal('show');
+                        populateTable(data);
+                    } else if (statusCode === 204) {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: '該行程無其他成員!',
+                            icon: 'warning',
+                            confirmButtonColor: "#405D72"
+                        });
+                    } else if (statusCode === 500) {
+                        var errorData = await response.json();
+                        Swal.fire({
+                            title: "Error",
+                            text: '伺服器發生錯誤，請稍後再試。',
+                            icon: 'error'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Error",
+                            text: '伺服器發生錯誤，請稍後再試。',
+                            icon: 'error'
+                        });
+                        console.log('Unexpected response status:', statusCode);
+                    }
+                } catch (error) {
+                    console.log('Unexpected response status:', statusCode);
+                    Swal.fire({
+                        title: "Error",
+                        text: '請求失敗。',
+                        icon: 'error'
+                    });
+                }
                 //#endregion
 
-                //#region 新增行程窗口初始化
-                $('#newschdule').on('shown.bs.modal', function () {
-                    initMap();
-                    initAirDatepicker();
-                });
-                //#endregion
+                //#region 修改權限
+                $('#authright_save').off('click').on('click', async function (schedule_id) {
+                    var usersData = [];
+                    $('#schedule-authority-table tbody tr').each(function () {
+                        var UserId = $(this).find('[data-authorityuserid]').data('authorityuserid');
+                        var ScheduleId = $(this).find('[data-scheduleid]').data('scheduleid');
+                        var checkedCheckboxes = $(this).find('.form-check-input:checked');
+                        var AuthorityCategoryIds = checkedCheckboxes.map(function () {
+                            return $(this).data('authority-id');
+                        }).get();
+                        console.log(`2.${ScheduleId}`);
 
-                //#region 新增行程
-                $('#createbtn').on('click', async function () {
-                    $('#newschdule').modal('hide');
-                    try {
-                        var name = $('#Name').val();
-                        var startTime = $('#el1').val();
-                        var endTime = $('#el2').val();
-                        var lat = $('#Lat').val();
-                        var lng = $('#Lng').val();
-                        var picture_url = $('#picture_url').val();
-                        var place_id = $('#place_id').val();
-                        var body = {
-                            "Name": name,
-                            "StartTime": startTime,
-                            "EndTime": endTime,
-                            "Lat": lat,
-                            "Lng": lng,
-                            "PlaceId": place_id,
-                            "PictureUrl": picture_url
+                        var userData = {
+                            'ScheduleId': ScheduleId,
+                            'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [],
+                            'UserId': UserId,
+                            'Id': null // 你可能需要為每個用戶生成一個唯一的 ID
                         };
+                        usersData.push(userData);
+                    });
 
-                        console.log(JSON.stringify(body));
-                        var response = await fetch(`${baseAddress}/api/Schedules`, {
-                            method: "POST",
+                    console.log('所有用戶數據:', JSON.stringify(usersData));
+
+                    try {
+                        var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/Modified`, {
+                            method: 'POST',
+                            body: JSON.stringify(usersData),
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            var responseData = await response.json();
+                                await Swal.fire({
+                                    icon: "success",
+                                    title: responseData.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                        } else {
+                            Swal.fire({
+                                title: "修改失敗，請再重新修改一次!",
+                                icon: "error"
+                            });
+                            console.log('更新失敗:', response.status, response.statusText);
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            title: "伺服器錯誤，請稍後再試!",
+                            icon: "error"
+                        });
+                            console.log('錯誤:', error.message);
+                    }
+                    finally {
+                        $('#scheduleauthority_modal').modal('hide');
+                    }
+                });
+                //#endregion
+
+                //#region 踢除成員
+                $('#schedule-authority-table').on('click', 'a.remove_btn', async function () {
+                    var userId = $(this).data('removememberid');
+                    var body = {
+                        'ScheduleId': schedule_id,
+                        'UserId': userId
+                    };
+                    try {
+                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
+                            method: "PUT",
                             body: JSON.stringify(body),
                             headers: {
                                 'Authorization': `Bearer ${token}`,
@@ -555,452 +748,381 @@
                             }
                         });
 
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                        if (response.ok) {
+                            $('#scheduleauthority_modal').modal('hide');
+                            var result = await response.json();                                
+                            await Swal.fire({
+                                icon: "success",
+                                title: result.message,
+                                confirmButtonColor: "#405D72",
+                                timer: 1500
+                            });
+                        } else {
+                            var error = await response.json();
+                            Swal.fire({
+                                title: "Error",
+                                html: responseData.message,
+                                icon: "error"
+                            });                                
                         }
-
-                        alert('行程已成功新增');
-
-                        // 成功提示后重新加载页面
-                        location.reload();
-
                     } catch (error) {
-                        console.error('Error:', error);
+                        console.error('請求失敗:', error);
+                    }
+                    finally{
+                        $('#scheduleauthority_modal').modal('hide');
                     }
                 });
                 //#endregion
 
-                //#region cards下拉式選單
-                function clearModalContent() {
-                    $('#authoritytable').empty(); 
+            }
+            //#endregion
+
+            //#region 查看成員
+            async function LoadGroupMembers(gschedule_id) {
+                try {
+                        $('#groupmembers_modal').modal('show');
+                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/GetGroupsMembers/${gschedule_id}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('網路回應不正常');
+                            $('#groupmembers_modal').modal('hide');
+                        }
+
+                        if (response.status === 204) {
+                            alert('查無其他成員');
+                            $('#groupmembers_modal').modal('hide');
+                        }
+
+                        var groupMembers = await response.json();
+
+                        // 根据 isHost 排序，将 isHost 为 true 的成员放在第一位
+                        groupMembers.sort((a, b) => b.isHost - a.isHost);
+
+                        var modalBody = document.querySelector('#groupmembers_modal .modal-body');
+                        modalBody.innerHTML = '';
+
+                        var memberHTML = groupMembers.map(member => `
+                            <div class="member-info">
+                                <div class="member-photo">
+                                    <img
+                                        src="${member.userPhoto || '/images/userfill.png'}"
+                                        alt="${member.userName}"
+                                        onerror="this.onerror=null;this.src='/images/userfill.png';"
+                                    />
+                                </div>
+                                <p>
+                                    ${member.userName}
+                                    ${member.removeauth && member.canremoveid ?
+                                    `<a type="button" class="remove-btn" data-removememberid="${member.userId}">
+                                    <i class="fa-solid fa-circle-xmark" style="color: #cf072f;"></i>
+                                    </a>`
+                                    : ''}
+                                </p>
+                            </div>
+                        `).join('');
+                            
+                        modalBody.innerHTML = `<div class="member-container">${memberHTML}</div>`;
+                    } 
+                    catch (error) {
+                    $('#groupmembers_modal').modal('hide');
+                    console.error('載入成員資料時發生錯誤:', error);
                 }
+            }
+            //#endregion
 
-                $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
-                    clearModalContent();
-                });
-
-                $(document).on('click', '.dropdown-item', async function (event) {
-                        event.preventDefault();
-                        var fun = $(this).data('fun');
-                        var sch_name = $(this).data('name');
-                        var schedule_id = $(this).closest('.course_card').find('[data-sche]').data('sche');
-                        var userId = $(this).data('exitid')
-                        var gschedule_id = $(this).closest('.course_card').find('[data-gsche]').data('gsche');
-                        switch (fun) {
-                            //Main
-                            case 'MemberManager':
-                                console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
-                                await handleMemberManager(schedule_id);
-                                break;
-                            
-                            case 'Delete':
-                                console.log(`fun:${fun}/schedule_id: ${schedule_id}`); await handleDelete(schedule_id);
-                                break;
-                            
-                            case 'InviteMember':
-                                console.log(`fun:${fun}/schedule_id: ${schedule_id}`); await handleInviteMember(schedule_id);
-                                break;
-                            //group
-                            case 'RemoveMemeber':
-                                console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`); await ExitGroup(gschedule_id);
-                                break;
-                            
-                            case 'Exit':
-                                console.log(`fun:${fun}_gschedule_id: ${gschedule_id}_userId:${userId}`);
-                                await ExitGroup(gschedule_id, userId);
-                                break;
-                            
-                            default:
-                                console.warn(`Unknown function: ${fun}`);
-                        }
+            //#region 刪除行程
+            async function handleDelete(schedule_id) {
+                try {
+                    var result = await Swal.fire({
+                        title: "Are you sure?",
+                        html: `
+                        您確認要刪除此行程?<br>
+                        當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                        也會一併刪除!
+                    `,
+                        icon: "warning",
+                        iconColor: '#E4003A',
+                        showCancelButton: true,
+                        confirmButtonColor: "#405D72",
+                        cancelButtonColor: "#F9E0BB",
+                        confirmButtonText: "確認刪除"
                     });
-                    //#region 成員權限管理
-                    async function handleMemberManager(schedule_id) {
-                        //#region 讀成員權限
-                        try {
-                            clearModalContent();
-                            var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/${schedule_id}`, {
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            if (response.status === 204 || response.status === 404) {
-                                alert('無群組成員!');
-                                if ($('#scheduleauthority_modal').hasClass('show')) {
-                                    $('#scheduleauthority_modal').modal('hide');
-                                }
-                            } else if (response.ok) {
-                                $('#scheduleauthority_modal').modal('show');
-                                var data = await response.json();
-                                populateTable(data);
-                                
-                            } else {
-                                console.error('Server error:', response.status);
-                                $('#scheduleauthority_modal').modal('hide');
+
+                    if (result.isConfirmed) {
+                        var response = await fetch(`${baseAddress}/api/Schedules/${schedule_id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
                             }
-                        } catch (error) {
-                            console.error('Fetch error:', error);
-                            $('#scheduleauthority_modal').modal('hide');
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('行程刪除失敗');
                         }
-                        //#endregion
 
-                        //#region 修改權限
-                        $('#authright_save').on('click', async function (schedule_id) {
-                            var usersData = [];
-                            
-                            $('#schedule-authority-table tbody tr').each(function () {                        
-                                        var UserId = $(this).find('[data-authorityuserid]').data('authorityuserid');
-                                        var ScheduleId = $(this).find('[data-scheduleid]').data('scheduleid');
-                                        var checkedCheckboxes = $(this).find('.form-check-input:checked');
-                                        var AuthorityCategoryIds = checkedCheckboxes.map(function () {
-                                            return $(this).data('authority-id');
-                                        }).get();
-
-                                        var userData = {
-                                            'UserName': '',
-                                        'ScheduleId': ScheduleId,
-                                            'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [],
-                                            'UserId': UserId,
-                                            'Id': null
-                                        };
-                                        usersData.push(userData);
-                                    });
-
-                            try {
-                                var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/Modified`, {
-                                    method: 'POST',
-                                    body: JSON.stringify(usersData),
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    }
-                                });
-
-                                if (!response.ok) {
-                                    var errorData = await response.json();
-                                    if (response === 409)
-                                    {
-                                        console.log(errorData);
-                                    }
-                                    else{                                        
-                                        console.error(`Error response: ${errorData.message}`);
-                                    }                                    
-                                } else {
-                                    var data = await response.json();
-                                    alert(data.message);
-                                    $('#scheduleauthority_modal').modal('hide');
-                                }
-                            } catch (error) {
-                                console.error(`Fetch error: ${error}`);
-                            }
+                        await Swal.fire({
+                            title: "已刪除!",
+                            text: `行程已刪除`,
+                            icon: "success",
+                            timer: 1500
                         });
-                        //#endregion
-
-                        //#region 踢除成員
-                        $('#schedule-authority-table').on('click', 'a.remove_btn', async function () {
-                            var userId = $(this).data('removememberid');
-                            var body = {
-                                'ScheduleId': schedule_id,
-                                'UserId': userId
-                            };
-                            try {
-                            var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
-                                    method: "PUT",
-                                    body:JSON.stringify(body),
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`, 
-                                        'Content-Type': 'application/json'
-                                    }
-                                });
-
-                                if (response.ok) {
-                                    var result = await response.json();
-                                    alert(result.message);
-                                    $('#invitemember_modal').modal('hide');
-                                } else {
-                                    var error = await response.json();
-                                    alert(`錯誤: ${error.message}`);
-                                     $('#invitemember_modal').modal('hide');
-                                }
-                            } catch (error) {
-                                console.error('請求失敗:', error);
-                                $('#invitemember_modal').modal('hide');
-                            }
-                        });
-                        //#endregion
+                        location.reload()
                     }
-                    //#endregion
+                } catch (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "刪除失敗",
+                        text: `行程刪除失敗: ${error.message}`
+                    });
+                }
+            }
+            //#endregion
 
-                    //#region 刪除行程
-                        async function handleDelete(schedule_id) {
-                        try {
-                            var result = await Swal.fire({
-                                title: "Are you sure?",
-                                html: `
-                                您確認要刪除此行程?<br>
-                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
-                                也會一併刪除!
-                            `,
-                                icon: "warning",
-                                iconColor: '#E4003A',
-                                showCancelButton: true,
-                                confirmButtonColor: "#405D72",
-                                cancelButtonColor: "#F9E0BB",
-                                confirmButtonText: "確認刪除"
-                            });
+            //#region 邀請成員
+            async function handleInviteMember(schedule_id) {
+                $('#checkmail').off('submit').on('submit', async function (event) {
+                    event.preventDefault();
+                    var Email = document.getElementById('txtMail');
+                        
+                    if (!Email.checkValidity()) {
+                        Swal.fire({
+                            title: "Error",
+                            text: '請確認好友的帳號(請輸入email)',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+                        
+                    var checkbox = document.getElementById('defalutauthority');
+                    var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
+                    try {
+                        var Body = {
+                            "Email": Email.value.trim(),
+                            "ScheduleId": schedule_id,
+                            "AuthorityCategoryId": AuthorityCategoryId,
+                        };
+                        console.log(JSON.stringify(Body));
 
-                            if (result.isConfirmed) {
-                                var response = await fetch(`${baseAddress}/api/Schedules/${schedule_id}`, {
-                                    method: 'DELETE',
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    }
-                                });
-
-                                if (!response.ok) {
-                                    throw new Error('行程刪除失敗');
-                                }
-
-                                await Swal.fire({
-                                    title: "已刪除!",
-                                    text: `行程已刪除`,
-                                    icon: "success"
-                                });
-                                
+                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
+                            method: "POST",
+                            body: JSON.stringify(Body),
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
                             }
-                        } catch (error) {
+                        });
+
+                        var responseData = await response.json();
+                        console.log(response.status);
+                        console.log(responseData);
+
+                        if (response.status === 200) {                               
+                            await Swal.fire({
+                                icon: "success",
+                                title: responseData.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                        else if (response.status === 400) {
+                            $('.owl-carousel').trigger('stop.owl.autoplay');
                             Swal.fire({
-                                icon: "error",
-                                title: "刪除失敗",
-                                text: `行程刪除失敗: ${error.message}`
+                                title: responseData.message,
+                                icon: "warning"                              
                             });
+                        }
+                        else {
+                            Swal.fire({
+                                title: '請再重新試一次!',
+                                icon: "error"                               
+                            });
+                            console.log(responseData.message);
                         }
                     }
-                        //#endregion
-                        
-                    //#region 邀請成員
-                    async function handleInviteMember(schedule_id) {
-                        $('#checkmail').on('submit', async function (event) {
-                            event.preventDefault();
+                    catch (error) {
+                        console.log('捕获错误:', error);
+                        Swal.fire({
+                            title: '請再重新試一次!',
+                            icon: "error"
+                        });
+                    }
+                    finally {
+                        $('#invitemember_modal').modal('hide');
+                        $('#txtMail').val('');
+                    }
+                });
+            }
+            //#endregion
 
-                            var Email = document.getElementById('txtMail');
-                            if (!Email.checkValidity()) {
-                                alert('請確認使用者的帳號');
-                                return;
-                            }
-
-                            var checkbox = document.getElementById('defalutauthority');
-                            var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
-                        
-                            try {
-                                var Body = {
-                                    "Email": Email.value.trim(),
-                                    "ScheduleId": schedule_id,
-                                    "AuthorityCategoryId": AuthorityCategoryId,
-                                };
-                                console.log(JSON.stringify(Body));
-
-                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
-                                    method: "POST",
-                                    body: JSON.stringify(Body),
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    }
-                                });
-
-                                var responseData = await response.json();
-
-                                    if (response.ok) {
-                                        if (responseData.message === "主辦者不需加入群組") {
-                                            alert('主辦者無需加入群組');
-                                            $('#invitemember_modal').modal('hide');
-                                        } else if (responseData.message === "會員已加入此群組") {
-                                            alert('該會員已是群組會員');
-                                            $('#invitemember_modal').modal('hide');
-                                        } else {
-                                            alert('已成功邀請好友進入群組!');
-                                            $('#invitemember_modal').modal('hide');
-                                        }
-                                        
-                                    } else {
-                                        console.log('錯誤:', responseData.message || '未知錯誤');
-                                        alert(responseData.message || '新增成員失敗');
-                                        $('#invitemember_modal').modal('hide');
-                                    }
-                                } catch (error) {
-                                    console.log('捕獲錯誤:', error);
-                                    alert('新增成員失敗');
-                                    $('#invitemember_modal').modal('hide');
-                                }
-                            });
-                        }
-                        //#endregion
-                        
-                    //#region 查看成員
-                        
-                    //#endregion
-                        
-                    //#region 離開群組
-                    async function ExitGroup(gschedule_id, userId) {
-                        try {
-                            var body = {
-                                'ScheduleID': gschedule_id,
-                                'UserID': userId
-                            };
-                            var result = await Swal.fire({
-                                title: "Are you sure?",
-                                html: `
+            //#region 離開群組
+            async function ExitGroup(gschedule_id, userId) {
+                try {
+                    var body = {
+                        'ScheduleID': gschedule_id,
+                        'UserID': userId
+                    };
+                    var result = await Swal.fire({
+                        title: "Are you sure?",
+                        html: `
                                 您確認要離開此行程?<br>
                                 當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
                                 也會一併刪除!
-                                        `,
-                                icon: "warning",
-                                iconColor: '#E4003A',
-                                showCancelButton: true,
-                                confirmButtonColor: "#405D72",
-                                cancelButtonColor: "#F9E0BB",
-                                confirmButtonText: "確認刪除"
-                            });
+                            `,
+                        icon: "warning",
+                        iconColor: '#E4003A',
+                        showCancelButton: true,
+                        confirmButtonColor: "#405D72",
+                        cancelButtonColor: "#F9E0BB",
+                        confirmButtonText: "確認刪除"
+                    });
 
-                            if (result.isConfirmed) {
-                                console.log(JSON.stringify(body)); // 修正此处
+                    if (result.isConfirmed) {
+                        console.log(JSON.stringify(body));
 
-                                var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
-                                    method: "PUT",
-                                    body: JSON.stringify(body),
-                                    headers: {
-                                        'Authorization': `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    }
-                                });
-
-                                if (!response.ok) {
-                                    throw new Error('行程刪除失敗');
-                                }
-
-                                await Swal.fire({
-                                    title: "已退出!",
-                                    text: `您已退出群組`,
-                                    icon: "success"
-                                });
-
-                                location.reload();
+                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/Memberexit`, {
+                            method: "PUT",
+                            body: JSON.stringify(body),
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
                             }
-                        } catch (error) {
-                            Swal.fire({
+                        });
+
+                        if (resopnse) {
+                            await Swal.fire({
+                                title: "已退出!",
+                                text: `您已退出群組`,
+                                icon: "success"
+                            });
+                        }
+
+                        if (!response.ok) {
+                            throw new Error('行程刪除失敗');
+                            await Swal.fire({
                                 icon: "error",
                                 title: "錯誤",
                                 text: `請重新再試一次`
                             });
-                            console.log(error.message);
                         }
                     }
-                //#endregion
-                
-                //#endregion
+                } catch (error) {
+                    await Swal.fire({
+                        icon: "error",
+                        title: "錯誤",
+                        text: `請重新再試一次`
+                    });
+                    console.log(error.message);
+                }
+            }
+            //#endregion
 
-                //#region Function area
+        //#endregion
 
-                    //#region Google Autocomplete
-                    let debounceTimer;
-                    function initMap() {
-                        var options = {
-                            types: ['geocode'],
-                            fields: ['place_id', 'geometry', 'name', 'photos']
-                        };
+        //#region Function area
 
-                        var input = $('#search_input')[0];
-                        if (input) {
-                            var autocomplete = new google.maps.places.Autocomplete(input, options);
+        //#region Google Autocomplete
+        let debounceTimer;
+        function initMap() {
+            var options = {
+                types: ['geocode'],
+                fields: ['place_id', 'geometry', 'name', 'photos']
+            };
 
-                            google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                                let place = autocomplete.getPlace();
-                                if (!place.geometry) {
-                                    console.error("No details available for input: '" + place.name + "'");
-                                    return;
-                                }
+            var input = $('#search_input')[0];
+            if (input) {
+                var autocomplete = new google.maps.places.Autocomplete(input, options);
 
-                                let lat = place.geometry.location.lat();
-                                let lng = place.geometry.location.lng();
-                                let placeId = place.place_id;
-
-                                let photos = place.photos;
-                                let photoUrl = '';
-                                if (photos && photos.length > 0) {
-                                    photoUrl = photos[0].getUrl({ maxWidth: 340, maxHeight: 255 });
-                                }
-
-                                $('#Lat').val(lat);
-                                $('#Lng').val(lng);
-                                $('#place_id').val(placeId);
-                                $('#picture_url').val(photoUrl);
-
-                                console.log('Place ID:', placeId);
-                                console.log('Latitude:', lat);
-                                console.log('Longitude:', lng);
-                                console.log('Photo URL:', photoUrl);
-                            });
-
-                            $('#search_input').on('input', function () {
-                                clearTimeout(debounceTimer);
-                                debounceTimer = setTimeout(function () {
-                                    google.maps.event.trigger(input, 'focus', {});
-                                }, 500);
-                            });
-                        }
+                google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                    let place = autocomplete.getPlace();
+                    if (!place.geometry) {
+                        console.error("No details available for input: '" + place.name + "'");
+                        return;
                     }
-                        //#endregion
-                        
-                    //#region Air Datepicker
-                    function initAirDatepicker() {
-                        try {
-                            let today = new Date();
-                            let dpMin, dpMax;
-                            dpMin = new AirDatepicker('#el1', {
-                                locale: window.airdatepickerEn,
-                                minDate: today,
-                                dateFormat(date) {
-                                    let year = date.getFullYear();
-                                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                                    let day = date.getDate().toString().padStart(2, '0');
-                                    return `${year}-${month}-${day}`;
-                                },
-                                autoClose: true,
-                                onSelect({ date }) {
-                                    dpMax.update({
-                                        minDate: date
-                                    });
-                                }
-                            });
 
-                            dpMax = new AirDatepicker('#el2', {
-                                locale: window.airdatepickerEn,
-                                dateFormat(date) {
-                                    let year = date.getFullYear();
-                                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                                    let day = date.getDate().toString().padStart(2, '0');
-                                    return `${year}-${month}-${day}`;
-                                },
-                                autoClose: true,
-                                onSelect({ date }) {
-                                    dpMin.update({
-                                        maxDate: date
-                                    });
-                                }
-                            });
-                        } catch (error) {
-                            console.log(`datepicker error ${error}`);
-                        }
+                    let lat = place.geometry.location.lat();
+                    let lng = place.geometry.location.lng();
+                    let placeId = place.place_id;
+
+                    let photos = place.photos;
+                    let photoUrl = '';
+                    if (photos && photos.length > 0) {
+                        photoUrl = photos[0].getUrl({ maxWidth: 340, maxHeight: 255 });
                     }
-                    //#endregion
-                
-                //#endregion                
-        });
-    </script>
+
+                    $('#Lat').val(lat);
+                    $('#Lng').val(lng);
+                    $('#place_id').val(placeId);
+                    $('#picture_url').val(photoUrl);
+
+                    console.log('Place ID:', placeId);
+                    console.log('Latitude:', lat);
+                    console.log('Longitude:', lng);
+                    console.log('Photo URL:', photoUrl);
+                });
+
+                $('#search_input').on('input', function () {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function () {
+                        google.maps.event.trigger(input, 'focus', {});
+                    }, 500);
+                });
+            }
+        }
+        //#endregion
+
+        //#region Air Datepicker
+        function initAirDatepicker() {
+            try {
+                let today = new Date();
+                let dpMin, dpMax;
+                dpMin = new AirDatepicker('#el1', {
+                    locale: window.airdatepickerEn,
+                    minDate: today,
+                    dateFormat(date) {
+                        let year = date.getFullYear();
+                        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        let day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    },
+                    autoClose: true,
+                    onSelect({ date }) {
+                        dpMax.update({
+                            minDate: date
+                        });
+                    }
+                });
+
+                dpMax = new AirDatepicker('#el2', {
+                    locale: window.airdatepickerEn,
+                    dateFormat(date) {
+                        let year = date.getFullYear();
+                        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        let day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    },
+                    autoClose: true,
+                    onSelect({ date }) {
+                        dpMin.update({
+                            maxDate: date
+                        });
+                    }
+                });
+            } catch (error) {
+                console.log(`datepicker error ${error}`);
+            }
+        }
+        //#endregion
+        
+        //#endregion                
+    });
+</script>
 
 
 

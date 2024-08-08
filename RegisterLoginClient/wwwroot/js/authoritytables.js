@@ -7,7 +7,9 @@
         const row = document.createElement('tr');
 
         row.innerHTML = `
-        <td style="text-align:center; vertical-align: middle;" data-scheduleId="${scheduleId}" data-authorityuserid="${userId}">${userName} <a class="button remove_btn" data-removememberid="${userId}"><i class="fa-solid fa-circle-xmark fa-xs" style="color: #c60619;"></i></a></td>
+        <td style="text-align:center; vertical-align: middle;" data-scheduleId="${scheduleId}" data-authorityuserid="${userId}">${userName}
+        <a class="remove_btn" data-removememberid="${userId}" style="font-size:12px;"><i class="fa-solid fa-circle-xmark" style="color: #cf072f;"></i></button>
+        </td>
         <td style="text-align:center;vertical-align: middle">
         <div class="form-check">
         <input class="form-check-input" type="checkbox" data-authority-id="1" ${authorityCategoryIds.includes(1) ? 'checked' : ''}>

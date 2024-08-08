@@ -21,7 +21,7 @@ namespace PinPinServer.Controllers
             _getUserId = getuserId;
 
         }
-
+        #region 讀取user自己創的行程
         // GET: api/Schedules/MainSchedules
         [HttpGet("MainSchedules")]
         public async Task<IActionResult> GetUserMainSchedule()
@@ -47,7 +47,7 @@ namespace PinPinServer.Controllers
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
-                    PictureUrl = s.Picture,
+                    Picture = s.Picture,
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups.Select(s => (string?)s.User.Name).Distinct().ToList(),
                 }).ToListAsync();
@@ -68,8 +68,9 @@ namespace PinPinServer.Controllers
             }
 
         }
+        #endregion
 
-
+        #region 讀取user被邀請的行程
         // GET: api/Schedules/SchedulesGroup
         [HttpGet("SchedulesGroup")]
         public async Task<IActionResult> GetUserSchedulesGroup()
@@ -100,7 +101,7 @@ namespace PinPinServer.Controllers
                         EndTime = s.EndTime,
                         CreatedAt = s.CreatedAt,
                         UserName = s.User.Name,
-                        PictureUrl = s.Picture,
+                        Picture = s.Picture,
                         UserId = userID,
                         SharedUserIDs = s.ScheduleGroups.Select(sg => (int?)sg.UserId).ToList(),
                         SharedUserNames = s.ScheduleGroups
@@ -125,9 +126,9 @@ namespace PinPinServer.Controllers
                 return StatusCode(500, "伺服器發生錯誤，請稍後再試");
             }
         }
+        #endregion
 
-
-
+        #region 查詢行程_2024/8/8-暫不採用該功能
         //Get:api/Schedules/{name}
         [HttpGet("{name}")]
         public async Task<ActionResult<IEnumerable<ScheduleDTO>>> GetUserSpecifiedSch(string name)
@@ -168,9 +169,9 @@ namespace PinPinServer.Controllers
                 return BadRequest();
             }
         }
+        #endregion
 
-
-
+        #region 修改自行創建主題(僅限sch_userid==userid && authorityid ==8) 2024/8/8尚未完成(可加入detial功能)
         // PUT: api/Schedules/{id}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -196,7 +197,7 @@ namespace PinPinServer.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok("行程修改成功!");
+                return Ok(new { Message = "行程修改成功!" });
             }
             //這段是啥?
             //EF存取併發衝突發生時
@@ -210,7 +211,9 @@ namespace PinPinServer.Controllers
                 throw;
             }
         }
+        #endregion
 
+        #region 自行創建主題
         // POST: api/Schedules
         [HttpPost]
         public async Task<IActionResult> PostSchedule([FromBody] EditScheduleDTO editschDTO)
@@ -259,7 +262,9 @@ namespace PinPinServer.Controllers
 
             return Ok();
         }
+        #endregion
 
+        #region 刪除行程主題(user自行創建的)
         // DELETE: api/Schedules/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(int id)
@@ -282,12 +287,16 @@ namespace PinPinServer.Controllers
                 return StatusCode(500, "刪除失敗!"); // 500 Internal Server Error if deletion fails
             }
         }
+        #endregion
 
+        #region bool行程是否存在
         private bool ScheduleExists(int id)
         {
             return _context.Schedules.Any(e => e.Id == id);
         }
+        #endregion
 
+        #region 待確認是不是還要保留 2024/8/8
         //GET:api/schedules/GetRelatedSchedules
         //GET資料回傳為Dictionary<ScheduleId,ScheduleName>
         [HttpGet("GetRelatedSchedules")]
@@ -310,5 +319,6 @@ namespace PinPinServer.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        #endregion
     }
 }

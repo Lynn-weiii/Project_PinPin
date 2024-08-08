@@ -13,7 +13,7 @@
 //				loop: false,
 //				margin: 24,
 //				nav: false,
-//				dots: false,
+//				dots: true,
 //				responsive:
 //				{
 //					0: {
@@ -72,6 +72,7 @@ function initPopularCoursesSlider() {
         let slider = $('.popular_courses_slider');
 
         slider.owlCarousel({
+            autoplay: false,
             loop: false,
             margin: 24,
             nav: false,
@@ -81,10 +82,10 @@ function initPopularCoursesSlider() {
                     items: 1
                 },
                 768: {
-                    items: 2
+                    items: 3
                 },
                 1200: {
-                    items: 3
+                    items: 4
                 }
             }
         });
