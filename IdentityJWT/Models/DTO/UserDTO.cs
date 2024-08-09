@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace PinPinServer.DTO
+namespace PinPinServer.Models.DTO
 {
     public class UserDTO
     {
@@ -13,7 +13,7 @@ namespace PinPinServer.DTO
 
         public DateOnly? Birthday { get; set; }
 
-        public IFormFile? Photo { get; set; } 
+        public IFormFile? Photo { get; set; }
 
         public int? Gender { get; set; }
 

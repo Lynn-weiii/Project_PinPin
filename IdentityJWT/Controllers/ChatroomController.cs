@@ -5,11 +5,11 @@ using System.Text.Json;
 using System.Text;
 using PinPinServer.Models;
 using Microsoft.EntityFrameworkCore;
-using PinPinServer.DTO;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Cors;
+using PinPinServer.Models.DTO;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

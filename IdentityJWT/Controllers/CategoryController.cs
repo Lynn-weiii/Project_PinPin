@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PinPinServer.DTO;
 using PinPinServer.Models;
+using PinPinServer.Models.DTO;
 using PinPinServer.Services;
 using PinPinServer.Utilities;
 

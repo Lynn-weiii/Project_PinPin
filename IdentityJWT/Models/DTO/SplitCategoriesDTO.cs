@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PinPinServer.DTO
+namespace PinPinServer.Models.DTO
 {
     public class SplitCategoriesDTO
     {

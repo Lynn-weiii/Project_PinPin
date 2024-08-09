@@ -1,6 +1,6 @@
 ﻿using PinPinServer.Models;
 
-namespace PinPinServer.DTO
+namespace PinPinServer.Models.DTO
 {
     public class WishlistDTO
     {

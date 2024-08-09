@@ -86,8 +86,7 @@
                             <div>
                                 <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i></button>
                                 <button class="btn btn-outline-primary" type="button" id="btnEditWishlist"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-outline-primary" type="button" id="btnDeleteWishlist"><i class="fa-solid fa-trash-can"></i></button>
-
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#deleteWishlistModal"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </div>
                     </div>
@@ -134,7 +133,7 @@
                                     <label>
                                         <input type="radio" name="categoryIcon" :value="icon.value" v-model="newCategoryIcon" :id="icon.value" required>
                                         <span class="round button">
-                                            <i :class="icon.value" class="fs-4 me-2"></i> 
+                                            <i :class="icon.value" class="fs-4 me-2"></i>
                                         </span>
                                     </label>
                                 </div>
@@ -148,6 +147,39 @@
     </div>
 
     <!--確認要刪除的願望清單及標籤-->
+    <div class="modal fade" id="deleteWishlistModal" tabindex="-1" aria-labelledby="deleteWishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteWishlistModalLabel">刪除願望清單及標籤</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form v-on:submit.prevent="deleteWishlistWithCategory">
+                        <div class="mb-3">
+                            <label for="wishlist">選擇清單:</label>
+                            <select id="wishlist" class="form-control" v-model="selectedWishlistName" v-on:change="changeOption">
+                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                    {{ wishlist.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location">選擇分類:</label>
+                            <select id="location" class="form-control" v-model="selectedLocationCategoryName">
+                                <option id="deleteAllLocation">全選</option>
+                                <option v-for="location in locationCategories" :key="location.id" :value="location.id">
+                                    {{ location.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">移除</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
 
 <!-- Include this script section in your view where you already have your other scripts -->
@@ -199,16 +231,39 @@
                     newCategoryColor: '',
                     newCategoryIcon: 'fa-solid fa-bowl-food', // 初始選中的圖示
                     icons: [
-                        { value: 'fa-solid fa-bowl-food'},
-                        { value: 'fa-solid fa-tree'},
-                        { value: 'fa-solid fa-person-swimming'},
-                        { value: 'fa-solid fa-house'}
-                    ]
+                        { value: 'fa-solid fa-bowl-food' },
+                        { value: 'fa-solid fa-tree' },
+                        { value: 'fa-solid fa-person-swimming' },
+                        { value: 'fa-solid fa-house' }
+                    ],
+                    selectedWishlistName: null,
+                    selectedLocationCategoryName: null,
+                    locationCategories: [],
+                    allLocationCategories: []
                 };
             },
             async mounted() {
                 console.log('Vue instance mounted!');
                 await this.fetchWishlists();
+                //await this.fetchAllLocationCategories();
+                const userId = getUserIdFromToken();
+                console.log('User ID:', userId);
+
+                const uri = `${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`;
+                axios.get(uri).then(response => {
+                    console.log('Response data:', response.data);
+
+                    this.wishlists = response.data.map(wishlist => ({
+                        id: wishlist.id,
+                        name: wishlist.name
+                    }));
+
+                    this.allLocationCategories = response.data.flatMap(wishlist => wishlist.locationCategories);
+
+                    this.locationCategories = [];
+                }).catch(error => {
+                    console.error('Error loading data:', error);
+                });
             },
             methods: {
                 async fetchWishlists() {
@@ -297,6 +352,7 @@
                         return null;
                     }
                 },
+                //新增願望清單及標籤
                 async createWishlistWithCategory() {
                     const userId = getUserIdFromToken();
                     if (!userId) {
@@ -339,7 +395,50 @@
                             console.error('Error message:', error.message);
                         }
                     }
-                }
+                },
+                //刪除
+                async deleteWishlistWithCategory() {
+                    const userId = getUserIdFromToken();
+                    if (!userId) {
+                        console.error('User ID not found');
+                        return;
+                    }
+
+                    try {
+                        // Create Wishlist
+                        const selectedWishlist = { id: this.wishlist.id, userId: userId, name: this.selectedWishlistName };
+                        const wishlistResponse = await axios.post(`${baseAddress}/api/Wishlist/DeleteWishlist/${this.selectedWishlist.id}`, selectedWishlist);
+                        const deleteWishlist = wishlistResponse.data;
+
+                        console.log("Delete data:",deleteWishlist);
+
+                        const selectedLocationCategory = { id: this.locationCategories.id, userId: userId, name: this.selectedLocationCategoryName };
+                        const categoryResponse = await axios.post(`${baseAddress}/api/Wishlist/DeleteLocationCategory/${this.selectedLocationCategoryName.id}`, selectedLocationCategoryName);
+                        const deleteLocationCategory = categoryResponse.data;
+                        console.log('delete LocationCategory:', deleteLocationCategory);
+
+
+                        // Fetch updated wishlists
+                        await this.fetchWishlists();
+
+                    } catch (error) {
+                            console.error('Error message:', error.message);
+                    }
+                },
+                changeOption: function () {
+                    this.filterLocationCategories();
+                },
+                filterLocationCategories: function () {
+                    if (this.selectedWishlistName !== null) {
+                        // 根據選擇的願望清單過濾分類
+                        this.locationCategories = this.allLocationCategories.filter(category => {
+                            return category.wishlistId === this.selectedWishlistName;
+                        });
+                    } else {
+                        // 沒有選擇清單時，保持分類為空
+                        this.locationCategories = [];
+                    }
+                },
             }
         };
         Vue.createApp(vueApp).mount('#appSidebar');

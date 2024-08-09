@@ -1,6 +1,6 @@
-﻿namespace PinPinServer.DTO
+﻿namespace PinPinServer.Models.DTO
 {
-    public class ScheduleGroupsDTO 
+    public class ScheduleGroupsDTO
     {
         //WEI
         public int Id { get; set; }
