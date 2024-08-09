@@ -15,7 +15,7 @@
         src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUl-h1ooBble_5ATQVVSjSJL0O2F6DHAo&loading=async&callback=initMap">
 </script>
 <script src="~/js/owl.carousel.js" type="text/javascript"></script>
-<script src="~/js/coursescard.js"  type="text/javascript"></script>
+<script src="~/js/coursescard.js" type="text/javascript"></script>
 <script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
 <script src="~/js/authoritytables.js" type="text/javascript"></script>
 
@@ -24,7 +24,7 @@
     <style>
     .btn-custom {
         background-color: #638889;
-        color: #F0F0F0; 
+        color: #F0F0F0;
         width: 100%;
         text-align: center;
     }
@@ -35,21 +35,21 @@
         box-shadow: 0 4px 8px #638889;
     }
 
-    .edit_btn{
-        z-index:1500;
+    .edit_btn {
+        z-index: 1500;
         text-decoration: none;
     }
 
     #createbtn, #newschbtn, #authright_save, #authright_cancel, #invite_btn {
-    background: #638889;
-    color: #F0F0F0;
+        background: #638889;
+        color: #F0F0F0;
     }
 
-    #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
-    background: #F0F0F0;
-    color: #638889;
-    border-bottom: 1px solid #7B7B7B;
-    }
+        #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
+            background: #F0F0F0;
+            color: #638889;
+            border-bottom: 1px solid #7B7B7B;
+        }
 
     .pac-container {
         z-index: 9999 !important;
@@ -58,7 +58,7 @@
     .air-datepicker {
         z-index: 9999 !important;
         background-color: #f8f9fa;
-        border: 1px solid #ced4da; 
+        border: 1px solid #ced4da;
     }
 
     #addnewcard {
@@ -71,15 +71,15 @@
         border-radius: 6px;
     }
 
-    #addnewcard img {
-        width: 150px;
-        height: 255px;
-        object-fit: cover;
-    }
+        #addnewcard img {
+            width: 150px;
+            height: 255px;
+            object-fit: cover;
+        }
 
-    #addnewcard:hover {
-        box-shadow: 0 4px 8px #638889;
-    }
+        #addnewcard:hover {
+            box-shadow: 0 4px 8px #638889;
+        }
 
     .header_search_container input {
         margin-right: -3px;
@@ -93,14 +93,14 @@
         display: block;
         text-decoration: none;
         color: inherit;
-        transition: all 0.3s ease; 
-        z-index:9999;
+        transition: all 0.3s ease;
+        z-index: 9999;
     }
 
-    .course_card_link:hover {
-        box-shadow: 0px 8px 8px #638889; 
-        border-radius: 14px;
-    }
+        .course_card_link:hover {
+            box-shadow: 0px 8px 8px #638889;
+            border-radius: 14px;
+        }
 
     .swal2-popup .swal2-cancel {
         color: #758694 !important;
@@ -113,12 +113,12 @@
             align-items: center;
     }
 
-    .modal-footer .row {
-        align-items: center;
-    }
+        .modal-footer .row {
+            align-items: center;
+        }
 
     #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
-    display:none;
+        display: none;
     }
 
     #schedule-authority-table td th {
@@ -137,9 +137,9 @@
         display: flex !important;
     }
 
-    .owl-carousel .owl-dots.disabled {
-        display: flex !important;
-    }
+        .owl-carousel .owl-dots.disabled {
+            display: flex !important;
+        }
 
     .owl-dots {
         justify-content: center;
@@ -208,21 +208,21 @@
 
 <div class="container">
     @*#region 新增行程btn *@
-        <div class="container search_container pb-1">
+    <div class="container search_container pb-1">
         <div class="row">
             <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
                 <div class="header_search_container position-relative">
-                        <div class="d-flex flex-row justify-content-end">
-                            <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
-                                新增行程
-                            </button>
-                        </div>
+                    <div class="d-flex flex-row justify-content-end">
+                        <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
+                            新增行程
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     @*#endregion*@
-            
+
     @*#region 顯示schedule*@
     <div class="row">
         @*tabs*@
@@ -348,41 +348,41 @@
     </div>
     @*#endregion*@
 
-    @*#region 成員管理Modal*@
-    <div class="modal fade" id="scheduleauthority_modal" tabindex="-1" aria-labelledby="scheduleauthority_modal" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header  d-flex justify-content-between">
-                    <p class="modal-title">權限設定</p>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+@*#region 成員管理Modal*@
+<div class="modal fade" id="scheduleauthority_modal" tabindex="-1" aria-labelledby="scheduleauthority_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header  d-flex justify-content-between">
+                <p class="modal-title">權限設定</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
                 <table class="table table-bordered-buttom table-bordered-light" id="schedule-authority-table">
-                        <thead>
-                            <tr>
-                                <th style="text-align:center; vertical-align: middle;">成員</th>
-                                <th data-id="1" style="text-align:center; vertical-align: middle;">行程<br />僅檢視</th>
-                                <th data-id="2" style="text-align:center; vertical-align: middle;">行程<br />可編輯</th>
-                                <th data-id="5" style="text-align:center; vertical-align: middle;">群組<br />邀請成員</th>
-                                <th data-id="3" style="text-align:center; vertical-align: middle;">群組<br />移除成員</th>
-                                <th data-id="6" style="text-align:center; vertical-align: middle;">聊天室<br />發起投票</th>
-                                <th data-id="4" style="text-align:center; vertical-align: middle;">聊天室<br />禁止他人發言</th>
-                                <th data-id="7" style="text-align:center; vertical-align: middle;">聊天室<br />刪除訊息</th>
-                            </tr>
-                        </thead>
-                        <tbody id="authoritytable">
-                                <!--foreach userid authright tables-->
-                        </tbody>
-                    </table>
-                    <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-sm" id="authright_save">修改</button>
-                        <button class="btn btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
-                    </div>
+                    <thead>
+                        <tr>
+                            <th style="text-align:center; vertical-align: middle;">成員</th>
+                            <th data-id="1" style="text-align:center; vertical-align: middle;">行程<br />僅檢視</th>
+                            <th data-id="2" style="text-align:center; vertical-align: middle;">行程<br />可編輯</th>
+                            <th data-id="5" style="text-align:center; vertical-align: middle;">群組<br />邀請成員</th>
+                            <th data-id="3" style="text-align:center; vertical-align: middle;">群組<br />移除成員</th>
+                            <th data-id="6" style="text-align:center; vertical-align: middle;">聊天室<br />發起投票</th>
+                            <th data-id="4" style="text-align:center; vertical-align: middle;">聊天室<br />禁止他人發言</th>
+                            <th data-id="7" style="text-align:center; vertical-align: middle;">聊天室<br />刪除訊息</th>
+                        </tr>
+                    </thead>
+                    <tbody id="authoritytable">
+                        <!--foreach userid authright tables-->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button class="btn btn-sm" id="authright_save">修改</button>
+                    <button class="btn btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
                 </div>
             </div>
         </div>
     </div>
-    @*#endregion*@
+</div>
+@*#endregion*@
 
     @*#region 邀請成員Modal*@
     <div class="modal fade" id="invitemember_modal" tabindex="-1" aria-labelledby="invitemember_modal" aria-hidden="true">
@@ -409,22 +409,22 @@
     </div>
     @*#endregion*@
 
-    @*#region 查看成員*@
-    <div class="modal fade" id="groupmembers_modal" tabindex="-1" aria-labelledby="groupmembers_modal"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header  d-flex justify-content-between">
-                    <p class="modal-title">權限設定</p>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!--foreach in modalbody-->
-                </div>
+@*#region 查看成員*@
+<div class="modal fade" id="groupmembers_modal" tabindex="-1" aria-labelledby="groupmembers_modal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header  d-flex justify-content-between">
+                <p class="modal-title">權限設定</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!--foreach in modalbody-->
             </div>
         </div>
     </div>
-    @*#endregion*@
+</div>
+@*#endregion*@
 
 <!-- Scripts-->
 <script>

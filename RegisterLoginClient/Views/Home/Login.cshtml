@@ -21,7 +21,6 @@
 @section Scripts
 {
     <script>
-        var baseAddress = "https://localhost:7280"; // 注意結尾沒有斜線!
         $("#Login").on("click", async function () {
             const email = $("#email").val();
             const password = $("#password").val();
@@ -44,9 +43,9 @@
                     title: "登入成功!",
                     //text: "You clicked the button!",
                     icon: "success"
-                }).then(c => { 
-                
-                window.location.href = '/Home/Index';
+                }).then(c => {
+                    //用Razo渲染正確的Url
+                    window.location.href = '@Url.Action("Index", "Home")';
                 });
                 //alert(JSON.stringify(data));///
             } else {

@@ -1,8 +1,77 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@section Styles {
+    <link href="~/css/animate.css" rel="stylesheet" />
+    <style>
+        .hero-section {
+            height: calc(100vh - 88px);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+        }
+
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: url("images/3.1.jpg");
+                background-size: cover;
+                background-position: center;
+                z-index: 0;
+                animation: zoomIn 20s infinite;
+            }
+
+            .hero-section::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1;
+            }
+
+            .hero-section > div {
+                position: relative;
+                z-index: 2;
+            }
+
+            .hero-section .btn {
+                margin: 0 10px;
+            }
+
+
+        @@keyframes zoomIn {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<main class="hero-section">
+    <div>
+        <h1 class="fs-1 fw-bold">將自己的腳印銘刻在世界</h1>
+        <p class="fs-5">
+            當你在世界各地留下足跡，不只是旅行，而是在編織屬於自己的冒險故事。探索未知，發現美麗，讓每一步都成為難忘的回憶。
+        </p>
+        <div>
+            <a href="#" class="btn btn-success btn-lg">開始規劃</a>
+            <a href="#" class="btn btn-success btn-lg">搜尋景點</a>
+        </div>
+    </div>
+</main>
