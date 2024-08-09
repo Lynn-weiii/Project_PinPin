@@ -3,7 +3,6 @@ function createCourseCard(course, isGroup = false) {
     var courseItem = document.createElement('div');
     courseItem.className = 'item course_card_owl_item';
     var picture = course.picture ? course.picture : '/images/course/course_01.jpg';
-    var detailsUrl = `https://localhost:7215/Schdules/ScduleDetials/${course.id}`;
     courseItem.innerHTML = `    
     <div class="course_card">
     <div class="course_card_container">
@@ -20,7 +19,7 @@ function createCourseCard(course, isGroup = false) {
                     </ul>
                 </div>
             </div>            
-                <a href="${detailsUrl}" type="buttom" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}">
+                <a type="buttom" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}">
                 <div class="course_card_pic">
                     <img src="${picture}" style="width:430px;height:286px">
                 </div>

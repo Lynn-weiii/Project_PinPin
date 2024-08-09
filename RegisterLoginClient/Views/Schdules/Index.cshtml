@@ -300,6 +300,7 @@
         
     </div>
     @*#endregion*@
+</div>
             
     @*#region 新增行程Modal*@
     <div class="modal fade" id="newschdule" tabindex="-1" aria-labelledby="newschduleLabel" aria-hidden="true">
@@ -468,7 +469,8 @@ $(document).ready(async function () {
             //#region 旅遊群組loading
             if (schedulesGroupResponse.status === 401) {
                 $('#result_container').hide();
-                alert('gologin');
+                alert('需登入才能使用行程規劃功能');
+                window.location.href = url;
                 return;
             } else if (schedulesGroupResponse.status === 204) {
                 $('#gcourse-container').show();
@@ -505,10 +507,9 @@ $(document).ready(async function () {
             var fun = $(this).data('fun');
             var editId = $(this).data('id');
             if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
-                alert(`$Fun_${fun}:Id$_${editId}`);
-                console.log(`$Fun_${fun}:Id$_${editId}`);
-                    window.location.href = `/Schdules/ScduleDetials/${course.id}`;
-            }
+                    var url = '@Url.Action("ScduleDetials", "Schdules")' + '?id=' + editId;
+                    window.location.href = url;
+                }
             alert('go schedule detail');
         });
         //#endregion

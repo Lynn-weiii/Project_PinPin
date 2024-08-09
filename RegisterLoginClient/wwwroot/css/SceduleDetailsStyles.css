@@ -1,0 +1,51 @@
+﻿/******************/
+
+/*****************/
+.fixed-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    /* 將 right 改為 left */
+    z-index: 1000;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .fixed-button:hover {
+        background-color: #0056b3;
+    }
+
+/* 針對大於等於 998px 的設備 */
+@media (min-width: 997.98px) {
+    .row-cols-md-2 {
+        display: flex;
+        height: 100vh; /* 高度滿版 */
+    }
+
+    #plannertable {
+        flex: 0 0 30%; /* 佔據 30% */
+        max-width: 30%;
+        box-sizing: border-box; /* 包含邊距和邊框 */
+    }
+
+    #map {
+        flex: 0 0 70%; /* 佔據 70% */
+        max-width: 70%;
+        box-sizing: border-box; /* 包含邊距和邊框 */
+    }
+}
+
+/* 針對小於 998px 的設備 */
+@media (max-width: 997.98px) {
+    #map {
+        display: none; /* 隱藏地圖 */
+    }
+
+    #plannertable {
+        width: 100%; /* 行程表寬度滿版 */
+    }
+}
