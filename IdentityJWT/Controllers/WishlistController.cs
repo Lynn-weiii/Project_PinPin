@@ -208,6 +208,10 @@ namespace PinPinServer.Controllers
             {
                 return NotFound();
             }
+            // 刪除相關的wishlistDetail
+            var relatedLocationCategory = _context.LocationCategories
+                .Where(category => category.WishlistId == id);
+            _context.LocationCategories.RemoveRange(relatedLocationCategory);
 
             _context.Wishlists.Remove(wishlist);
             await _context.SaveChangesAsync();
@@ -304,10 +308,16 @@ namespace PinPinServer.Controllers
                 return NotFound();
             }
 
+            // 刪除相關的wishlistDetail
+            var relatedWishlistDetails = _context.WishlistDetails
+                .Where(detail => detail.LocationCategoryId == id);
+            _context.WishlistDetails.RemoveRange(relatedWishlistDetails);
+
+            // 刪除locationCategory
             _context.LocationCategories.Remove(locationCategory);
             await _context.SaveChangesAsync();
 
-            return Content("標籤刪除成功!");
+            return Content("標籤及相關項目刪除成功!");
         }
 
 
