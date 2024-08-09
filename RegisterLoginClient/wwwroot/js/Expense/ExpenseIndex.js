@@ -10,7 +10,7 @@ const modalContainerId = 'modal-container';
 */
 
 $(function () {
-    $(`#${bottonId}`).on("click", async function () {
+    $(`#${ExpenseBtnId}`).on("click", async function () {
         $(`#${modalContainerId}`).empty();
 
         try {
