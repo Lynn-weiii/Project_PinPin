@@ -462,6 +462,14 @@ export function initExpenseModal() {
             confirmButtonText: "OK!",
           });
         } else {
+          let response = await axios.delete(
+            `${baseAddress}/api/SplitExpenses/DeleteExpense${editExpenseId.value}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           putExpense();
         }
       };
