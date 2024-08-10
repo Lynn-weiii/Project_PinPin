@@ -70,15 +70,15 @@
         border-radius: 6px;
     }
 
-        #addnewcard img {
-            width: 150px;
-            height: 255px;
-            object-fit: cover;
-        }
+    #addnewcard img {
+        width: 150px;
+        height: 255px;
+        object-fit: cover;
+    }
 
-        #addnewcard:hover {
-            box-shadow: 0 4px 8px #638889;
-        }
+    #addnewcard:hover {
+        box-shadow: 0 4px 8px #638889;
+    }
 
     .header_search_container input {
         margin-right: -3px;
@@ -105,16 +105,16 @@
         color: #758694 !important;
     }    
 
-        .modal-footer {
-            justify-content: flex-start !important;
-            display: flex !important;
-            width: 100% !important;
-            align-items: center;
+    .modal-footer {
+        justify-content: flex-start !important;
+        display: flex !important;
+        width: 100% !important;
+        align-items: center;
     }
 
-        .modal-footer .row {
-            align-items: center;
-        }
+    .modal-footer .row {
+        align-items: center;
+    }
 
     #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
             display: none;
@@ -460,12 +460,8 @@
                 } else if (mainSchedulesResponse.ok) {
                         $('#course-container').show();
                     var data = await mainSchedulesResponse.json();
-                    if (Array.isArray(data)) {
-                        data.forEach(item => {
-                            console.log(item);
-                        });
+                    if (Array.isArray(data)) {                        
                         renderCourses(data);
-                        console.log(data);
                     }
                 }
                 //#endregion
@@ -547,8 +543,7 @@
                     "PlaceId": place_id,
                     "PictureUrl": picture_url
                 };
-
-                console.log(JSON.stringify(body));
+                
                 var response = await fetch(`${baseAddress}/api/Schedules`, {
                     method: "POST",
                     body: JSON.stringify(body),
@@ -593,33 +588,27 @@
             switch (fun) {
                 // Main
                 case 'MemberManager':
-                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
                     await handleMemberManager(schedule_id);
                     break;
 
                 case 'Delete':
-                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
                     await handleDelete(schedule_id);
                     break;
 
                 case 'InviteMember':
-                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
                     await handleInviteMember(schedule_id);
                     break;
 
                 // group
                 case 'RemoveMemeber':
-                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
                     await ExitGroup(gschedule_id);
                     break;
 
                 case 'Exit':
-                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}_userId:${userId}`);
                     await ExitGroup(gschedule_id, userId);
                     break;
 
                 case 'CheckManager':
-                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
                     await LoadGroupMembers(gschedule_id);
                     break;
 
@@ -640,7 +629,6 @@
                         }
                     });
                     var statusCode = response.status;
-                    console.log('Status Code:', statusCode);
                     if (statusCode === 200) {
                         var data = await response.json();
                         $('#scheduleauthority_modal').modal('show');
@@ -687,7 +675,6 @@
                         var AuthorityCategoryIds = checkedCheckboxes.map(function () {
                             return $(this).data('authority-id');
                         }).get();
-                        console.log(`2.${ScheduleId}`);
 
                         var userData = {
                             'ScheduleId': ScheduleId,
@@ -698,7 +685,6 @@
                         usersData.push(userData);
                     });
 
-                    console.log('所有用戶數據:', JSON.stringify(usersData));
 
                     try {
                         var response = await fetch(`${baseAddress}/api/ScheduleAuthorities/Modified`, {
@@ -927,8 +913,6 @@
                         });
 
                         var responseData = await response.json();
-                        console.log(response.status);
-                        console.log(responseData);
 
                         if (response.status === 200) {                               
                             await Swal.fire({
@@ -954,7 +938,7 @@
                         }
                     }
                     catch (error) {
-                        console.log('捕获错误:', error);
+                        console.log('錯誤:', error);
                         Swal.fire({
                             title: '請再重新試一次!',
                             icon: "error"
