@@ -96,7 +96,7 @@
             </div>
             <!--願望清單內容 end-->
             <div id="chatRoomTab" class="tab-pane fade">
-                @await Html.PartialAsync("../Chatroom/_ChatRoomPartial")
+@*                 @await Html.PartialAsync("../Chatroom/_ChatRoomPartial") *@
                 @* <!--聊天室群組按鈕start-->
                 <div id="groupList" class="list-group">
                 <!-- 群組按鈕將在這裡動態生成 -->
@@ -180,16 +180,9 @@
             </div>
         </div>
     </div>
-    
-</div>
 
-<!-- Include this script section in your view where you already have your other scripts -->
-<script src="https://unpkg.com/vue@3.4.31/dist/vue.global.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"
-        integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</div>
 <script>
-    var baseAddress = "https://localhost:7280"; // Change this to your actual server address
 
     //解密token取得ID
     function base64UrlDecode(base64Url) {
@@ -454,6 +447,4 @@
         };
         Vue.createApp(vueApp).mount('#appSidebar');
     });
-
-
 </script>
