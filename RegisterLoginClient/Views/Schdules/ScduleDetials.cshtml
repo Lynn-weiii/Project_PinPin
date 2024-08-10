@@ -43,7 +43,6 @@
     <div class="container-fluid" style="margin:0; padding:0;">
     <div class="row row-cols-md-2 g-0">
         <div class="col-12 col-md-4 mt-2" id="plannertable">
-            <h1> 行程編號 @scheduleId 的行程</h1>
             <div class="row">
                 <div class="theme-header" id="theme-header" style="background-image: url('https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAelY_Ct5pgodDtRQ2EnddxYbUebpTGO5hQv51XDOe52rzj7pbqfCeaxElbtkTwkqDg-QbUT8ABmkw9tQDq5N1bMTf8MJ7rqevrzjPBFIfBcVqzVntutrminjdKTtbwSkjhkflOwyH8ZLhoUsduybKfURvMwBLLG7ZuAifKZPRuLDzXyhMLHO&3u340&4u255&5m1&2e1&callback=none&r_url=https%3A%2F%2Flocalhost%3A7215%2FSchdules&key=AIzaSyCUl-h1ooBble_5ATQVVSjSJL0O2F6DHAo&token=34971');">
                     <h1 id="theme-name" style="color:red"></h1>
@@ -65,115 +64,113 @@
     </div>
 </div>
 
-    @section Scripts{ 
-        <script>
-            $(document).ready(async function(){
-                LoadScheduleInfo(@scheduleId);
-                //#region initGooglemaps
-                let map;
-                let service;
-                async function initMap(position, placeId) {
-                    const { Map } = await google.maps.importLibrary("maps");
-                    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+@section Scripts {
+    <script>
+        $(document).ready(async function () {
+            LoadScheduleInfo(@scheduleId);
 
-                    map = new Map(document.getElementById("map"), {
-                        center: position,
-                        zoom: 17,
-                        mapTypeId: "roadmap"
+            //#region LoadScheduleInfo
+            async function LoadScheduleInfo(scheduleId) {
+                try {
+                    var response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
                     });
 
-                    service = new google.maps.places.PlacesService(map);
+                    if (response.ok) {
+                        var results = await response.json();
+                        if (results.length > 0) {
+                            var lastResult = results[results.length - 1];
+                            var name = lastResult.name;
+                            var lat = lastResult.lat;
+                            var lng = lastResult.lng;
+                            var placeId = lastResult.placeId;
+                            var position = { lat: lat, lng: lng };
 
-                    if (placeId) {
-                        service.getDetails({ placeId: placeId }, (place, status) => {
-                            if (status === google.maps.places.PlacesServiceStatus.OK) {
-                                const location = place.geometry.location;
-                                map.setCenter(location);
-                                new google.maps.Marker({
-                                    position: location,
-                                    map: map,
-                                    title: place.name
-                                });
+                            document.getElementById('theme-name').innerText = name;
+
+                            if (placeId) {
+                                initMap(null, placeId); // 使用 placeId 初始化地图
+                            } else if (lat && lng) {
+                                initMap(position, null); // 使用 position 初始化地图
                             } else {
-                                console.error('Place details request failed due to ' + status);
-                                if (position) {
-                                    map.setCenter(position);
-                                    new google.maps.Marker({
-                                        position: position,
-                                        map: map,
-                                        title: 'Default Location'
-                                    });
-                                }
+                                console.error('缺少地理位置信息');
+                                alert('地理位置信息不可用');
                             }
-                        });
-                    } else if (position) {
-                        map.setCenter(position);
-                        new google.maps.Marker({
-                            position: position,
-                            map: map,
-                            title: 'Default Location'
-                        });
-                    }
-                }
-                //#endregion
-                //#region LoadScheduleInfo
-                async function LoadScheduleInfo(scheduleId) {
-                    try {
-                        console.log(baseAddress);
-                        console.log(`schID: ${scheduleId}`);
-
-                        var response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            }
-                        });
-
-                        if (response.ok) {
-                            var results = await response.json();
-                            if (results.length > 0) {
-                                var lastResult = results[results.length - 1];
-                                var name = lastResult.name;
-                                var lat = lastResult.lat;
-                                var lng = lastResult.lng;
-                                var placeId = lastResult.placeId;
-                                var position = { lat: lat, lng: lng };
-
-                                document.getElementById('theme-name').innerText = name;
-
-                                if (placeId) {
-                                    initMap(null, placeId); // 使用 placeId 初始化地图
-                                } else {
-                                    initMap(position, null); // 使用 position 初始化地图
-                                }
-
-                            } else {
-                                document.getElementById('theme-name').innerText = 'No data available';
-                            }
-                        } else if (response.status === 204) {
-                            alert('無法找到相關日程資訊!');
-                        } else if (response.status === 401) {
-                            alert('請重新登入再使用功能!');
-                            goToLoginPage();
-                            return;
                         } else {
-                            // Handle other errors
-                            const errorResult = await response.json();
-                            alert(errorResult.message || 'An error occurred');
+                            document.getElementById('theme-name').innerText = 'No data available';
                         }
-                    } catch (error) {
-                        alert('伺服器錯誤，請稍後再試'); // Catch server errors
-                        console.log(error.message); // Log error message to console
+                    } else if (response.status === 204) {
+                        alert('無法找到相關日程資訊!');
+                    } else if (response.status === 401) {
+                        alert('請重新登入再使用功能!');
+                        goToLoginPage();
+                        return;
+                    } else {
+                        const errorResult = await response.json();
+                        alert(errorResult.message || 'An error occurred');
                     }
+                } catch (error) {
+                    alert('伺服器錯誤，請稍後再試');
+                    console.log(error.message);
                 }
-                //#endregion
-                const scheduleId = new URLSearchParams(window.location.search).get('scheduleId');
-                if (scheduleId) {
-                    LoadScheduleInfo(scheduleId);
+            }
+            //#endregion
+
+            //#region initGooglemaps
+            let map;
+            let service;
+
+            async function initMap(position, placeId) {
+                const { Map } = await google.maps.importLibrary("maps");
+                const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+
+                map = new Map(document.getElementById("map"), {
+                    center: position || { lat: 0, lng: 0 }, // 如果沒有 position, 設置默認值
+                    zoom: 17,
+                    mapTypeId: "roadmap"
+                });
+
+                service = new google.maps.places.PlacesService(map);
+
+                if (placeId) {
+                    service.getDetails({ placeId: placeId }, (place, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            const location = place.geometry.location;
+                            map.setCenter(location);
+                            new AdvancedMarkerElement({
+                                map: map,
+                                position: location.toJSON(),
+                                title: place.name
+                            });
+                        } else {
+                            console.error('Place details request failed due to ' + status);
+                            if (position) {
+                                map.setCenter(position);
+                                new AdvancedMarkerElement({
+                                    map: map,
+                                    position: position,
+                                    title: 'Default Location'
+                                });
+                            }
+                        }
+                    });
+                } else if (position) {
+                    map.setCenter(position);
+                    new AdvancedMarkerElement({
+                        map: map,
+                        position: position,
+                        title: 'Default Location'
+                    });
                 }
-            });
-        </script>
-    }
+            }
+            //#endregion
+
+        });
+    </script>
+}
 
 
