@@ -399,7 +399,7 @@ namespace PinPinServer.Controllers
         }
         #endregion
 
-        #region 待確認是不是還要保留 2024/8/8
+        #region 回傳與這個使用者有關的行程表 型態Dictionary<int, string>>
         //GET:api/schedules/GetRelatedSchedules
         //GET資料回傳為Dictionary<ScheduleId,ScheduleName>
         [HttpGet("GetRelatedSchedules")]
