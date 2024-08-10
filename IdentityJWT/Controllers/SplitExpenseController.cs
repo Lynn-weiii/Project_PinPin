@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PinPinServer.Models;
 using PinPinServer.Models.DTO;
+using PinPinServer.Models.DTO.Expense;
 using PinPinServer.Services;
 
 namespace PinPinServer.Controllers
