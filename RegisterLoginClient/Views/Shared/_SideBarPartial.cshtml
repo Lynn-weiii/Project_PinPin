@@ -300,7 +300,7 @@
                 },
                 async fetchDetailsForCategory(wishlist, locationCategoryId) {
                     const details = wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === locationCategoryId);
-
+                    //若尚無行程，提示用戶
                     for (const detail of details) {
                         if (detail.googlePlaceId) {
                             try {
@@ -407,7 +407,7 @@
                         }
                     }
                 },
-                //刪除
+                //刪除願望清單及標籤
                 async deleteWishlistWithCategory() {
                     const userId = getUserIdFromToken();
                     if (!userId) {
@@ -417,10 +417,12 @@
 
                     try {
                         if (this.selectedLocationCategoryId === "deleteAllLocation") {
+                            //提示用戶刪除清單會連動刪除標籤及行程
                             // 刪除整個願望清單及其所有標籤
                             await axios.delete(`${baseAddress}/api/Wishlist/DeleteWishlist/${this.selectedWishlistId}`);
                             console.log("願望清單及其所有標籤已刪除!");
                         } else {
+                            //提示用戶會連動刪除行程
                             // 刪除選定的標籤
                             await axios.delete(`${baseAddress}/api/Wishlist/DeleteLocationCategory/${this.selectedLocationCategoryId}`);
                             console.log("選定標籤已刪除!");
@@ -433,6 +435,7 @@
                         console.error('Error during deletion:', error.message);
                     }
                 },
+                //依選取的願望清單對應標籤
                 changeOption: function () {
                     this.filterLocationCategories();
                 },
