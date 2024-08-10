@@ -575,7 +575,7 @@ $(document).ready(async function () {
             clearModalContent();
         });
 
-        $(document).off('click', '.dropdown-item').on('click', '.dropdown-item', async function (event) {
+            $(document).off('click', '.memberdrop').on('click', '.memberdrop', async function (event) {
             event.preventDefault();
             var fun = $(this).data('fun');
             var sch_name = $(this).data('name');

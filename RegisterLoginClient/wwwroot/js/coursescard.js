@@ -14,9 +14,9 @@ function createCourseCard(course, isGroup = false) {
                         <i class="fa fa-ellipsis"></i>
                     </div>
                     <ul class="dropdown-menu" aria-labelledby="courseDropdown-${course.id}">
-                        <li><a class="dropdown-item" data-fun="MemberManager" data-id="${course.id}" onclick="" data-name="${course.name}">成員管理</a></li>
-                        <li><a class="dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>
-                        <li><a class="dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
+                        <li><a class="memberdrop dropdown-item"  data-fun="MemberManager" data-id="${course.id}" onclick="" data-name="${course.name}">成員管理</a></li>
+                        <li><a class="memberdrop dropdown-item" data-fun="InviteMember" data-id="${course.id}" data-name="${course.name}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>
+                        <li><a class="memberdrop dropdown-item" data-fun="Delete" data-id="${course.id}" data-name="${course.name}">刪除行程</a></li>
                     </ul>
                 </div>
             </div>            
@@ -62,8 +62,8 @@ function createGroupCourseCard(gcourse) {
                                 <i class="fa fa-ellipsis"></i>
                             </div>
                             <ul class="dropdown-menu" aria-labelledby="courseDropdown-${gcourse.id}">
-                                <li><a class="dropdown-item" data-fun="CheckManager" data-id="${gcourse.id}" data-name="${gcourse.name}">查看成員</a></li>
-                                <li><a class="dropdown-item" data-fun="Exit" data-exitid="${gcourse.userId}" data-name="${gcourse.name}">離開</a></li>
+                                <li><a class="memberdrop dropdown-item" data-fun="CheckManager" data-id="${gcourse.id}" data-name="${gcourse.name}">查看成員</a></li>
+                                <li><a class="memberdrop dropdown-item" data-fun="Exit" data-exitid="${gcourse.userId}" data-name="${gcourse.name}">離開</a></li>
                             </ul>
                         </div>
                     </div>
