@@ -1,0 +1,468 @@
+﻿@section Styles {
+    <style>
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .map-details {
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .map-details-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1a73e8;
+        }
+
+        .map-details-address {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .map-details-rating {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .map-details-hours {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .map-details-reviews-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .map-details-reviews {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .map-details-review {
+            background-color: #f1f3f4;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+            .map-details-review strong {
+                color: #1a73e8;
+            }
+    </style>
+}
+<meta charset="UTF-8">
+<title>搜尋景點</title>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">搜尋景點</h1>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+        </div>
+        <input type="text" id="searchCity" class="form-control" placeholder="想去哪裡玩?">
+        <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+        </div>
+        <input type="text" id="searchKeyword" class="form-control" placeholder="吃、喝、玩、樂，立即搜尋!">
+        <div class="input-group-append">
+            <button class="btn btn-mantis" type="button" onclick="search()">
+                <i class="fas fa-search"></i> 搜尋
+            </button>
+        </div>
+    </div>
+    <div id="results" class="row"></div>
+
+    <!-- Button trigger modal -->
+    <!-- 詳細資訊Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">詳細資訊</h5>
+                </div>
+                <div class="modal-body">
+                    <div id="detailContent">
+                        <p>載入地點詳細資訊</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-earth-yellow" data-bs-dismiss="modal"><i class="fas fa-times"></i> 關閉</button>
+                    <button type="button" class="btn btn-mantis wishlists"><i class="fas fa-heart"></i> 加入願望清單</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--願望清單Modal-->
+    <div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="wishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="app2">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="wishlistModalLabel">願望清單</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form id="wishlistForm">
+                            <div class="form-group">
+                                <label for="wishlist">選擇清單:</label>
+                                <select id="wishlist" class="form-control" v-model="selectedWishlist" v-on:change="changeOption">
+                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                        {{ wishlist.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="location">選擇分類:</label>
+                                <select id="location" class="form-control" v-model="selectedLocationCategory">
+                                    <option v-for="location in locationCategories" :key="location.id" :value="location.id">
+                                        {{ location.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-earth-yellow" data-bs-dismiss="modal">取消</button>
+                        <button id="addwishlist" type="submit" class="btn btn-mantis wishlists" v-on:click="addWishlistDetail">加入</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+
+        async function search() {
+            const searchCity = document.getElementById('searchCity').value;
+            const searchKeyword = document.getElementById('searchKeyword').value;
+
+            if (searchCity) {
+                try {
+                    let queries = [];
+
+                    if (searchKeyword) {
+                        const keywordQuery = `${searchCity} ${searchKeyword}`;
+                        queries.push(axios.get(`${baseAddress}/api/SearchSpots/search`, { params: { query: keywordQuery } }));
+                    } else {
+                        const foodQuery = `${searchCity} 美食`;
+                        const attractionsQuery = `${searchCity} 景點`;
+                        const activitiesQuery = `${searchCity} 行程`;
+                        queries.push(
+                            axios.get(`${baseAddress}/api/SearchSpots/search`, { params: { query: foodQuery } }),
+                            axios.get(`${baseAddress}/api/SearchSpots/search`, { params: { query: attractionsQuery } }),
+                            axios.get(`${baseAddress}/api/SearchSpots/search`, { params: { query: activitiesQuery } })
+                        );
+                    }
+
+                    const responses = await Promise.all(queries);
+
+                    const resultsContainer = document.getElementById('results');
+                    resultsContainer.innerHTML = '';
+
+                    function processResults(results, limit) {
+                        if (Array.isArray(results)) {
+                            results.sort((a, b) => b.user_ratings_total - a.user_ratings_total);
+                            return limit ? results.slice(0, limit) : results;
+                        } else {
+                            console.error('data.results 不是數組');
+                            return [];
+                        }
+                    }
+
+                    let allResults = [];
+
+                    if (searchKeyword) {
+                        const keywordData = responses[0].data;
+                        const sortedKeywordResults = processResults(keywordData.results);
+                        allResults = sortedKeywordResults;
+                        await displayResults(sortedKeywordResults, `搜尋結果 (${searchKeyword})`, searchCity);
+                    } else {
+                        const foodData = responses[0].data;
+                        const attractionsData = responses[1].data;
+                        const activitiesData = responses[2].data;
+
+                        const topFoodResult = processResults(foodData.results, 3);
+                        const topAttractionResults = processResults(attractionsData.results, 3);
+                        const topActivitiesResults = processResults(activitiesData.results, 3);
+
+                        allResults = [...topFoodResult, ...topAttractionResults, ...topActivitiesResults];
+
+                        await displayResults(topFoodResult, '美食', searchCity);
+                        await displayResults(topAttractionResults, '景點', searchCity);
+                        await displayResults(topActivitiesResults, '體驗', searchCity);
+                    }
+                    // 將所有結果存儲在全局變量 allPlaces 中
+                    allPlaces = allResults;
+                    console.log('All Places:', allPlaces);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            } else {
+                console.error('請輸入城市名稱');
+            }
+        }
+
+        //取得地點照片
+        async function getPhotoUrl(photoReference) {
+            try {
+                const response = await axios.get(`${baseAddress}/api/SearchSpots/GetPhoto`, {
+                    params: {
+                        photoReference: photoReference
+                    }
+                });
+                return response.data.url;
+            } catch (error) {
+                console.error('Error:', error);
+                return '';
+            }
+        }
+
+        // 定義 getSelectedPlace 方法
+        let selectedPlaceData = null; // 用於存儲選定的地點信息
+
+        function getSelectedPlace() {
+            return selectedPlaceData;
+        }
+
+        let allPlaces = []; // 全局變量，存儲所有加載的地點信息
+
+        function setSelectedPlace(placeId) {
+            console.log('Received Place ID:', placeId);
+            selectedPlaceData = allPlaces.find(place => place.place_id === placeId);
+
+            if (!selectedPlaceData) {
+                console.error('Could not find place with ID:', placeId);
+                // 显示错误提示给用户
+                return;
+            }
+
+            console.log('Selected Place Data:', selectedPlaceData);
+        }
+        //以card形式顯示搜尋結果
+        async function displayResults(sortedResults, category, searchCity) {
+            const resultsContainer = document.getElementById('results');
+            if (sortedResults.length > 0) {
+                resultsContainer.innerHTML += `<h2>${searchCity} ${category}</h2>`;
+                for (const place of sortedResults) {
+                    console.log('Place ID:', place.place_id);
+
+                    let photoUrl = '';
+                    if (place.photos && place.photos.length > 0) {
+                        const photoReference = place.photos[0].photo_reference;
+                        photoUrl = await getPhotoUrl(photoReference);
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'col-md-4 mb-3';
+                    card.innerHTML = `
+                                                        <div class="card">
+                                                            ${photoUrl ? `<img src="${photoUrl}" class="card-img-top" alt="${place.name}">` : '<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="No image available">'}
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">${place.name}</h5>
+                                                                <p class="card-text">${place.formatted_address}</p>
+                                                                <p class="card-text">評價: ${place.rating} (${place.user_ratings_total} reviews)</p>
+                                                                                         <button type="button" class="btn btn-mantis wishlists" data-bs-toggle="modal" data-bs-target="#wishlistModal" onclick="setSelectedPlace('${place.place_id}')"><i class="fa-solid fa-heart"></i></button>
+
+                                                                                        <button type="button" class="btn btn-mantis btnDetail" data-bs-toggle="modal" data-bs-target="#detailModal" data-place-id="${place.place_id}"><i class="fa-solid fa-circle-info"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                    resultsContainer.appendChild(card);
+                }
+                //  <button type="button" class="btn btn-primary wishlists" data-bs-toggle="modal" data-bs-target="#wishlistModal" onclick="setSelectedPlace('${place.place_id}')">加入願望清單</button>
+                // 將加載的地點信息存儲在全局變量 allPlaces 中
+                allPlaces = [...sortedResults];
+                console.log('All Places:', allPlaces); // 調試輸出，檢查 allPlaces
+
+
+                // 為 "詳細資訊" 按鈕添加事件監聽器
+                const detailButtons = document.querySelectorAll('.btnDetail');
+                detailButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const placeId = e.currentTarget.getAttribute('data-place-id');
+                        loadDetails(placeId);
+                    });
+                });
+            }
+        }
+
+        //在user點選地點的[詳細資料]後，以跳出視窗顯示評論、營業時間、價格
+        async function loadDetails(placeId) {
+            console.log(`placeId=${placeId}`);
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = '載入中...';
+
+            try {
+                const response = await axios.get(`${baseAddress}/api/SearchSpots/GetDetails`, {
+                    params: { placeId }
+                });
+
+                console.log('api response', response);
+                const details = response.data.result;
+
+                if (details) {
+                    detailContent.innerHTML = `
+                                                  <div class="map-details">
+                                                  <h5 class="map-details-title">${details.name}</h5>
+                                                  <p class="map-details-address">${details.formatted_address}</p>
+                                                  <p class="map-details-rating">評價: ${details.rating} (${details.user_ratings_total} reviews)</p>
+                                                  <p class="map-details-hours"><strong>營業時間:</strong><br>
+                                                  ${details.opening_hours ? details.opening_hours.weekday_text.join('<br>') : '未提供'}</p>
+                                                   <h6 class="map-details-reviews-title">評論</h6>
+                                                    <ul class="map-details-reviews">
+                                                        ${details.reviews ? details.reviews.map(review => `
+                                                        <li class="map-details-review">
+                                                        <strong>${review.author_name}:</strong> ${review.text}
+                                                        </li> `).join('') : '<li>無評論</li>'}
+                                                    </ul>
+                                                  </div>`;
+                } else {
+                    detailContent.innerHTML = '無法找到此地點的詳細資料。';
+                }
+
+            } catch (error) {
+                console.error('Error fetching details', error);
+                detailContent.innerHTML = '無法加載詳細資料，請稍後再試';
+            }
+        }
+
+        //當user點選[加入願望清單]時，以modal視窗供user選擇要加入的清單。系統載入user所有願望清單，選定願望清單後，系統載入清單項下的所有分類
+        const vueWishlist = {
+            data() {
+                return {
+                    selectedWishlist: null,
+                    selectedLocationCategory: null,
+                    wishlists: [],
+                    locationCategories: [],
+                    allLocationCategories: [],
+                };
+            },
+            methods: {
+                changeOption: function () {
+                    this.filterLocationCategories();
+                },
+                filterLocationCategories: function () {
+                    if (this.selectedWishlist !== null) {
+                        // 根據選擇的願望清單過濾分類
+                        this.locationCategories = this.allLocationCategories.filter(category => {
+                            return category.wishlistId === this.selectedWishlist;
+                        });
+                    } else {
+                        // 沒有選擇清單時，保持分類為空
+                        this.locationCategories = [];
+                    }
+                },
+                addWishlistDetail: function () {
+                    const selectedPlace = getSelectedPlace(); // 获取当前选定的地点信息
+                    if (!selectedPlace) {
+                        console.error('請選擇地點!');
+                        return;
+                    }
+
+                    console.log('Selected Wishlist:', this.selectedWishlist);
+                    console.log('Selected Location Category:', this.selectedLocationCategory);
+                    console.log('Selected Place:', selectedPlace);
+
+                    const wishlistDetail = {
+                        wishlistId: this.selectedWishlist,
+                        locationCategoryId: this.selectedLocationCategory,
+                        locationLng: selectedPlace.geometry.location.lng,
+                        locationLat: selectedPlace.geometry.location.lat,
+                        googlePlaceId: selectedPlace.place_id,
+                        name: selectedPlace.name,
+                        createdAt: new Date()
+                    };
+
+                    axios.post(`${baseAddress}/api/Wishlist/AddtoWishlistDetail`, wishlistDetail)
+                        .then(response => {
+                            console.log('Wishlist detail added:', response.data);
+                            // 顯示成功訊息或進行其他操作
+                            Swal.fire({
+                                title: "已成功加入清單！",
+                                icon: "success"
+                            })
+                        })
+                        .catch(error => {
+                            console.error('Error adding wishlist detail:', error);
+                            Swal.fire({
+                                title: "此行程已存在清單中！",
+                                icon: "error"
+                            })
+                        });
+                }
+            },
+            mounted() {
+                const userId = getUserIdFromToken();
+                console.log('User ID:', userId);
+
+                const uri = `${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`;
+                axios.get(uri).then(response => {
+                    console.log('Response data:', response.data);
+
+                    this.wishlists = response.data.map(wishlist => ({
+                        id: wishlist.id,
+                        name: wishlist.name
+                    }));
+
+                    this.allLocationCategories = response.data.flatMap(wishlist => wishlist.locationCategories);
+
+                    this.locationCategories = [];
+                }).catch(error => {
+                    console.error('Error loading data:', error);
+                });
+            }
+        };
+        Vue.createApp(vueWishlist).mount("#app2");
+
+        /*取得當前用戶ID start*/
+        //處理Base64
+        function base64UrlDecode(base64Url) {
+            // 替換 Base64Url 特有字符
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            // 解碼 Base64 字符串
+            return decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+        }
+        //decode JWT
+        function parseJwt(token) {
+            // 分割 JWT 字符串
+            const parts = token.split('.');
+            if (parts.length !== 3) {
+                throw new Error('Invalid token');
+            }
+
+            // 解碼 payload 部分
+            const payload = parts[1];
+            return JSON.parse(base64UrlDecode(payload));
+        }
+        function getUserIdFromToken() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const decodedToken = parseJwt(token);
+                    return decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']; // 根據實際的 claim 名稱來提取 userId
+                } catch (error) {
+                    console.error('Failed to decode token:', error);
+                }
+            }
+            return null;
+        }
+        /*取得當前用戶ID end*/
+
+        //在user點選地點的[加入願望清單]後，加到DB願望清單中
+    </script>
+}

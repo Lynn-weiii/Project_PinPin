@@ -49,7 +49,12 @@
                 });
                 //alert(JSON.stringify(data));///
             } else {
-                alert('登入失敗');
+                //alert('登入失敗');
+                Swal.fire({
+                    title: "登入失敗!請確認帳號密碼",
+                    //text: "You clicked the button!",
+                    icon: "error"
+                })
             }
         });
     

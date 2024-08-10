@@ -5,10 +5,8 @@ namespace PinPinServer.Models.DTO
     public class LocationCategoryDTO
     {
         public int Id { get; set; }
-
-        public string? Name { get; set; }
-
-        [RegularExpression("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", ErrorMessage = "Invalid color format.")]
-        public string? Color { get; set; }
+        public int WishlistId { get; set; }
+        public string Name { get; set; }
+        public string Color { get; set; }
     }
 }

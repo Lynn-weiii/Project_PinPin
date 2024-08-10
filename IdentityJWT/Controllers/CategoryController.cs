@@ -66,25 +66,22 @@ namespace PinPinTest.Controllers
             }
         }
 
-        //GET:api/category/GetFavorCategory
-        [HttpGet("GetFavorCategory")]
-        public async Task<ActionResult<Dictionary<int, string>>> GetFavorCategory()
+
+        //取得喜好項目
+        //GET:api/category/GetFavorCategories
+        [HttpGet("GetFavorCategories")]
+        public async Task<IActionResult> GetFavorCategories()
         {
-            try
-            {
-                var results = await _context.FavorCategories
-                    .Where(fc => fc.IsDeleted == false)
-                    .ToDictionaryAsync(category => category.Id, category => category.Category);
+            var categories = await _context.FavorCategories
+                .Select(c => new { c.Id, c.Category }).ToListAsync(); // 假设Id和Name是你表中的列
 
-                if (results.Count == 0) return NotFound("category not found");
-
-                return Ok(results);
-            }
-            catch
-            {
-                return StatusCode(500, "A Database error.");
-            }
+            return Ok(categories);
         }
+
+
+
+
+
 
         //-------------------------------CREATE----------------------------------------
 

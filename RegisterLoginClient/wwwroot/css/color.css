@@ -1,0 +1,38 @@
+﻿.mantis {
+    background-color: #7ABA78;
+}
+
+.caramel {
+    background-color: #C38154;
+}
+
+.earth-yellow {
+    background-color: #FFC26F;
+}
+
+.wheat {
+    background-color: #F9E0BB;
+}
+
+/* Custom button colors */
+.btn-mantis {
+    background-color: #7ABA78;
+    color: white;
+}
+
+.btn-caramel {
+    background-color: #C38154;
+    color: white;
+}
+
+.btn-earth-yellow {
+    background-color: #FFC26F;
+    color: white;
+}
+
+.btn-wheat {
+    background-color: #F9E0BB;
+    color: black;
+}
+
+

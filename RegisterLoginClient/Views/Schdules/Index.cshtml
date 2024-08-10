@@ -10,6 +10,7 @@
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
 <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCUl-h1ooBble_5ATQVVSjSJL0O2F6DHAo&loading=async&callback=initMap&region=TW&language=zh-TW">
 </script>
@@ -18,56 +19,56 @@
 <script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
 <script src="~/js/authoritytables.js" type="text/javascript"></script>
 @section Styles{
-    <!-- Styles  -->
+<!-- Styles  -->
     <style>
-        .btn-custom {
-            background-color: #638889;
-            color: #F0F0F0;
-            width: 100%;
-            text-align: center;
-        }
+    .btn-custom {
+        background-color: #638889;
+        color: #F0F0F0; 
+        width: 100%;
+        text-align: center;
+    }
 
 
-        input:hover {
-            border: 1px solid #638889;
-            box-shadow: 0 4px 8px #638889;
-        }
+    input:hover {
+        border: 1px solid #638889;
+        box-shadow: 0 4px 8px #638889;
+    }
 
         .edit_btn {
             z-index: 1500;
-            text-decoration: none;
-        }
+        text-decoration: none;
+    }
 
-        #createbtn, #newschbtn, #authright_save, #authright_cancel, #invite_btn {
-            background: #638889;
-            color: #F0F0F0;
-        }
+    #createbtn, #newschbtn, #authright_save, #authright_cancel, #invite_btn {
+    background: #638889;
+    color: #F0F0F0;
+    }
 
-            #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
-                background: #F0F0F0;
-                color: #638889;
-                border-bottom: 1px solid #7B7B7B;
-            }
+    #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
+    background: #F0F0F0;
+    color: #638889;
+    border-bottom: 1px solid #7B7B7B;
+    }
 
-        .pac-container {
-            z-index: 9999 !important;
-        }
+    .pac-container {
+        z-index: 9999 !important;
+    }
 
-        .air-datepicker {
-            z-index: 9999 !important;
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-        }
+    .air-datepicker {
+        z-index: 9999 !important;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da; 
+    }
 
-        #addnewcard {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 390px;
-            height: 451px;
-            transition: box-shadow 0.3s ease-in-out;
-            border-radius: 6px;
-        }
+    #addnewcard {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 390px;
+        height: 451px;
+        transition: box-shadow 0.3s ease-in-out;
+        border-radius: 6px;
+    }
 
         #addnewcard img {
             width: 150px;
@@ -79,141 +80,149 @@
             box-shadow: 0 4px 8px #638889;
         }
 
-        .header_search_container input {
-            margin-right: -3px;
-        }
+    .header_search_container input {
+        margin-right: -3px;
+    }
 
-        .item course_card_owl_item:hover {
-            box-shadow: 0 4px 8px #638889;
-        }
+    .item course_card_owl_item:hover {
+        box-shadow: 0 4px 8px #638889;
+    }
 
-        .course_card_link {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
+    .course_card_link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease; 
             z-index: 9999;
-        }
+    }
 
         .course_card_link:hover {
             box-shadow: 0px 8px 8px #638889;
             border-radius: 14px;
         }
 
-        .swal2-popup .swal2-cancel {
-            color: #758694 !important;
-        }
+    .swal2-popup .swal2-cancel {
+        color: #758694 !important;
+    }    
 
         .modal-footer {
             justify-content: flex-start !important;
             display: flex !important;
             width: 100% !important;
             align-items: center;
-        }
+    }
 
         .modal-footer .row {
             align-items: center;
         }
 
-        #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
+    #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
             display: none;
-        }
+    }
 
-        #schedule-authority-table td th {
-            font-size: 14px;
-            text-align: center;
-            vertical-align: middle;
-        }
+    #schedule-authority-table td th {
+        font-size: 14px;
+        text-align: center;
+        vertical-align: middle;
+    }
 
-        #schedule-authority-table .form-check {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    #schedule-authority-table .form-check {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        .owl-carousel .owl-dots {
-            display: flex !important;
-        }
+    .owl-carousel .owl-dots {
+        display: flex !important;
+    }
 
-            .owl-carousel .owl-dots.disabled {
-                display: flex !important;
-            }
+    .owl-carousel .owl-dots.disabled {
+        display: flex !important;
+    }
 
-        .owl-dots {
-            justify-content: center;
-            margin-top: 10px;
-        }
+    .owl-dots {
+        justify-content: center;
+        margin-top: 10px;
+    }
 
-        /*#region 查看群組成員modal css*/
-        .member-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: flex-start;
-        }
+    /*#region 查看群組成員modal css*/    
+    .member-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: flex-start;
+    }
 
-        .member-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 10px;
-            border: none;
-            background: transparent;
-        }
+    .member-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+        border: none;
+        background: transparent;
+    }
 
-        .member-photo {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            border-radius: 50%;
-            margin-bottom: 5px;
-        }
+    .member-photo {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 50%;
+        margin-bottom: 5px;
+    }
 
-            .member-photo img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
+    .member-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-        .member-info p {
-            margin: 0;
-            font-size: 12px;
-            color: #638889;
-        }
-        /*#endregion*/
+    .member-info p {
+        margin: 0;
+        font-size: 12px;
+        color: #638889;
+    }
+    /*#endregion*/
 
-        /*查看成員modal css*/
-        #groupmembers_modal .modal-content {
-            background-color: #FCF8F3; /* 设置背景色 */
-        }
-
-        #groupmembers_modal .modal-header h5 {
-            color: #638889;
-            font-size: 12px;
-        }
-
-        #groupmembers_modal .modal-footer .btn {
-            background-color: #638889;
-            color: #FCF8F3;
-            
-            
-        }
-        /*#endregion*/
+    /*查看成員modal css*/
+    #groupmembers_modal .modal-content {
+        background-color: #FCF8F3; /* 设置背景色 */
+    }
+    
+    #groupmembers_modal .modal-header h5 {
+        color: #638889;
+        font-size: 12px;
+    }
+    
+    #groupmembers_modal .modal-footer .btn {
+        background-color: #638889;
+        color: #FCF8F3;
+    }
+    /*#endregion*/
     </style>
 }
 
 
-<div class="container-fluid mt-0 mb-2" style="width: 100%; height:100vh; align-items:center; overflow: hidden;">
-    @*#region 新增行程btn *@       
-    <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
-        新增行程
-    </button>  
+<div class="container">
+    @*#region 新增行程btn *@
+    <div class="container search_container pb-1">
+        <div class="row">
+            <div class="header_right d-flex flex-row align-items-center justify-content-end w-100">
+                <div class="header_search_container position-relative">
+                    <div class="d-flex flex-row justify-content-end">
+                        <button id="newschbtn" type="button" class="btn mt-3" data-bs-toggle="modal" data-bs-target="#newschdule" style="text-align:center;">
+                            新增行程
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     @*#endregion*@
-
+            
     @*#region 顯示schedule*@
     <div class="row" id="showschedule row">
         @*tabs*@
@@ -338,41 +347,41 @@
     </div>
     @*#endregion*@
 
-@*#region 成員管理Modal*@
-<div class="modal fade" id="scheduleauthority_modal" tabindex="-1" aria-labelledby="scheduleauthority_modal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header  d-flex justify-content-between">
-                <p class="modal-title">權限設定</p>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
+    @*#region 成員管理Modal*@
+    <div class="modal fade" id="scheduleauthority_modal" tabindex="-1" aria-labelledby="scheduleauthority_modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header  d-flex justify-content-between">
+                    <p class="modal-title">權限設定</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
                 <table class="table table-bordered-buttom table-bordered-light" id="schedule-authority-table">
-                    <thead>
-                        <tr>
-                            <th style="text-align:center; vertical-align: middle;">成員</th>
-                            <th data-id="1" style="text-align:center; vertical-align: middle;">行程<br />僅檢視</th>
-                            <th data-id="2" style="text-align:center; vertical-align: middle;">行程<br />可編輯</th>
-                            <th data-id="5" style="text-align:center; vertical-align: middle;">群組<br />邀請成員</th>
-                            <th data-id="3" style="text-align:center; vertical-align: middle;">群組<br />移除成員</th>
-                            <th data-id="6" style="text-align:center; vertical-align: middle;">聊天室<br />發起投票</th>
-                            <th data-id="4" style="text-align:center; vertical-align: middle;">聊天室<br />禁止他人發言</th>
-                            <th data-id="7" style="text-align:center; vertical-align: middle;">聊天室<br />刪除訊息</th>
-                        </tr>
-                    </thead>
-                    <tbody id="authoritytable">
-                        <!--foreach userid authright tables-->
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-end mt-3">
-                    <button class="btn btn-sm" id="authright_save">修改</button>
-                    <button class="btn btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
+                        <thead>
+                            <tr>
+                                <th style="text-align:center; vertical-align: middle;">成員</th>
+                                <th data-id="1" style="text-align:center; vertical-align: middle;">行程<br />僅檢視</th>
+                                <th data-id="2" style="text-align:center; vertical-align: middle;">行程<br />可編輯</th>
+                                <th data-id="5" style="text-align:center; vertical-align: middle;">群組<br />邀請成員</th>
+                                <th data-id="3" style="text-align:center; vertical-align: middle;">群組<br />移除成員</th>
+                                <th data-id="6" style="text-align:center; vertical-align: middle;">聊天室<br />發起投票</th>
+                                <th data-id="4" style="text-align:center; vertical-align: middle;">聊天室<br />禁止他人發言</th>
+                                <th data-id="7" style="text-align:center; vertical-align: middle;">聊天室<br />刪除訊息</th>
+                            </tr>
+                        </thead>
+                        <tbody id="authoritytable">
+                                <!--foreach userid authright tables-->
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-sm" id="authright_save">修改</button>
+                        <button class="btn btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@*#endregion*@
+    @*#endregion*@
 
     @*#region 邀請成員Modal*@
     <div class="modal fade" id="invitemember_modal" tabindex="-1" aria-labelledby="invitemember_modal" aria-hidden="true">
@@ -399,22 +408,22 @@
     </div>
     @*#endregion*@
 
-@*#region 查看成員*@
-<div class="modal fade" id="groupmembers_modal" tabindex="-1" aria-labelledby="groupmembers_modal"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header  d-flex justify-content-between">
-                <p class="modal-title">權限設定</p>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!--foreach in modalbody-->
+    @*#region 查看成員*@
+    <div class="modal fade" id="groupmembers_modal" tabindex="-1" aria-labelledby="groupmembers_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header  d-flex justify-content-between">
+                    <p class="modal-title">權限設定</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!--foreach in modalbody-->
+                </div>
             </div>
         </div>
     </div>
-</div>
-@*#endregion*@
+    @*#endregion*@
 
 @section Scripts{
     <!-- Scripts-->
@@ -440,9 +449,9 @@
                 ]);
                 //#endregion
 
-                //#region user創建群組loading
-                if (mainSchedulesResponse.status === 401) {
-                    $('#course-container').hide();
+            //#region user創建群組loading
+            if (mainSchedulesResponse.status === 401) {
+                $('#course-container').hide();
                     goToLoginPage();
                     return;
                 } else if (mainSchedulesResponse.status === 204) {
@@ -492,132 +501,132 @@
             }
             //#endregion
 
-            //#region 切換標籤
-            $('input[name="tabGroup1"]').on('change', function () {
-                $('.popular_courses_slider').trigger('destroy.owl.carousel');
-                initPopularCoursesSlider();
-            });
-            //#endregion
+        //#region 切換標籤
+        $('input[name="tabGroup1"]').on('change', function () {
+            $('.popular_courses_slider').trigger('destroy.owl.carousel');
+            initPopularCoursesSlider();
+        });
+        //#endregion
 
-            //#region 編輯詳細行程
-            $(document).off('click').on('click', '.edit_btn', function (event) {
-                var fun = $(this).data('fun');
-                var editId = $(this).data('id');
-                if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
+        //#region 編輯詳細行程
+        $(document).off('click').on('click', '.edit_btn', function (event) {
+            var fun = $(this).data('fun');
+            var editId = $(this).data('id');
+            if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
                     var url = '@Url.Action("ScduleDetials", "Schdules")' + '?id=' + editId;
                     window.location.href = url;
-                }
-                alert('go schedule detail');
-            });
-            //#endregion
-
-            //#region 新增行程窗口初始化
-            $('#newschdule').on('shown.bs.modal', function () {
-                initMap();
-                initAirDatepicker();
-            });
-            //#endregion
-
-            //#region 新增行程
-            $('#createbtn').on('click', async function () {
-                $('#newschdule').modal('hide');
-                try {
-                    var name = $('#Name').val();
-                    var startTime = $('#el1').val();
-                    var endTime = $('#el2').val();
-                    var lat = $('#Lat').val();
-                    var lng = $('#Lng').val();
-                    var picture_url = $('#picture_url').val();
-                    var place_id = $('#place_id').val();
-                    var body = {
-                        "Name": name,
-                        "StartTime": startTime,
-                        "EndTime": endTime,
-                        "Lat": lat,
-                        "Lng": lng,
-                        "PlaceId": place_id,
-                        "PictureUrl": picture_url
-                    };
-
-                    console.log(JSON.stringify(body));
-                    var response = await fetch(`${baseAddress}/api/Schedules`, {
-                        method: "POST",
-                        body: JSON.stringify(body),
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    await Swal.fire({
-                        icon: "success",
-                        title: '行程已成功新增',
-                        timer: 1500
-                    });
-                    location.reload();
-                } catch (error) {
-                    console.error('Error:', error);
-                }
-            });
-            //#endregion
-
-            //#region cards下拉式選單
-            function clearModalContent() {
-                $('#authoritytable').empty();
             }
+            alert('go schedule detail');
+        });
+        //#endregion
 
-            $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
-                clearModalContent();
-            });
+        //#region 新增行程窗口初始化
+        $('#newschdule').on('shown.bs.modal', function () {
+            initMap();
+            initAirDatepicker();
+        });
+        //#endregion
 
-            $(document).off('click', '.dropdown-item').on('click', '.dropdown-item', async function (event) {
-                event.preventDefault();
-                var fun = $(this).data('fun');
-                var sch_name = $(this).data('name');
-                var schedule_id = $(this).closest('.course_card').find('[data-sche]').data('sche');
-                var userId = $(this).data('exitid');
-                var gschedule_id = $(this).closest('.course_card').find('[data-gsche]').data('gsche');
+        //#region 新增行程
+        $('#createbtn').on('click', async function () {
+            $('#newschdule').modal('hide');
+            try {
+                var name = $('#Name').val();
+                var startTime = $('#el1').val();
+                var endTime = $('#el2').val();
+                var lat = $('#Lat').val();
+                var lng = $('#Lng').val();
+                var picture_url = $('#picture_url').val();
+                var place_id = $('#place_id').val();
+                var body = {
+                    "Name": name,
+                    "StartTime": startTime,
+                    "EndTime": endTime,
+                    "Lat": lat,
+                    "Lng": lng,
+                    "PlaceId": place_id,
+                    "PictureUrl": picture_url
+                };
 
-                switch (fun) {
-                    // Main
-                    case 'MemberManager':
-                        console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
-                        await handleMemberManager(schedule_id);
-                        break;
+                console.log(JSON.stringify(body));
+                var response = await fetch(`${baseAddress}/api/Schedules`, {
+                    method: "POST",
+                    body: JSON.stringify(body),
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                    case 'Delete':
-                        console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
-                        await handleDelete(schedule_id);
-                        break;
-
-                    case 'InviteMember':
-                        console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
-                        await handleInviteMember(schedule_id);
-                        break;
-
-                    // group
-                    case 'RemoveMemeber':
-                        console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
-                        await ExitGroup(gschedule_id);
-                        break;
-
-                    case 'Exit':
-                        console.log(`fun:${fun}_gschedule_id: ${gschedule_id}_userId:${userId}`);
-                        await ExitGroup(gschedule_id, userId);
-                        break;
-
-                    case 'CheckManager':
-                        console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
-                        await LoadGroupMembers(gschedule_id);
-                        break;
-
-                    default:
-                        console.warn(`Unknown function: ${fun}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-            });
+                await Swal.fire({
+                    icon: "success",
+                    title: '行程已成功新增',
+                    timer: 1500
+                });
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+        //#endregion
+
+        //#region cards下拉式選單
+        function clearModalContent() {
+            $('#authoritytable').empty();
+        }
+
+        $('#scheduleauthority_modal').on('hidden.bs.modal', function () {
+            clearModalContent();
+        });
+
+            $(document).off('click', '.memberdrop').on('click', '.memberdrop', async function (event) {
+            event.preventDefault();
+            var fun = $(this).data('fun');
+            var sch_name = $(this).data('name');
+            var schedule_id = $(this).closest('.course_card').find('[data-sche]').data('sche');
+            var userId = $(this).data('exitid');
+            var gschedule_id = $(this).closest('.course_card').find('[data-gsche]').data('gsche');
+
+            switch (fun) {
+                // Main
+                case 'MemberManager':
+                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
+                    await handleMemberManager(schedule_id);
+                    break;
+
+                case 'Delete':
+                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
+                    await handleDelete(schedule_id);
+                    break;
+
+                case 'InviteMember':
+                    console.log(`fun:${fun}/schedule_id: ${schedule_id}`);
+                    await handleInviteMember(schedule_id);
+                    break;
+
+                // group
+                case 'RemoveMemeber':
+                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
+                    await ExitGroup(gschedule_id);
+                    break;
+
+                case 'Exit':
+                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}_userId:${userId}`);
+                    await ExitGroup(gschedule_id, userId);
+                    break;
+
+                case 'CheckManager':
+                    console.log(`fun:${fun}_gschedule_id: ${gschedule_id}`);
+                    await LoadGroupMembers(gschedule_id);
+                    break;
+
+                default:
+                    console.warn(`Unknown function: ${fun}`);
+            }
+        });
             //#region 成員權限管理
             async function handleMemberManager(schedule_id) {
                 //#region 讀成員權限
@@ -703,12 +712,12 @@
 
                         if (response.ok) {
                             var responseData = await response.json();
-                            await Swal.fire({
-                                icon: "success",
-                                title: responseData.message,
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
+                                await Swal.fire({
+                                    icon: "success",
+                                    title: responseData.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
                         } else {
                             Swal.fire({
                                 title: "修改失敗，請再重新修改一次!",
@@ -721,7 +730,7 @@
                             title: "伺服器錯誤，請稍後再試!",
                             icon: "error"
                         });
-                        console.log('錯誤:', error.message);
+                            console.log('錯誤:', error.message);
                     }
                     finally {
                         $('#scheduleauthority_modal').modal('hide');
@@ -748,7 +757,7 @@
 
                         if (response.ok) {
                             $('#scheduleauthority_modal').modal('hide');
-                            var result = await response.json();
+                            var result = await response.json();                                
                             await Swal.fire({
                                 icon: "success",
                                 title: result.message,
@@ -761,7 +770,7 @@
                                 title: "Error",
                                 html: responseData.message,
                                 icon: "error"
-                            });
+                            });                                
                         }
                     } catch (error) {
                         console.error('請求失敗:', error);
@@ -778,56 +787,56 @@
             //#region 查看成員
             async function LoadGroupMembers(gschedule_id) {
                 try {
-                    $('#groupmembers_modal').modal('show');
-                    var response = await fetch(`${baseAddress}/api/ScheduleGroups/GetGroupsMembers/${gschedule_id}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
+                        $('#groupmembers_modal').modal('show');
+                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/GetGroupsMembers/${gschedule_id}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('網路回應不正常');
+                            $('#groupmembers_modal').modal('hide');
                         }
-                    });
 
-                    if (!response.ok) {
-                        throw new Error('網路回應不正常');
-                        $('#groupmembers_modal').modal('hide');
-                    }
+                        if (response.status === 204) {
+                            alert('查無其他成員');
+                            $('#groupmembers_modal').modal('hide');
+                        }
 
-                    if (response.status === 204) {
-                        alert('查無其他成員');
-                        $('#groupmembers_modal').modal('hide');
-                    }
+                        var groupMembers = await response.json();
 
-                    var groupMembers = await response.json();
+                        // 根据 isHost 排序，将 isHost 为 true 的成员放在第一位
+                        groupMembers.sort((a, b) => b.isHost - a.isHost);
 
-                    // 根据 isHost 排序，将 isHost 为 true 的成员放在第一位
-                    groupMembers.sort((a, b) => b.isHost - a.isHost);
+                        var modalBody = document.querySelector('#groupmembers_modal .modal-body');
+                        modalBody.innerHTML = '';
 
-                    var modalBody = document.querySelector('#groupmembers_modal .modal-body');
-                    modalBody.innerHTML = '';
-
-                    var memberHTML = groupMembers.map(member => `
-                                    <div class="member-info">
-                                        <div class="member-photo">
-                                            <img
-                                                src="${member.userPhoto || '/images/userfill.png'}"
-                                                alt="${member.userName}"
-                                                onerror="this.onerror=null;this.src='/images/userfill.png';"
-                                            />
-                                        </div>
-                                        <p>
-                                            ${member.userName}
-                                            ${member.removeauth && member.canremoveid ?
-                            `<a type="button" class="remove-btn" data-removememberid="${member.userId}">
-                                            <i class="fa-solid fa-circle-xmark" style="color: #cf072f;"></i>
-                                            </a>`
-                            : ''}
-                                        </p>
-                                    </div>
-                                `).join('');
-
-                    modalBody.innerHTML = `<div class="member-container">${memberHTML}</div>`;
-                }
-                catch (error) {
+                        var memberHTML = groupMembers.map(member => `
+                            <div class="member-info">
+                                <div class="member-photo">
+                                    <img
+                                        src="${member.userPhoto || '/images/userfill.png'}"
+                                        alt="${member.userName}"
+                                        onerror="this.onerror=null;this.src='/images/userfill.png';"
+                                    />
+                                </div>
+                                <p>
+                                    ${member.userName}
+                                    ${member.removeauth && member.canremoveid ?
+                                    `<a type="button" class="remove-btn" data-removememberid="${member.userId}">
+                                    <i class="fa-solid fa-circle-xmark" style="color: #cf072f;"></i>
+                                    </a>`
+                                    : ''}
+                                </p>
+                            </div>
+                        `).join('');
+                            
+                        modalBody.innerHTML = `<div class="member-container">${memberHTML}</div>`;
+                    } 
+                    catch (error) {
                     $('#groupmembers_modal').modal('hide');
                     console.error('載入成員資料時發生錯誤:', error);
                 }
@@ -840,10 +849,10 @@
                     var result = await Swal.fire({
                         title: "Are you sure?",
                         html: `
-                                您確認要刪除此行程?<br>
-                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
-                                也會一併刪除!
-                            `,
+                        您確認要刪除此行程?<br>
+                        當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                        也會一併刪除!
+                    `,
                         icon: "warning",
                         iconColor: '#E4003A',
                         showCancelButton: true,
@@ -888,7 +897,7 @@
                 $('#checkmail').off('submit').on('submit', async function (event) {
                     event.preventDefault();
                     var Email = document.getElementById('txtMail');
-
+                        
                     if (!Email.checkValidity()) {
                         Swal.fire({
                             title: "Error",
@@ -897,7 +906,7 @@
                         });
                         return;
                     }
-
+                        
                     var checkbox = document.getElementById('defalutauthority');
                     var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
                     try {
@@ -921,7 +930,7 @@
                         console.log(response.status);
                         console.log(responseData);
 
-                        if (response.status === 200) {
+                        if (response.status === 200) {                               
                             await Swal.fire({
                                 icon: "success",
                                 title: responseData.message,
@@ -933,13 +942,13 @@
                             $('.owl-carousel').trigger('stop.owl.autoplay');
                             Swal.fire({
                                 title: responseData.message,
-                                icon: "warning"
+                                icon: "warning"                              
                             });
                         }
                         else {
                             Swal.fire({
                                 title: '請再重新試一次!',
-                                icon: "error"
+                                icon: "error"                               
                             });
                             console.log(responseData.message);
                         }
@@ -969,10 +978,10 @@
                     var result = await Swal.fire({
                         title: "Are you sure?",
                         html: `
-                                        您確認要離開此行程?<br>
-                                        當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
-                                        也會一併刪除!
-                                    `,
+                                您確認要離開此行程?<br>
+                                當您確認刪除時，此行程相關資訊(ex.行程表及聊天室)<br>
+                                也會一併刪除!
+                            `,
                         icon: "warning",
                         iconColor: '#E4003A',
                         showCancelButton: true,
@@ -1021,106 +1030,106 @@
             }
             //#endregion
 
-            //#endregion
+        //#endregion
 
-            //#region Function area
+        //#region Function area
 
-            //#region Google Autocomplete
-            let debounceTimer;
-            function initMap() {
-                var options = {
-                    types: ['geocode'],
-                    fields: ['place_id', 'geometry', 'name', 'photos']
-                };
+        //#region Google Autocomplete
+        let debounceTimer;
+        function initMap() {
+            var options = {
+                types: ['geocode'],
+                fields: ['place_id', 'geometry', 'name', 'photos']
+            };
 
-                var input = $('#search_input')[0];
-                if (input) {
-                    var autocomplete = new google.maps.places.Autocomplete(input, options);
+            var input = $('#search_input')[0];
+            if (input) {
+                var autocomplete = new google.maps.places.Autocomplete(input, options);
 
-                    google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                        let place = autocomplete.getPlace();
-                        if (!place.geometry) {
-                            console.error("No details available for input: '" + place.name + "'");
-                            return;
-                        }
+                google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                    let place = autocomplete.getPlace();
+                    if (!place.geometry) {
+                        console.error("No details available for input: '" + place.name + "'");
+                        return;
+                    }
 
-                        let lat = place.geometry.location.lat();
-                        let lng = place.geometry.location.lng();
-                        let placeId = place.place_id;
+                    let lat = place.geometry.location.lat();
+                    let lng = place.geometry.location.lng();
+                    let placeId = place.place_id;
 
-                        let photos = place.photos;
-                        let photoUrl = '';
-                        if (photos && photos.length > 0) {
-                            photoUrl = photos[0].getUrl({ maxWidth: 340, maxHeight: 255 });
-                        }
+                    let photos = place.photos;
+                    let photoUrl = '';
+                    if (photos && photos.length > 0) {
+                        photoUrl = photos[0].getUrl({ maxWidth: 340, maxHeight: 255 });
+                    }
 
-                        $('#Lat').val(lat);
-                        $('#Lng').val(lng);
-                        $('#place_id').val(placeId);
-                        $('#picture_url').val(photoUrl);
+                    $('#Lat').val(lat);
+                    $('#Lng').val(lng);
+                    $('#place_id').val(placeId);
+                    $('#picture_url').val(photoUrl);
 
-                        console.log('Place ID:', placeId);
-                        console.log('Latitude:', lat);
-                        console.log('Longitude:', lng);
-                        console.log('Photo URL:', photoUrl);
-                    });
+                    console.log('Place ID:', placeId);
+                    console.log('Latitude:', lat);
+                    console.log('Longitude:', lng);
+                    console.log('Photo URL:', photoUrl);
+                });
 
-                    $('#search_input').on('input', function () {
-                        clearTimeout(debounceTimer);
-                        debounceTimer = setTimeout(function () {
-                            google.maps.event.trigger(input, 'focus', {});
-                        }, 500);
-                    });
-                }
+                $('#search_input').on('input', function () {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function () {
+                        google.maps.event.trigger(input, 'focus', {});
+                    }, 500);
+                });
             }
-            //#endregion
+        }
+        //#endregion
 
-            //#region Air Datepicker
-            function initAirDatepicker() {
-                try {
-                    let today = new Date();
-                    let dpMin, dpMax;
-                    dpMin = new AirDatepicker('#el1', {
-                        locale: window.airdatepickerEn,
-                        minDate: today,
-                        dateFormat(date) {
-                            let year = date.getFullYear();
-                            let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                            let day = date.getDate().toString().padStart(2, '0');
-                            return `${year}-${month}-${day}`;
-                        },
-                        autoClose: true,
-                        onSelect({ date }) {
-                            dpMax.update({
-                                minDate: date
-                            });
-                        }
-                    });
+        //#region Air Datepicker
+        function initAirDatepicker() {
+            try {
+                let today = new Date();
+                let dpMin, dpMax;
+                dpMin = new AirDatepicker('#el1', {
+                    locale: window.airdatepickerEn,
+                    minDate: today,
+                    dateFormat(date) {
+                        let year = date.getFullYear();
+                        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        let day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    },
+                    autoClose: true,
+                    onSelect({ date }) {
+                        dpMax.update({
+                            minDate: date
+                        });
+                    }
+                });
 
-                    dpMax = new AirDatepicker('#el2', {
-                        locale: window.airdatepickerEn,
-                        dateFormat(date) {
-                            let year = date.getFullYear();
-                            let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                            let day = date.getDate().toString().padStart(2, '0');
-                            return `${year}-${month}-${day}`;
-                        },
-                        autoClose: true,
-                        onSelect({ date }) {
-                            dpMin.update({
-                                maxDate: date
-                            });
-                        }
-                    });
-                } catch (error) {
-                    console.log(`datepicker error ${error}`);
-                }
+                dpMax = new AirDatepicker('#el2', {
+                    locale: window.airdatepickerEn,
+                    dateFormat(date) {
+                        let year = date.getFullYear();
+                        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        let day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    },
+                    autoClose: true,
+                    onSelect({ date }) {
+                        dpMin.update({
+                            maxDate: date
+                        });
+                    }
+                });
+            } catch (error) {
+                console.log(`datepicker error ${error}`);
             }
-            //#endregion
-
-            //#endregion
-        });
-    </script>
+        }
+        //#endregion
+        
+        //#endregion                
+    });
+</script>
 }
 
 
