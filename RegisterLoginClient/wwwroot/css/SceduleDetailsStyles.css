@@ -49,3 +49,48 @@
         width: 100%; /* 行程表寬度滿版 */
     }
 }
+
+/* 主题名称区 */
+.theme-header {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    height: 200px; /* 根据需要调整高度 */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+    .theme-header h1 {
+        font-size: 2em;
+        margin: 0;
+    }
+
+    .theme-header .weather-info {
+        font-size: 1em;
+        margin: 10px 0;
+    }
+
+    .theme-header .edit-btn {
+        display: none; /* 默认隐藏 */
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+/* 当用户是主办人时显示编辑按钮 */
+.edit-btn.visible {
+    display: inline-block;
+}
+
+/* 轮播区和出发日期区 */
+.carousel-container, .departure-dates {
+    margin-top: 15px;
+}

@@ -21,6 +21,68 @@ namespace PinPinServer.Controllers
             _getUserId = getuserId;
 
         }
+
+        #region 進入edit畫面需要行程資料(userid==jwtuserid || (schdule.userid != jwtuserid && authority == 2 )
+        // GET: api/Schedules/Entereditdetailsch
+        [HttpGet("Entereditdetailsch/{scheduleId}")]
+        public async Task<IActionResult> Entereditdetailsch(int scheduleId)
+        {
+            //IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
+            try
+            {
+                int jwtuserID = _getUserId.PinGetUserId(User).Value;
+                if (jwtuserID == 0)
+                {
+                    return Unauthorized(new { message = "請先登入會員" });
+                }
+                var scheduledetails = await _context.Schedules
+                .Where(s => s.Id == scheduleId)
+                .Include(s => s.User) // 載入 User 關聯
+                .Include(s => s.ScheduleGroups) // 載入 ScheduleGroups 關聯
+                    .ThenInclude(sg => sg.User) // 載入 ScheduleGroups 內的 User 關聯
+                .Include(s => s.ScheduleAuthorities)
+                .Select(s => new ScheduleDTO
+                {
+                    Id = scheduleId,
+                    HostId = s.UserId, // 確保這裡有 UserId
+                    Name = s.Name,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    CreatedAt = s.CreatedAt,
+                    Picture = s.Picture,
+                    PlaceId = s.PlaceId,
+                    lng = s.Lng, // 確保這裡有 Lng 屬性
+                    lat = s.Lat, // 確保這裡有 Lat 屬性
+                    SharedUserIDs = s.ScheduleGroups
+                        .Select(sg => (int?)sg.UserId)
+                        .ToList(),
+                })
+                .ToListAsync();
+
+                if (scheduledetails == null || !scheduledetails.Any())
+                {
+
+                    Console.WriteLine("查無相關紀錄");
+                    return NoContent();
+                }
+
+                return Ok(scheduledetails);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return StatusCode(409, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex}");
+                throw new Exception("伺服器發生錯誤，請稍後再試");
+            }
+
+        }
+        #endregion
+
+
         #region 讀取user自己創的行程
         // GET: api/Schedules/MainSchedules
         [HttpGet("MainSchedules")]
@@ -41,13 +103,16 @@ namespace PinPinServer.Controllers
                 .Select(s => new ScheduleDTO
                 {
                     Id = s.Id,
-                    UserId = s.UserId,
+                    HostId = s.UserId,
                     Name = s.Name,
                     StartTime = s.StartTime,
                     EndTime = s.EndTime,
                     CreatedAt = s.CreatedAt,
                     UserName = s.User.Name,
                     Picture = s.Picture,
+                    PlaceId = s.PlaceId,
+                    lng = s.Lng, // 確保這裡有 Lng 屬性
+                    lat = s.Lat, // 確保這裡有 Lat 屬性
                     SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                     SharedUserNames = s.ScheduleGroups.Select(s => (string?)s.User.Name).Distinct().ToList(),
                 }).ToListAsync();
@@ -96,13 +161,16 @@ namespace PinPinServer.Controllers
                     .Select(s => new ScheduleDTO
                     {
                         Id = s.Id,
+                        HostId = userID,
                         Name = s.Name,
                         StartTime = s.StartTime,
                         EndTime = s.EndTime,
                         CreatedAt = s.CreatedAt,
                         UserName = s.User.Name,
                         Picture = s.Picture,
-                        UserId = userID,
+                        PlaceId = s.PlaceId,
+                        lng = s.Lng, // 確保這裡有 Lng 屬性
+                        lat = s.Lat, // 確保這裡有 Lat 屬性
                         SharedUserIDs = s.ScheduleGroups.Select(sg => (int?)sg.UserId).ToList(),
                         SharedUserNames = s.ScheduleGroups
                             .Where(sg => sg.UserId != userID)
@@ -146,7 +214,7 @@ namespace PinPinServer.Controllers
                         (sch, usr) => new ScheduleDTO
                         {
                             Id = sch.Id,
-                            UserId = sch.UserId,
+                            HostId = sch.UserId,
                             Name = sch.Name,
                             StartTime = sch.StartTime,
                             EndTime = sch.EndTime,
@@ -222,7 +290,35 @@ namespace PinPinServer.Controllers
             {
                 return NotFound();
             }
+
             int userID = _getUserId.PinGetUserId(User).Value;
+
+            decimal? lat = null;
+            decimal? lng = null;
+            if (!string.IsNullOrEmpty(editschDTO.Lat))
+            {
+                if (decimal.TryParse(editschDTO.Lat, out var parsedLat))
+                {
+                    lat = parsedLat;
+                }
+                else
+                {
+                    return BadRequest("Invalid latitude format.");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(editschDTO.Lng))
+            {
+                if (decimal.TryParse(editschDTO.Lng, out var parsedLng))
+                {
+                    lng = parsedLng;
+                }
+                else
+                {
+                    return BadRequest("Invalid longitude format.");
+                }
+            }
+
             var schedule = new Schedule
             {
                 Id = 0,
@@ -231,11 +327,12 @@ namespace PinPinServer.Controllers
                 EndTime = editschDTO.EndTime,
                 CreatedAt = DateTime.Now,
                 UserId = userID,
-                Lng = editschDTO.lng,
-                Lat = editschDTO.lat,
+                Lng = lng,
+                Lat = lat,
                 PlaceId = editschDTO.PlaceId,
                 Picture = editschDTO.Pictureurl,
             };
+
             _context.Schedules.Add(schedule);
             await _context.SaveChangesAsync();
 
@@ -247,9 +344,12 @@ namespace PinPinServer.Controllers
                 UserId = userID,
                 IsHoster = true,
             };
+
+            // 添加 ScheduleGroup 並保存更改
             _context.ScheduleGroups.Add(schedulegroup);
             await _context.SaveChangesAsync();
 
+            // 創建 ScheduleAuthority 物件
             var scheduleAuthority = new ScheduleAuthority
             {
                 Id = 0,
@@ -257,11 +357,14 @@ namespace PinPinServer.Controllers
                 UserId = userID,
                 AuthorityCategoryId = 7
             };
+
+            // 添加 ScheduleAuthority 並保存更改
             _context.ScheduleAuthorities.Add(scheduleAuthority);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(); // 返回成功響應
         }
+
         #endregion
 
         #region 刪除行程主題(user自行創建的)

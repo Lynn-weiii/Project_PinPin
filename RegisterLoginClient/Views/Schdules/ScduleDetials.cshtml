@@ -4,40 +4,175 @@
 }
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script>
-        (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
-        key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
-            v: "weekly",
-            // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
-            // Add other bootstrap parameters as needed, using camel case.
-        });
-    </script>
     <link href="~/css/sceduledetailsstyles.css" rel="stylesheet" />
+    <script>
+    // 加载 Google Maps API
+    (function (g) {
+        var h, a, k, p = "The Google Maps JavaScript API",
+            c = "google",
+            l = "importLibrary",
+            q = "__ib__",
+            m = document,
+            b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+            r = new Set(),
+            e = new URLSearchParams(),
+            u = () => h || (h = new Promise(async (f, n) => {
+                a = m.createElement("script");
+                e.set("libraries", [...r].join(","));
+                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                e.set("callback", c + ".maps." + q);
+                e.set("language", "zh-TW");
+                e.set("region", "TW");
+                a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
+                d[q] = f;
+                a.onerror = () => h = n(Error(p + " could not load."));
+                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                m.head.append(a);
+            }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
+    })({
+        key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
+        v: "weekly",
+        libraries: "places"
+    });
+    </script>
+
 
     <div class="container-fluid" style="margin:0; padding:0;">
-        <div class="row row-cols-md-2 g-0">
-            <div class="col-12 col-md-4 mt-2" id="plannertable">
-                <h1> 行程編號 @scheduleId 的行程</h1>
+    <div class="row row-cols-md-2 g-0">
+        <div class="col-12 col-md-4 mt-2" id="plannertable">
+            <h1> 行程編號 @scheduleId 的行程</h1>
+            <div class="row">
+                <div class="theme-header" id="theme-header" style="background-image: url('https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAelY_Ct5pgodDtRQ2EnddxYbUebpTGO5hQv51XDOe52rzj7pbqfCeaxElbtkTwkqDg-QbUT8ABmkw9tQDq5N1bMTf8MJ7rqevrzjPBFIfBcVqzVntutrminjdKTtbwSkjhkflOwyH8ZLhoUsduybKfURvMwBLLG7ZuAifKZPRuLDzXyhMLHO&3u340&4u255&5m1&2e1&callback=none&r_url=https%3A%2F%2Flocalhost%3A7215%2FSchdules&key=AIzaSyCUl-h1ooBble_5ATQVVSjSJL0O2F6DHAo&token=34971');">
+                    <h1 id="theme-name" style="color:red"></h1>
+                    <div class="weather-info" id="weather-info">天气信息</div>
+                    <button class="edit-btn" id="edit-btn">编辑</button>
+                </div>
             </div>
-            <div class="col-12 col-md-8" id="map"></div>
+            <div class="row">
+                <div class="carousel-container" id="carousel-container">
+                    <!-- 根据日程日期生成的轮播内容 -->
+                </div>
+            </div>
+            <div class="row" id="plannertables">
+                <!--出發日期(可以調整)-->
+                <!--也是一個div，當user按下加入行程的時候就會自動生成一個div，每個div內還要可以調整出發時間-->
+            </div>
         </div>
+        <div class="col-12 col-md-8" id="map"></div>
     </div>
+</div>
 
-    @section Scripts{    
+    @section Scripts{ 
         <script>
-            $(document).ready(function () {
-
+            $(document).ready(async function(){
+                LoadScheduleInfo(@scheduleId);
+                //#region initGooglemaps
                 let map;
-                async function initMap() {
+                let service;
+                async function initMap(position, placeId) {
                     const { Map } = await google.maps.importLibrary("maps");
+                    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
                     map = new Map(document.getElementById("map"), {
-                        center: { lat: -34.397, lng: 150.644 },
-                        zoom: 8,
+                        center: position,
+                        zoom: 17,
+                        mapTypeId: "roadmap"
                     });
-                };
-                initMap();
-            })
+
+                    service = new google.maps.places.PlacesService(map);
+
+                    if (placeId) {
+                        service.getDetails({ placeId: placeId }, (place, status) => {
+                            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                                const location = place.geometry.location;
+                                map.setCenter(location);
+                                new google.maps.Marker({
+                                    position: location,
+                                    map: map,
+                                    title: place.name
+                                });
+                            } else {
+                                console.error('Place details request failed due to ' + status);
+                                if (position) {
+                                    map.setCenter(position);
+                                    new google.maps.Marker({
+                                        position: position,
+                                        map: map,
+                                        title: 'Default Location'
+                                    });
+                                }
+                            }
+                        });
+                    } else if (position) {
+                        map.setCenter(position);
+                        new google.maps.Marker({
+                            position: position,
+                            map: map,
+                            title: 'Default Location'
+                        });
+                    }
+                }
+                //#endregion
+                //#region LoadScheduleInfo
+                async function LoadScheduleInfo(scheduleId) {
+                    try {
+                        console.log(baseAddress);
+                        console.log(`schID: ${scheduleId}`);
+
+                        var response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            var results = await response.json();
+                            if (results.length > 0) {
+                                var lastResult = results[results.length - 1];
+                                var name = lastResult.name;
+                                var lat = lastResult.lat;
+                                var lng = lastResult.lng;
+                                var placeId = lastResult.placeId;
+                                var position = { lat: lat, lng: lng };
+
+                                document.getElementById('theme-name').innerText = name;
+
+                                if (placeId) {
+                                    initMap(null, placeId); // 使用 placeId 初始化地图
+                                } else {
+                                    initMap(position, null); // 使用 position 初始化地图
+                                }
+
+                            } else {
+                                document.getElementById('theme-name').innerText = 'No data available';
+                            }
+                        } else if (response.status === 204) {
+                            alert('無法找到相關日程資訊!');
+                        } else if (response.status === 401) {
+                            alert('請重新登入再使用功能!');
+                            goToLoginPage();
+                            return;
+                        } else {
+                            // Handle other errors
+                            const errorResult = await response.json();
+                            alert(errorResult.message || 'An error occurred');
+                        }
+                    } catch (error) {
+                        alert('伺服器錯誤，請稍後再試'); // Catch server errors
+                        console.log(error.message); // Log error message to console
+                    }
+                }
+                //#endregion
+                const scheduleId = new URLSearchParams(window.location.search).get('scheduleId');
+                if (scheduleId) {
+                    LoadScheduleInfo(scheduleId);
+                }
+            });
         </script>
     }
 
