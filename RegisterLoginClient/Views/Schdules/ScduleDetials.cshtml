@@ -20,8 +20,8 @@
                 <h1> 行程編號 @scheduleId 的行程</h1>
             </div>
             <div class="col-12 col-md-8" id="map"></div>
-        </div>
-    </div>
+                    </div>
+                </div>
 
     @section Scripts{    
         <script>
@@ -34,11 +34,11 @@
                     map = new Map(document.getElementById("map"), {
                         center: { lat: -34.397, lng: 150.644 },
                         zoom: 8,
-                    });
+        });
                 };
                 initMap();
             })
-        </script>
+    </script>
     }
 
 

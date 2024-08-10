@@ -129,7 +129,7 @@
                 }
 
                 try {
-                    const response = await fetch(`${baseAddress}/api/Auth/Register`, {
+                    const response = await fetch(`${baseAddress}/api/Register`, {
                         method: 'POST',
                         body: formData // Send FormData instead of JSON.stringify
                     });
@@ -169,10 +169,11 @@
             return password.length >= minLength && password.length <= maxLength && hasLetter && hasNumber;
         }
 
+        //動態載入所有favor項目
         const vuefavor = {
             data() {
                 return {
-                    optionSelected: [], // 預設是649
+                    optionSelected: [],
                     options: []
                 };
             },
@@ -182,7 +183,7 @@
                 }
             },
             mounted() {
-                const uri = `${baseAddress}/api/Auth/GetFavorCategories`;
+                const uri = `${baseAddress}/api/category/GetFavorCategories`;
                 axios.get(uri).then(response => {
                     this.options = response.data;
                     // 在選項加載完畢後初始化 multi-select-tag
