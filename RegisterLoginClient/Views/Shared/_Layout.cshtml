@@ -50,15 +50,10 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link fs-5" asp-area="" asp-controller="Schdules" asp-action="Index" style="color:#73584E;">行程規劃</a>
+                            <a class="nav-link fs-5 fw-bold text-white" asp-area="" asp-controller="Schdules" asp-action="Index">行程規劃</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fs-5" asp-area="" asp-controller="SearchSpots" asp-action="Index" style="color:#73584E;">搜尋景點</a>
-                        </li>
-                        <li class="nav-item">
-                            <button class="btn btn-outline-danger" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideBarOffcanvas" aria-controls="sideBarOffcanvas">
-                                側邊欄
-                            </button>
+                            <a class="nav-link fs-5 fw-bold text-white  " asp-area="" asp-controller="SearchSpots" asp-action="Index">搜尋景點</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -85,6 +80,9 @@
                             </ul>
                         </li>
                     </ul>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideBarOffcanvas" aria-controls="sideBarOffcanvas">
+                        <i class="fa-solid fa-heart"></i> | <i class="fa-solid fa-comment"></i>
+                    </button>
                 </div>
             </div>
         </nav>
@@ -126,6 +124,7 @@
 
                 const getToken = () => {
                     token = localStorage.getItem('token');
+                    console.log(token);
                     isLogin.value = token === null ? false : true;
                 }
 
