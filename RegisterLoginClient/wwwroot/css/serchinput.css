@@ -1,4 +1,4 @@
-﻿:root {
+﻿/*:root {
     --white: #fff;
     --primary_text: #242730;
     --secondary_text: #757575;
@@ -27,9 +27,9 @@
 
 
 .header_search_container {
-    min-width: 200px; /* 调整最小宽度 */
-    max-width: 300px; /* 调整最大宽度 */
-    margin-left: 36px;
+    min-width: 200px;*/ /* 调整最小宽度 */
+    /*max-width: 300px;*/ /* 调整最大宽度 */
+    /*margin-left: 36px;
     margin-right: 24px;
     flex: 1 1 auto;
     display: block;
@@ -48,9 +48,9 @@
     width: 100%;
     height: 52px;
     border-radius: 26px;
-    padding: 1px 25px; /* 上下1px，左右25px */
-    padding-right: 50px; /* 为按钮留出空间 */
-    color: fieldtext;
+    padding: 1px 25px;*/ /* 上下1px，左右25px */
+    /*padding-right: 50px;*/ /* 为按钮留出空间 */
+    /*color: fieldtext;
     outline: none;
     font-size: 16px;
     text-rendering: auto;
@@ -86,16 +86,16 @@
 }
 
 .header_search_btn img {
-    transition: transform 0.3s; /* 平滑过渡效果 */
-}
+    transition: transform 0.3s;*/ /* 平滑过渡效果 */
+/*}
 
 .header_search_btn:hover img {
-    transform: scale(1.2); /* 鼠标悬停时放大图片10% */
-}
+    transform: scale(1.2);*/ /* 鼠标悬停时放大图片10% */
+/*}
 
 .btn-primary {
     height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
+}*/
