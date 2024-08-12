@@ -246,7 +246,7 @@
             async mounted() {
                 console.log('Vue instance mounted!');
                 //await this.fetchWishlists();
-                //未登入提示字樣
+                //未登入提示
                 const userId = getUserIdFromToken();
                 if (userId) {
                     this.isLoggedIn = true;
