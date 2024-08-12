@@ -17,7 +17,7 @@ namespace PinPinServer.Models.DTO
         public DateOnly EndTime { get; set; }
 
         [Column("user_id")]
-        public int UserId { get; set; }
+        public int HostId { get; set; }
 
         [Display(Name = "主辦人")]
         public string UserName { get; set; }
@@ -36,5 +36,12 @@ namespace PinPinServer.Models.DTO
         public Decimal? lng { get; set; }
 
         public Decimal? lat { get; set; }
+
+        //可以修改主題
+        public bool? canedittitle { get; set; }
+        //可以修改內文
+        public bool? caneditdetail { get; set; }
+
+        public bool? isHost { get; set; }
     }
 }

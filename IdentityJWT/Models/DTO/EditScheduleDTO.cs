@@ -32,9 +32,9 @@ namespace PinPinServer.Models.DTO
 
         public int isHoster { get; set; }
 
-        public Decimal? lng { get; set; }
+        public string? Lng { get; set; }
 
-        public Decimal? lat { get; set; }
+        public string? Lat { get; set; }
 
         public string? Pictureurl { get; set; }
 
