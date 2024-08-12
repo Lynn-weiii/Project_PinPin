@@ -96,12 +96,7 @@
             </div>
             <!--願望清單內容 end-->
             <div id="chatRoomTab" class="tab-pane fade">
-@*                 @await Html.PartialAsync("../Chatroom/_ChatRoomPartial") *@
-                @* <!--聊天室群組按鈕start-->
-                <div id="groupList" class="list-group">
-                <!-- 群組按鈕將在這裡動態生成 -->
-                </div>
-                <!--聊天室群組按鈕end--> *@
+                <partial name="~/Views/ChatRoom/_ChatRoomPartial.cshtml" />
             </div>
         </div>
     </div>
