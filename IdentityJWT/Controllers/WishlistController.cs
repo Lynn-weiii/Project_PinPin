@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PinPinServer.Models;
-using System.Collections.Immutable;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using System.Net.Http;
 using PinPinServer.Models.DTO;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -165,7 +161,7 @@ namespace PinPinServer.Controllers
         /*"id","userId","name"*/
         //PUT:api/Wishlist/UpdateWishlist/{id}
         [HttpPut("UpdateWishlist/{id}")]
-        public async Task<IActionResult> UpdateWishlist(int id, Wishlist wishlist) 
+        public async Task<IActionResult> UpdateWishlist(int id, Wishlist wishlist)
         {
             if (id != wishlist.Id)
             {
@@ -265,7 +261,7 @@ namespace PinPinServer.Controllers
         //"id","wishlistId","name","color","icon"
         //PUT:api/Wishlist/UpdateLocationCategory/{id}
         [HttpPut("UpdateLocationCategory/{id}")]
-        public async Task<IActionResult> UpdateLocationCategory(int id,[FromBody]LocationCategory locationCategory)
+        public async Task<IActionResult> UpdateLocationCategory(int id, [FromBody] LocationCategory locationCategory)
         {
             if (id != locationCategory.Id)
             {

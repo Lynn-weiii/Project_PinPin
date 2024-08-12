@@ -162,7 +162,7 @@
 
                 map = new Map(document.getElementById("map"), {
                     center: position,
-                    zoom: 10,
+                    zoom: 15,
                     mapId: "d4432686758d8acc",
                 });
 
@@ -207,7 +207,7 @@
                 }
 
                 map.setCenter(place.geometry.location);
-                map.setZoom(20);
+                map.setZoom(15);
 
                 if (marker) {
                     marker.setMap(null);

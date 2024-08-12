@@ -25,6 +25,8 @@
     <Compile Remove="Views\Schdules\Index.cshtml.cs" />
     <Content Remove="bundleconfig.json" />
     <Content Remove="Views\Home\Schedule.cshtml" />
+    <Content Remove="wwwroot\images\entrylogolightnoshadow.png" />
+    <Content Remove="wwwroot\images\entrylogomiddle.png" />
     <Content Remove="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
 
