@@ -12,32 +12,6 @@
 /*********************************
 2. Body and some general stuff
 *********************************/
-:root {
-    --white: #fff;
-    --primary_text: #242730;
-    --secondary_text: #757575;
-    --secondary_light_text: #9799a6;
-    --secondary_background: #f1f1f2;
-    --body_text: #4a4e70;
-    --body_text_2: #585f97;
-    --divider: #e8ecf6;
-    --border: #d9dbf7;
-    --primary_color: #5965d4;
-    --primary_color_light: #6c83e1;
-    --primary_grad_end: #4450bc;
-    --primary_light: #aeb9e9;
-    --primary_dark: #38429c;
-    --accent_1: #f3ec9e;
-    --accent_2: #ff8796;
-    --accent_3: #ffd383;
-    --font1: 'Inter', sans-serif;
-    --grad_light_start: #e8ecf6;
-    --grad_light_end: #c7cff1;
-    --grad_mid_start: #6c83e1;
-    --grad_mid_end: #7892fa;
-    --border_rad_l: 12px;
-    --border_rad_s: 8px;
-}
 
 * {
     margin: 0;
@@ -51,9 +25,9 @@
     text-shadow: rgba(0,0,0,.01) 0 0 1px;
 }
 
- *h1 {
+    *h1 {
         font-size: 48px;
- }
+    }
 
 h2 {
     font-size: 36px;
@@ -68,7 +42,7 @@ h4 {
 }
 
 h5 {
-    font-size: 14px;
+    font-size: 1.25rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -103,8 +77,8 @@ section {
 .owl-carousel .owl-stage,
 .owl-carousel .owl-item {
     height: 100%;
-    margin-top:5px;
-    margin-bottom:5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .slide {
@@ -271,42 +245,42 @@ section {
     left: -64px;
 }
 
-.courses_slider_nav_prev.disabled {
-    opacity: 0;
-    pointer-events: none;
-}
+    .courses_slider_nav_prev.disabled {
+        opacity: 0;
+        pointer-events: none;
+    }
 
-.courses_slider_nav_prev > div {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    opacity: 0;
-}
+    .courses_slider_nav_prev > div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        opacity: 0;
+    }
 
-.courses_slider_nav_prev img {
-    z-index: 1;
-}
+    .courses_slider_nav_prev img {
+        z-index: 1;
+    }
 
 .course_card_top {
     width: 100%;
     border-radius: var(--border_rad_l);
 }
 
-.course_card_top::after {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    content: '';
-    border-radius: var(--border_rad_l);
-    border: solid 1px var(--divider);
-    z-index: -1;
-}
+    .course_card_top::after {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        border-radius: var(--border_rad_l);
+        border: solid 1px var(--divider);
+        z-index: -1;
+    }
 
 .course_card_category {
     position: absolute;
@@ -314,7 +288,7 @@ section {
     left: 16px;
     width: 30px; /* 设置宽度为30px */
     height: 30px; /* 设置高度为30px */
-    background-color:#73584E;
+    background-color: #73584E;
     border-radius: 50%; /* 设置为50%确保为圆形 */
     color: white; /* 设置文字颜色与背景对比 */
     font-size: 14px; /* 根据需要调整文字大小 */
@@ -329,21 +303,21 @@ section {
     transform: translateY(230PX);
 }
 
-.course_card_category a {
-    display: block;
-    height: 100%;
-    padding-left: 16px;
-    padding-right: 16px;
-}
-
-    .course_card_category a span {
-        font-size: 12px;
-        color: #fff;
-        line-height: 27px;
+    .course_card_category a {
+        display: block;
+        height: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
-.course_card_category:hover {
-    background-color: var(--primary_color);
+        .course_card_category a span {
+            font-size: 12px;
+            color: #fff;
+            line-height: 27px;
+        }
+
+    .course_card_category:hover {
+        background-color: var(--primary_color);
     }
 
 .course_card_pic {
@@ -351,12 +325,12 @@ section {
     overflow: hidden;
 }
 
-.course_card_pic img {
-      display: block;
-  max-width: 100%;
-  max-height: 100%;
-    object-fit: cover;
-}
+    .course_card_pic img {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+    }
 
 .course_card_content {
     padding-left: 24px;
@@ -501,4 +475,3 @@ section {
 course_card {
     background: #D8D8D8;
 }
-

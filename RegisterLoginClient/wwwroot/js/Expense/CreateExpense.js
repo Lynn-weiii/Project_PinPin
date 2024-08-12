@@ -233,12 +233,14 @@
         };
 
         borrowerData.value.forEach((data) => {
-          formData.participants.push({
-            userId: data.id,
-            userName: data.name,
-            amount: data.amount,
-            isPaid: data.isPaid,
-          });
+          if (amount != 0) {
+            formData.participants.push({
+              userId: data.id,
+              userName: data.name,
+              amount: data.amount,
+              isPaid: data.isPaid,
+            });
+          }
         });
 
         try {

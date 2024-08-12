@@ -124,6 +124,7 @@
 
                 const getToken = () => {
                     token = localStorage.getItem('token');
+                    console.log(token);
                     isLogin.value = token === null ? false : true;
                 }
 
