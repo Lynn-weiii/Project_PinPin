@@ -52,6 +52,7 @@
         <div class="offcanvas-body tab-content">
             <!--願望清單內容 start-->
             <div id="wishlistTab" class="tab-pane fade show active">
+                <div v-if="isLoggedIn">
                 <!-- accordion start -->
                 <div class="accordion accordion-flush" id="wishlistAccordionFlush">
                     <div class="accordion-item" v-for="(wishlist, index) in wishlists" :key="wishlist.id">
@@ -93,6 +94,11 @@
                     </div>
                 </div>
                 <!-- accordion end -->
+            </div>
+                <div v-else>
+                    <!-- 尚未登入提示 -->
+                    <p>尚未登入，請先登入後查看您的願望清單。</p>
+                </div>
             </div>
             <!--願望清單內容 end-->
             <div id="chatRoomTab" class="tab-pane fade">
@@ -219,6 +225,7 @@
         const vueApp = {
             data() {
                 return {
+                    isLoggedIn: false,
                     wishlists: [],
                     newWishlistName: '',
                     newCategoryName: '',
@@ -238,20 +245,22 @@
             },
             async mounted() {
                 console.log('Vue instance mounted!');
-                await this.fetchWishlists();
-                //await this.fetchAllLocationCategories();
+                //await this.fetchWishlists();
                 const userId = getUserIdFromToken();
-                console.log('User ID:', userId);
+                if (userId) {
+                    this.isLoggedIn = true;
+                    await this.fetchWishlists();
+                } else {
+                    this.isLoggedIn = false;
+                    console.log("尚未登入");
+                }
 
                 const uri = `${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`;
                 axios.get(uri).then(response => {
-                    console.log('Response data:', response.data);
-
                     this.wishlists = response.data.map(wishlist => ({
                         id: wishlist.id,
                         name: wishlist.name
                     }));
-
                     this.allLocationCategories = response.data.flatMap(wishlist => wishlist.locationCategories);
 
                     this.locationCategories = [];

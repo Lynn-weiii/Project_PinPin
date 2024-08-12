@@ -55,11 +55,6 @@
                         <li class="nav-item">
                             <a class="nav-link fs-5 fw-bold text-white  " asp-area="" asp-controller="SearchSpots" asp-action="Index">搜尋景點</a>
                         </li>
-                        <li class="nav-item">
-                            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideBarOffcanvas" aria-controls="sideBarOffcanvas">
-                                側邊欄
-                            </button>
-                        </li>
                     </ul>
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item" v-if="!isLogin">
@@ -85,6 +80,9 @@
                             </ul>
                         </li>
                     </ul>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideBarOffcanvas" aria-controls="sideBarOffcanvas">
+                        <i class="fa-solid fa-heart"></i> | <i class="fa-solid fa-comment"></i>
+                    </button>
                 </div>
             </div>
         </nav>
