@@ -162,7 +162,7 @@ namespace PinPinServer.Controllers
         }
 
         //修改願望清單OK
-        /*"id","userId","name"*/
+        /*  */
         //PUT:api/Wishlist/UpdateWishlist/{id}
         [HttpPut("UpdateWishlist/{id}")]
         public async Task<IActionResult> UpdateWishlist(int id, Wishlist wishlist) 

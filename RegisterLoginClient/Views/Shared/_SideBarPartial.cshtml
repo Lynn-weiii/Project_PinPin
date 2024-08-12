@@ -84,12 +84,12 @@
                                     </div>
                                 </div>
                             </div>
+                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#editWishlistModal"><i class="fa-solid fa-pen"></i></button>
                         </div>
                     </div>
                     <!--編輯願望清單/標籤按鈕-->
                     <div>
                         <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn btn-outline-primary" type="button" id="btnEditWishlist"><i class="fa-solid fa-pen"></i></button>
                         <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#deleteWishlistModal"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
@@ -111,6 +111,36 @@
             </div>
         </div>
     </div>
+    <!--編輯願望清單及標籤modal-->
+    <!--先選定要修改的標籤-->
+    <div class="modal fade" id="editWishlistModal" tabindex="-1" aria-labelledby="editWishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editWishlistModalLabel">編輯願望清單及標籤</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form v-on:submit.prevent="editWishlistAndCategory">
+                        <div class="mb-3">
+                            <label for="wishlist">清單名稱:</label>
+                                @* <p :key="wishlist.id" :value="wishlist.id">{{ wishlist.name }}</p> *@
+                        </div>
+                        <div class="mb-3">
+                            <label for="location">選擇分類:</label>
+                            <select id="location" class="form-control" v-model="selectedLocationCategoryId">
+                                <option v-for="location in locationCategories" :key="location.id" :value="location.id">
+                                    {{ location.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">修改</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 新增wishlist及locationCategory的模態視窗 -->
     <div class="modal fade" id="createWishlistModal" tabindex="-1" aria-labelledby="createWishlistModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -355,6 +385,8 @@
                         console.error('Error fetching place details:', error);
                         return null;
                     }
+                },
+                async editWishlistAndCategory() { 
                 },
                 //新增願望清單及標籤
                 async createWishlistWithCategory() {
