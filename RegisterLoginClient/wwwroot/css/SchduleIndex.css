@@ -1,0 +1,192 @@
+﻿<!--
+
+Styles -->
+<style >
+.btn-custom {
+    background-color: #638889;
+    color: #F0F0F0;
+    width: 100%;
+    text-align: center;
+}
+
+#newschdule input:hover {
+    border: 1px solid #638889;
+    box-shadow: 0 4px 8px #638889;
+}
+
+.edit_btn {
+    z-index: 1500;
+    text-decoration: none;
+}
+
+#createbtn, #newschbtn, #authright_save, #authright_cancel, #invite_btn {
+    background: #638889;
+    color: #F0F0F0;
+}
+
+    #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
+        background: #F0F0F0;
+        color: #638889;
+        border-bottom: 1px solid #7B7B7B;
+    }
+
+.pac-container {
+    z-index: 9999 !important;
+}
+
+.air-datepicker {
+    z-index: 9999 !important;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+
+#addnewcard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 390px;
+    height: 451px;
+    transition: box-shadow 0.3s ease-in-out;
+    border-radius: 6px;
+}
+
+    #addnewcard img {
+        width: 150px;
+        height: 255px;
+        object-fit: cover;
+    }
+
+    #addnewcard:hover {
+        box-shadow: 0 4px 8px #638889;
+    }
+
+.header_search_container input {
+    margin-right: -3px;
+}
+
+.item course_card_owl_item:hover {
+    box-shadow: 0 4px 8px #638889;
+}
+
+.course_card_link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+    .course_card_link:hover {
+        box-shadow: 0px 8px 8px #638889;
+        border-radius: 14px;
+    }
+
+.swal2-popup .swal2-cancel {
+    color: #758694 !important;
+}
+
+#newschdule .modal-footer {
+    justify-content: flex-start !important;
+    display: flex !important;
+    width: 100% !important;
+    align-items: center;
+}
+
+.modal-footer {
+    justify-content: flex-start !important;
+    display: flex !important;
+    width: 100% !important;
+    align-items: center;
+}
+
+    .modal-footer .row {
+        align-items: center;
+    }
+
+#emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
+    display: none;
+}
+
+#schedule-authority-table td th {
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#schedule-authority-table .form-check {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.owl-carousel .owl-dots {
+    display: flex !important;
+}
+
+    .owl-carousel .owl-dots.disabled {
+        display: flex !important;
+    }
+
+.owl-dots {
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/*#region 查看群組成員modal css*/
+.member-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: flex-start;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    border: none;
+    background: transparent;
+}
+
+.member-photo {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    margin-bottom: 5px;
+}
+
+    .member-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.member-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #638889;
+}
+/*#endregion*/
+
+/*查看成員modal css*/
+#groupmembers_modal .modal-content {
+    background-color: #FCF8F3; /* 设置背景色 */
+}
+
+#groupmembers_modal .modal-header h5 {
+    color: #638889;
+    font-size: 12px;
+}
+
+#groupmembers_modal .modal-footer .btn {
+    background-color: #638889;
+    color: #FCF8F3;
+}
+/*#endregion*/
+</style >

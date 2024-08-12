@@ -3,76 +3,84 @@
     var scheduleId = ViewBag.ScheduleId;
 }
 
+@section Styles{
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="~/css/sceduledetailsstyles.css" rel="stylesheet" />
-    <script>
-    // 加载 Google Maps API
-    (function (g) {
-        var h, a, k, p = "The Google Maps JavaScript API",
-            c = "google",
-            l = "importLibrary",
-            q = "__ib__",
-            m = document,
-            b = window;
-        b = b[c] || (b[c] = {});
-        var d = b.maps || (b.maps = {}),
-            r = new Set(),
-            e = new URLSearchParams(),
-            u = () => h || (h = new Promise(async (f, n) => {
-                a = m.createElement("script");
-                e.set("libraries", [...r].join(","));
-                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                e.set("callback", c + ".maps." + q);
-                e.set("language", "zh-TW");
-                e.set("region", "TW");
-                a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
-                d[q] = f;
-                a.onerror = () => h = n(Error(p + " could not load."));
-                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                m.head.append(a);
-            }));
-        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
-    })({
-        key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
-        v: "weekly",
-        libraries: "places"
-    });
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
+}
 
 
-    <div class="container-fluid" style="margin:0; padding:0;">
+<div class="container-fluid" style="margin:1px;padding:0;">
     <div class="row row-cols-md-2 g-0">
-        <div class="col-12 col-md-4 mt-2" id="plannertable">
-            <div class="row">
-                <div class="theme-header" id="theme-header" style="background-image: url('https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAelY_Ct5pgodDtRQ2EnddxYbUebpTGO5hQv51XDOe52rzj7pbqfCeaxElbtkTwkqDg-QbUT8ABmkw9tQDq5N1bMTf8MJ7rqevrzjPBFIfBcVqzVntutrminjdKTtbwSkjhkflOwyH8ZLhoUsduybKfURvMwBLLG7ZuAifKZPRuLDzXyhMLHO&3u340&4u255&5m1&2e1&callback=none&r_url=https%3A%2F%2Flocalhost%3A7215%2FSchdules&key=AIzaSyCUl-h1ooBble_5ATQVVSjSJL0O2F6DHAo&token=34971');">
-                    <h1 id="theme-name" style="color:red"></h1>
-                    <div class="weather-info" id="weather-info">天气信息</div>
-                    <button class="edit-btn" id="edit-btn">编辑</button>
-                </div>
+        @*# region行程表*@
+        <div class="col-12 col-md-4" id="plannertable" style="border:2px solid #f6f4e8;">
+            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;">
+                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none">編輯</button>
+                <h5 id="theme-name"></h5>
             </div>
-            <div class="row">
-                <div class="carousel-container" id="carousel-container">
-                    <!-- 根据日程日期生成的轮播内容 -->
-                </div>
+            <div class="carousel-container" id="carousel-container">
+                <!-- 根據日程日期生成的輪播內容 -->
             </div>
             <div class="row" id="plannertables">
-                <!--出發日期(可以調整)-->
-                <!--也是一個div，當user按下加入行程的時候就會自動生成一個div，每個div內還要可以調整出發時間-->
+                <!--GOGOGOGO-->
+                <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
+                <input id="Lat" type="hidden" name="lat">
+                <input id="Lng" type="hidden" name="lng">
+                <input id="place_id" type="hidden" name="place_id">
+                <input id="picture_url" type="hidden" name="picture_url">
             </div>
         </div>
+        @*#endgion*@
+        @*#region 地圖*@                  
         <div class="col-12 col-md-8" id="map"></div>
+        @*#endgion*@
     </div>
 </div>
 
 @section Scripts {
     <script>
-        $(document).ready(async function () {
-            LoadScheduleInfo(@scheduleId);
-
-            //#region LoadScheduleInfo
+        //#region 加載 Google Maps API
+        (function (g) {
+            var h, a, k, p = "The Google Maps JavaScript API",
+                c = "google",
+                l = "importLibrary",
+                q = "__ib__",
+                m = document,
+                b = window;
+            b = b[c] || (b[c] = {});
+            var d = b.maps || (b.maps = {}),
+                r = new Set(),
+                e = new URLSearchParams(),
+                u = () => h || (h = new Promise(async (f, n) => {
+                    a = m.createElement("script");
+                    e.set("libraries", [...r].join(","));
+                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                    e.set("callback", c + ".maps." + q);
+                    e.set("language", "zh-TW");
+                    e.set("region", "TW");
+                    a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
+                    d[q] = f;
+                    a.onerror = () => h = n(Error(p + " could not load."));
+                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                    m.head.append(a);
+                }));
+            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
+        })({
+            key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
+            v: "weekly",
+            libraries: "places,geometry,drawing,visualization"
+        });
+        //#endregion
+    </script>
+    <script>
+        $(document).ready(function () {
+            let map, marker, autocomplete, infowindow, position;
+            //#region 匯入時的資料
             async function LoadScheduleInfo(scheduleId) {
                 try {
-                    var response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
+                    const response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -81,94 +89,164 @@
                     });
 
                     if (response.ok) {
-                        var results = await response.json();
+                        const results = await response.json();
+                        console.log('API Results:', results);
+
                         if (results.length > 0) {
-                            var lastResult = results[results.length - 1];
-                            var name = lastResult.name;
-                            var lat = lastResult.lat;
-                            var lng = lastResult.lng;
-                            var placeId = lastResult.placeId;
-                            var position = { lat: lat, lng: lng };
+                            const lastResult = results[results.length - 1];
 
-                            document.getElementById('theme-name').innerText = name;
-
-                            if (placeId) {
-                                initMap(null, placeId); // 使用 placeId 初始化地图
-                            } else if (lat && lng) {
-                                initMap(position, null); // 使用 position 初始化地图
-                            } else {
-                                console.error('缺少地理位置信息');
-                                alert('地理位置信息不可用');
+                            const { name, lat, lng, placeId, picture } = lastResult;
+                            console.log('Name:', name);
+                            console.log('Lat:', lat);
+                            console.log('Lng:', lng);
+                            console.log('Place ID:', placeId);
+                            console.log('Picture:', picture);
+                            const parsedLat = parseFloat(lat);
+                            const parsedLng = parseFloat(lng);
+                            if (isNaN(parsedLat) || isNaN(parsedLng)) {
+                                console.error('Invalid coordinates:', { lat, lng });
+                                alert('Invalid location coordinates received.');
+                                return;
                             }
-                        } else {
-                            document.getElementById('theme-name').innerText = 'No data available';
+                            if (document.getElementById('theme-header')) {
+                                document.getElementById('theme-header').style.backgroundImage = `url('${picture}')`;
+                            }
+
+                            position = { lat: parsedLat, lng: parsedLng };
+                            console.log('Position:', position);
+
+                            if (document.getElementById('theme-name')) {
+                                document.getElementById('theme-name').innerText = name;
+                            }
+
+                            initMap();
                         }
-                    } else if (response.status === 204) {
-                        alert('無法找到相關日程資訊!');
-                    } else if (response.status === 401) {
-                        alert('請重新登入再使用功能!');
-                        goToLoginPage();
-                        return;
                     } else {
-                        const errorResult = await response.json();
-                        alert(errorResult.message || 'An error occurred');
+                        handleResponseErrors(response);
                     }
                 } catch (error) {
                     alert('伺服器錯誤，請稍後再試');
                     console.log(error.message);
                 }
             }
-            //#endregion
 
-            //#region initGooglemaps
-            let map;
-            let service;
-
-            async function initMap(position, placeId) {
-                const { Map } = await google.maps.importLibrary("maps");
-                const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-
-                map = new Map(document.getElementById("map"), {
-                    center: position || { lat: 0, lng: 0 }, // 如果沒有 position, 設置默認值
-                    zoom: 17,
-                    mapTypeId: "roadmap"
-                });
-
-                service = new google.maps.places.PlacesService(map);
-
-                if (placeId) {
-                    service.getDetails({ placeId: placeId }, (place, status) => {
-                        if (status === google.maps.places.PlacesServiceStatus.OK) {
-                            const location = place.geometry.location;
-                            map.setCenter(location);
-                            new AdvancedMarkerElement({
-                                map: map,
-                                position: location.toJSON(),
-                                title: place.name
-                            });
-                        } else {
-                            console.error('Place details request failed due to ' + status);
-                            if (position) {
-                                map.setCenter(position);
-                                new AdvancedMarkerElement({
-                                    map: map,
-                                    position: position,
-                                    title: 'Default Location'
-                                });
-                            }
-                        }
-                    });
-                } else if (position) {
-                    map.setCenter(position);
-                    new AdvancedMarkerElement({
-                        map: map,
-                        position: position,
-                        title: 'Default Location'
-                    });
+            function handleResponseErrors(response) {
+                switch (response.status) {
+                    case 204:
+                        alert('無法找到相關日程資訊!');
+                        break;
+                    case 401:
+                        alert('請重新登入再使用功能!');
+                        goToLoginPage();
+                        break;
+                    default:
+                        response.json().then(errorResult => {
+                            alert(errorResult.message || '發生錯誤');
+                        });
+                        break;
                 }
             }
             //#endregion
 
+            //#region Google Maps API
+            async function initMap() {
+                if (!position) {
+                    console.error('位置未設置。');
+                    return;
+                }
+
+                console.log('在 initMap 中收到的位置:', position);  // Log the position object
+
+                const { Map } = await google.maps.importLibrary("maps");
+                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+                map = new Map(document.getElementById("map"), {
+                    center: position,
+                    zoom: 10,
+                    mapId: "d4432686758d8acc",
+                });
+
+                if (position) {
+                    const center = new google.maps.LatLng(position.lat, position.lng);
+                    const bounds = new google.maps.LatLngBounds();
+                    bounds.extend(center);
+                    map.fitBounds(bounds);
+                }
+
+                setupAutocomplete();  // Call setupAutocomplete here to ensure it runs after map is initialized
+            }
+
+            function setupAutocomplete() {
+                if (!google || !google.maps || !google.maps.places) {
+                    console.error('Google Maps API not fully loaded.');
+                    return;
+                }
+
+                autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input'), {
+                    types: ['establishment']
+                });
+
+                autocomplete.addListener('place_changed', onPlaceChanged);
+            }
+
+            function onPlaceChanged() {
+                const place = autocomplete.getPlace();
+
+                if (!place.geometry) {
+                    console.error("No details available for input: '" + place.name + "'");
+                    return;
+                }
+
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.error('Invalid coordinates:', { lat, lng });
+                    alert('Invalid location coordinates received.');
+                    return;
+                }
+
+                map.setCenter(place.geometry.location);
+                map.setZoom(20);
+
+                if (marker) {
+                    marker.setMap(null);
+                }
+
+                marker = new google.maps.Marker({
+                    map: map,
+                    position: place.geometry.location
+                });
+
+                document.getElementById('Lat').value = lat;
+                document.getElementById('Lng').value = lng;
+                document.getElementById('place_id').value = place.place_id;
+                document.getElementById('picture_url').value = place.photos ? place.photos[0].getUrl() : '';
+            }
+
+            function showModal(place) {
+                const modal = document.getElementById('locationModal');
+                const span = document.getElementsByClassName('close')[0];
+
+                document.getElementById('locationName').innerText = place.name;
+                document.getElementById('locationAddress').innerText = place.formatted_address;
+                document.getElementById('locationRating').innerText = `Rating: ${place.rating}`;
+
+                modal.style.display = "block";
+
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+
+                window.onclick = function (event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
+            }
+            //#endregion
+
+            LoadScheduleInfo(@scheduleId);
         });
     </script>
 }

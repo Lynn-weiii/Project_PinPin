@@ -37,6 +37,11 @@ namespace PinPinServer.Models.DTO
 
         public Decimal? lat { get; set; }
 
-        public bool? canedit { get; set; }
+        //可以修改主題
+        public bool? canedittitle { get; set; }
+        //可以修改內文
+        public bool? caneditdetail { get; set; }
+
+        public bool? isHost { get; set; }
     }
 }
