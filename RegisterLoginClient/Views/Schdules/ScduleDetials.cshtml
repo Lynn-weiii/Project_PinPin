@@ -25,7 +25,6 @@
             </div>
             <div class="row" id="plannertables">
                 <!--GOGOGOGO-->
-                <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
                 <input id="Lat" type="hidden" name="lat">
                 <input id="Lng" type="hidden" name="lng">
                 <input id="place_id" type="hidden" name="place_id">
@@ -33,49 +32,54 @@
             </div>
         </div>
         @*#endgion*@
-        @*#region 地圖*@                  
-        <div class="col-12 col-md-8" id="map"></div>
+        @*#region 地圖*@   
+        
+        <div class="col-12 col-md-8">
+            <div id="search_input" class="position-absolute top-5 end-0 p-2">
+                <input id="search_input_field" type="text" class="form-control mb-1" placeholder="目的地" required>
+            </div>
+            <div id="map"></div>
+        </div>
         @*#endgion*@
     </div>
 </div>
 
 @section Scripts {
     <script>
-        //#region 加載 Google Maps API
-        (function (g) {
-            var h, a, k, p = "The Google Maps JavaScript API",
-                c = "google",
-                l = "importLibrary",
-                q = "__ib__",
-                m = document,
-                b = window;
-            b = b[c] || (b[c] = {});
-            var d = b.maps || (b.maps = {}),
-                r = new Set(),
-                e = new URLSearchParams(),
-                u = () => h || (h = new Promise(async (f, n) => {
-                    a = m.createElement("script");
-                    e.set("libraries", [...r].join(","));
-                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                    e.set("callback", c + ".maps." + q);
-                    e.set("language", "zh-TW");
-                    e.set("region", "TW");
-                    a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
-                    d[q] = f;
-                    a.onerror = () => h = n(Error(p + " could not load."));
-                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                    m.head.append(a);
-                }));
-            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
-        })({
-            key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
-            v: "weekly",
-            libraries: "places,geometry,drawing,visualization"
-        });
-        //#endregion
-    </script>
-    <script>
         $(document).ready(function () {
+            //#region 加載 Google Maps API
+            (function (g) {
+                var h, a, k, p = "The Google Maps JavaScript API",
+                    c = "google",
+                    l = "importLibrary",
+                    q = "__ib__",
+                    m = document,
+                    b = window;
+                b = b[c] || (b[c] = {});
+                var d = b.maps || (b.maps = {}),
+                    r = new Set(),
+                    e = new URLSearchParams(),
+                    u = () => h || (h = new Promise(async (f, n) => {
+                        a = m.createElement("script");
+                        e.set("libraries", [...r].join(","));
+                        for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                        e.set("callback", c + ".maps." + q);
+                        e.set("language", "zh-TW");
+                        e.set("region", "TW");
+                        a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
+                        d[q] = f;
+                        a.onerror = () => h = n(Error(p + " could not load."));
+                        a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                        m.head.append(a);
+                    }));
+                d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
+            })({
+                key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
+                v: "weekly",
+                libraries: "places,geometry,drawing,visualization"
+            });
+            //#endregion
+            
             let map, marker, autocomplete, infowindow, position;
             //#region 匯入時的資料
             async function LoadScheduleInfo(scheduleId) {
@@ -147,33 +151,46 @@
                 }
             }
             //#endregion
-
-            //#region Google Maps API
+            
             async function initMap() {
                 if (!position) {
-                    console.error('位置未設置。');
+                    console.error('位置未设定。');
                     return;
                 }
 
-                console.log('在 initMap 中收到的位置:', position);  // Log the position object
+                console.log('在 initMap 中收到的位置:', position); 
 
                 const { Map } = await google.maps.importLibrary("maps");
                 const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
                 map = new Map(document.getElementById("map"), {
                     center: position,
-                    zoom: 15,
+                    zoom: 14, 
                     mapId: "d4432686758d8acc",
                 });
 
-                if (position) {
-                    const center = new google.maps.LatLng(position.lat, position.lng);
-                    const bounds = new google.maps.LatLngBounds();
-                    bounds.extend(center);
-                    map.fitBounds(bounds);
-                }
+                marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: "这是一个 marker", 
+                });
+                const bounds = new google.maps.LatLngBounds();
+                const kmInLatitudeDegrees = 1 / 110.574; 
+                const kmInLongitudeDegrees = 1 / (111.32 * Math.cos(position.lat * Math.PI / 180));
 
-                setupAutocomplete();  // Call setupAutocomplete here to ensure it runs after map is initialized
+                bounds.extend(new google.maps.LatLng(position.lat + 5 * kmInLatitudeDegrees, position.lng));
+                bounds.extend(new google.maps.LatLng(position.lat - 5 * kmInLatitudeDegrees, position.lng));
+                bounds.extend(new google.maps.LatLng(position.lat, position.lng + 5 * kmInLongitudeDegrees));
+                bounds.extend(new google.maps.LatLng(position.lat, position.lng - 5 * kmInLongitudeDegrees));
+
+                map.fitBounds(bounds);
+
+                google.maps.event.addListenerOnce(map, 'idle', function () {
+                    google.maps.event.trigger(map, 'resize');
+                });
+
+                // 设置自动完成输入框
+                setupAutocomplete(); // 在地图初始化后调用 setupAutocomplete
             }
 
             function setupAutocomplete() {
@@ -182,7 +199,7 @@
                     return;
                 }
 
-                autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input'), {
+                autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input_field'), {
                     types: ['establishment']
                 });
 
@@ -206,8 +223,11 @@
                     return;
                 }
 
-                map.setCenter(place.geometry.location);
-                map.setZoom(15);
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend(place.geometry.location);
+
+                map.fitBounds(bounds);
+                map.setCenter(bounds.getCenter());
 
                 if (marker) {
                     marker.setMap(null);
