@@ -137,7 +137,8 @@
                     const result = await response.text();
                     alert(result);
                     if (response.ok) {
-                        // window.location.href = '/Home/Index';
+                        //用Razo渲染正確的Url
+                        window.location.href = '@Url.Action("Index", "Home")';
                     }
 
                 } catch (error) {

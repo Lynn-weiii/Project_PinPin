@@ -92,17 +92,6 @@ Styles -->
     align-items: center;
 }
 
-.modal-footer {
-    justify-content: flex-start !important;
-    display: flex !important;
-    width: 100% !important;
-    align-items: center;
-}
-
-    .modal-footer .row {
-        align-items: center;
-    }
-
 #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
     display: none;
 }
