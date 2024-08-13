@@ -104,7 +104,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 app.MapHub<ChatHub>("/ChatHub");
+app.MapControllers();
 
 app.Run();
