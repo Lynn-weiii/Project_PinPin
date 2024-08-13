@@ -53,48 +53,48 @@
             <!--願望清單內容 start-->
             <div id="wishlistTab" class="tab-pane fade show active">
                 <div v-if="isLoggedIn">
-                <!-- accordion start -->
-                <div class="accordion accordion-flush" id="wishlistAccordionFlush">
-                    <div class="accordion-item" v-for="(wishlist, index) in wishlists" :key="wishlist.id">
-                        <h2 class="accordion-header" :id="'flush-heading' + index">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    :data-bs-target="'#flush-collapse' + index" aria-expanded="false"
-                                    :aria-controls="'flush-collapse' + index">
-                                {{wishlist.name}}
-                            </button>
-                        </h2>
-                        <div :id="'flush-collapse' + index" class="accordion-collapse collapse"
-                             :aria-labelledby="'flush-heading' + index" data-bs-parent="#wishlistAccordionFlush">
-                            <div class="accordion-body d-flex flex-column" v-for="(locationCategory, lcIndex) in wishlist.locationCategories" :key="locationCategory.id">
-                                <div class="d-grid gap-2">
-                                    <button class="btn btn-outline-primary" type="button" v-on:click="setSelectedCategory(wishlist, locationCategory.id)">{{locationCategory.name}}</button>
-                                </div>
-                                <!--行程卡片-->
-                                <div class="row" v-if="wishlist.selectedCategoryId === locationCategory.id">
-                                    <div class="col-md-6" v-for="detail in getFilteredDetails(wishlist)" :key="detail.id">
-                                        <div class="card mb-3" style="width: 100%;">
-                                            <img :src="detail.photoUrl" class="card-img-top" alt="...">
-                                            <div class="card-body">
-                                                <h5 class="card-title">{{ detail.name }}</h5>
-                                                <p class="card-text">{{ detail.address }}</p>
-                                                <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
-                                                <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
+                    <!-- accordion start -->
+                    <div class="accordion accordion-flush" id="wishlistAccordionFlush">
+                        <div class="accordion-item" v-for="(wishlist, index) in wishlists" :key="wishlist.id">
+                            <h2 class="accordion-header" :id="'flush-heading' + index">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        :data-bs-target="'#flush-collapse' + index" aria-expanded="false"
+                                        :aria-controls="'flush-collapse' + index">
+                                    {{wishlist.name}}
+                                </button>
+                            </h2>
+                            <div :id="'flush-collapse' + index" class="accordion-collapse collapse"
+                                 :aria-labelledby="'flush-heading' + index" data-bs-parent="#wishlistAccordionFlush">
+                                <div class="accordion-body d-flex flex-column" v-for="(locationCategory, lcIndex) in wishlist.locationCategories" :key="locationCategory.id">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary" type="button" v-on:click="setSelectedCategory(wishlist, locationCategory.id)">{{locationCategory.name}}</button>
+                                    </div>
+                                    <!--行程卡片-->
+                                    <div class="row" v-if="wishlist.selectedCategoryId === locationCategory.id">
+                                        <div class="col-md-6" v-for="detail in getFilteredDetails(wishlist)" :key="detail.id">
+                                            <div class="card mb-3" style="width: 100%;">
+                                                <img :src="detail.photoUrl" class="card-img-top" alt="...">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ detail.name }}</h5>
+                                                    <p class="card-text">{{ detail.address }}</p>
+                                                    <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
+                                                    <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#editWishlistModal"><i class="fa-solid fa-pen"></i></button>
+                        </div>
+                        <!--編輯願望清單/標籤按鈕-->
+                        <div>
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i></button>
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#editWishlistModal"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#deleteWishlistModal"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>
-                    <!--編輯願望清單/標籤按鈕-->
-                    <div>
-                        <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#deleteWishlistModal"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
+                    <!-- accordion end -->
                 </div>
-                <!-- accordion end -->
-            </div>
                 <div v-else>
                     <!-- 尚未登入提示 -->
                     <p>尚未登入，請先登入後查看您的願望清單。</p>
@@ -102,7 +102,7 @@
             </div>
             <!--願望清單內容 end-->
             <div id="chatRoomTab" class="tab-pane fade">
-@*                 @await Html.PartialAsync("../Chatroom/_ChatRoomPartial") *@
+                @*                 @await Html.PartialAsync("../Chatroom/_ChatRoomPartial") *@
                 @* <!--聊天室群組按鈕start-->
                 <div id="groupList" class="list-group">
                 <!-- 群組按鈕將在這裡動態生成 -->
@@ -111,31 +111,52 @@
             </div>
         </div>
     </div>
+
     <!--編輯願望清單及標籤modal-->
-    <!--先選定要修改的標籤-->
     <div class="modal fade" id="editWishlistModal" tabindex="-1" aria-labelledby="editWishlistModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editWishlistModalLabel">編輯願望清單及標籤</h5>
+                    <!-- 編輯Modal頁籤 start-->
+                    <ul class="nav nav-tabs" id="editWishlistModalLabel">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" aria-current="page" href="#editWishlistTab">願望清單</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#editLocationCategoryTab">標籤</a>
+                        </li>
+                    </ul>
+                    <!-- 編輯Modal頁籤 end-->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form v-on:submit.prevent="editWishlistAndCategory">
+                <!--編輯願望清單-->
+                <div id="editWishlistTab" class="tab-pane fade show active">
+                    <!-- 顯示畫面 -->
+                    <div class="modal-body">
                         <div class="mb-3">
-                            <label for="wishlist">清單名稱:</label>
-                                @* <p :key="wishlist.id" :value="wishlist.id">{{ wishlist.name }}</p> *@
-                        </div>
-                        <div class="mb-3">
-                            <label for="location">選擇分類:</label>
-                            <select id="location" class="form-control" v-model="selectedLocationCategoryId">
-                                <option v-for="location in locationCategories" :key="location.id" :value="location.id">
-                                    {{ location.name }}
+                            <label for="wishlist">選擇清單:</label>
+                            <select id="wishlist" class="form-control" v-model="selectedWishlistId" v-on:change="updateSelectedWishlist">
+                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                    {{ wishlist.name }}
                                 </option>
                             </select>
                         </div>
-                        <button id="edit" type="submit" class="btn btn-primary">修改</button>
-                    </form>
+                        <div v-if="selectedWishlist">
+                            <label for="editWishlistName">編輯名稱:</label>
+                            <input id="editWishlistName" v-model="selectedWishlist.name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" v-on:click="saveWishlist">儲存</button>
+                    </div>
+                </div>
+
+                <!--編輯標籤顯示畫面-->
+                <div id="editLocationCategoryTab" class="tab-pane fade">
+                    <div class="modal-body">
+                        編輯標籤頁籤
+                    </div>
                 </div>
             </div>
         </div>
@@ -176,9 +197,12 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">新增</button>
+                       
                     </form>
                 </div>
+                <div class="modal-footer"> 
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    </div>
             </div>
         </div>
     </div>
@@ -267,6 +291,7 @@
                         { value: 'fa-solid fa-person-swimming' },
                         { value: 'fa-solid fa-house' }
                     ],
+                    selectedWishlist: null,
                     selectedWishlistId: null,
                     selectedLocationCategoryId: null,
                     locationCategories: [],
@@ -275,7 +300,7 @@
             },
             async mounted() {
                 console.log('Vue instance mounted!');
-                //await this.fetchWishlists();
+
                 //未登入提示
                 const userId = getUserIdFromToken();
                 if (userId) {
@@ -386,8 +411,6 @@
                         return null;
                     }
                 },
-                async editWishlistAndCategory() { 
-                },
                 //新增願望清單及標籤
                 async createWishlistWithCategory() {
                     const userId = getUserIdFromToken();
@@ -485,6 +508,41 @@
                         this.locationCategories = [];
                     }
                 },
+                updateSelectedWishlist() {
+                    //根據選定的清單，將其設置於<input>元素供用戶修改
+                    this.selectedWishlist = this.wishlists.find(w => w.id === this.selectedWishlistId) || null;
+                },
+                //修改願望清單
+                async saveWishlist() {
+                    if (!this.selectedWishlist) {
+                        console.error('No wishlist selected');
+                        return;
+                    }
+                    const userId = getUserIdFromToken();
+                    if (!userId) {
+                        console.error('User ID not found');
+                        return;
+                    }
+                    try {
+                        //回傳後端data
+                        const updateData = {
+                            id: this.selectedWishlist.id,
+                            userId: userId,
+                            name: this.selectedWishlist.name
+                        };
+
+                        //向發送請求
+                        const response = await axios.put(`${baseAddress}/api/Wishlist/UpdateWishlist/${this.selectedWishlist.id}`, updateData);
+                        //顯示後端回傳訊息
+                        Swal.fire({
+                            title: "修改成功!",
+                            icon: "success"
+                        })
+                        await this.fetchWishlists(); // 更新清單
+                    } catch (error) {
+                        console.error('Error updating wishlist:', error);
+                    }
+                }
             }
         };
         Vue.createApp(vueApp).mount('#appSidebar');

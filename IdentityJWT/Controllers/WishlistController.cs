@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Net.Http;
 using PinPinServer.Models.DTO;
+using PinPinServer.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -161,19 +162,31 @@ namespace PinPinServer.Controllers
             //return Content("新增成功!");
         }
 
+        
         //修改願望清單OK
-        /*  */
         //PUT:api/Wishlist/UpdateWishlist/{id}
         [HttpPut("UpdateWishlist/{id}")]
-        public async Task<IActionResult> UpdateWishlist(int id, Wishlist wishlist) 
+        public async Task<IActionResult> UpdateWishlist(int id, [FromBody] WishlistUpdateDTO updateDTO)
         {
-            if (id != wishlist.Id)
+            // 取得userId
+            var user = await _context.Users.FindAsync(updateDTO.UserId);
+            if (user == null)
             {
-                return BadRequest();
+                return BadRequest("無此用戶");
             }
 
-            _context.Entry(wishlist).State = EntityState.Modified;
+            // 取得願望清單
+            var wishlist = await _context.Wishlists.FindAsync(id);
+            if (wishlist == null || wishlist.UserId != updateDTO.UserId)
+            {
+                return BadRequest("無此願望清單或無修改權限");
+            }
 
+            // 更新願望清單
+            wishlist.Name = updateDTO.Name;
+
+            // 儲存修改
+            _context.Entry(wishlist).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -192,6 +205,8 @@ namespace PinPinServer.Controllers
 
             return Content("願望清單修改成功！");
         }
+
+
         private bool WishlistExists(int id)
         {
             return _context.Wishlists.Any(e => e.Id == id);
