@@ -104,8 +104,8 @@
             <!-- 聊天室內容 start-->
             <div id="chatRoomTab" class="tab-pane fade">
                 <div v-if="isLoggedIn">
-                    <div class="d-grid gap-2" id="chatRoomList">
-                        <button class="btn btn-outline-primary" type="button">聊天室</button>
+                    <div class="d-grid gap-2" id="SchdulesList">
+                        <button v-for="(value, key) in schdules" class="btn btn-outline-primary mb-3" type="button" v-on:click="axioschatroom">{{value}}</button>
                     </div>
                 </div>
                 <div v-else>
@@ -287,6 +287,10 @@
                 }
             },
             methods: {
+                async axioschatroom(scheduleId){
+
+                }
+
                 async fetchWishlists() {
                     const userId = getUserIdFromToken();
                     if (!userId) {

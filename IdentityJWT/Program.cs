@@ -33,6 +33,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
 //JWT驗證用
 builder.Services.AddSwaggerGen(options =>
 {
@@ -59,7 +60,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
-builder.Services.AddSignalR();
 
 //註冊天氣服務    
 builder.Services.AddHttpClient<WeatherService>(client =>
