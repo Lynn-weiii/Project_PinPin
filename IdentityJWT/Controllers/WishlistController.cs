@@ -280,15 +280,22 @@ namespace PinPinServer.Controllers
         //"id","wishlistId","name","color","icon"
         //PUT:api/Wishlist/UpdateLocationCategory/{id}
         [HttpPut("UpdateLocationCategory/{id}")]
-        public async Task<IActionResult> UpdateLocationCategory(int id,[FromBody]LocationCategory locationCategory)
+        public async Task<IActionResult> UpdateLocationCategory(int id,[FromBody]LocationCategoryDTO locationCategoryDTO)
         {
-            if (id != locationCategory.Id)
+            // 取得標籤
+            var locationCategory = await _context.LocationCategories.FindAsync(id);
+            if (locationCategory == null || locationCategory.WishlistId != locationCategoryDTO.WishlistId)
             {
-                return BadRequest("ID mismatch.");
+                return BadRequest("無此標籤");
             }
 
-            _context.Entry(locationCategory).State = EntityState.Modified;
+            // 更新標籤
+            locationCategory.Name = locationCategoryDTO.Name;
+            locationCategory.Icon = locationCategoryDTO.Icon;
+            locationCategory.Color = locationCategoryDTO.Color;
 
+            // 保存更改
+            _context.Entry(locationCategory).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();

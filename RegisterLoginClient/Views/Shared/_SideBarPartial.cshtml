@@ -151,13 +151,56 @@
                         <button type="button" class="btn btn-primary" v-on:click="saveWishlist">儲存</button>
                     </div>
                 </div>
-
-                <!--編輯標籤顯示畫面-->
+                <!--編輯標籤-->
                 <div id="editLocationCategoryTab" class="tab-pane fade">
+                    <!-- 顯示畫面 -->
                     <div class="modal-body">
-                        編輯標籤頁籤
+                        <div class="mb-3">
+                            <label for="wishlist">選擇清單:</label>
+                            <select id="wishlist" class="form-control" v-model="selectedWishlistId" v-on:change="changeOption">
+                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                    {{ wishlist.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location">選擇分類:</label>
+                            <select id="location" class="form-control" v-model="selectedLocationCategoryId" v-on:change="updateSelectedLocationCategory">
+                                <option v-for="location in locationCategories" :key="location.id" :value="location.id">
+                                    {{ location.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div v-if="selectedLocationCategory">
+                            <div class="mb-3">
+                                <label for="editLocationCategory">編輯標籤名稱:</label>
+                                <input id="editLocationCategory" v-model="selectedLocationCategory.name" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editLocationIcon">編輯標籤圖示:</label>
+                                    <div id="editLocationIcon" class="d-flex flex-wrap">
+                                        <div v-for="icon in icons" :key="icon.value" class="me-3 mb-2">
+                                            <label>
+                                            <input type="radio" name="categoryIcon" :value="icon.value" v-model="selectedLocationCategory.icon" :id="icon.value" required>
+                                                <span class="round button">
+                                                    <i :class="icon.value" class="fs-4 me-2"></i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editLocationColor">編輯標籤顏色:</label>
+                                <input id="editLocationColor" v-model="selectedLocationCategory.color" class="form-control" type="color">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" v-on:click="saveLocationCategory">儲存</button>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -197,12 +240,12 @@
                                 </div>
                             </div>
                         </div>
-                       
+
                     </form>
                 </div>
-                <div class="modal-footer"> 
+                <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">新增</button>
-                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -293,6 +336,7 @@
                     ],
                     selectedWishlist: null,
                     selectedWishlistId: null,
+                    selectedLocationCategory: null,
                     selectedLocationCategoryId: null,
                     locationCategories: [],
                     allLocationCategories: []
@@ -496,6 +540,7 @@
                 //依選取的願望清單對應標籤
                 changeOption: function () {
                     this.filterLocationCategories();
+                    this.updateSelectedLocationCategory(); // 設置更新後的標籤
                 },
                 filterLocationCategories: function () {
                     if (this.selectedWishlistId !== null) {
@@ -503,6 +548,8 @@
                         this.locationCategories = this.allLocationCategories.filter(category => {
                             return category.wishlistId === this.selectedWishlistId;
                         });
+                        this.selectedLocationCategoryId = null;
+                        this.selectedLocationCategory = null;
                     } else {
                         // 沒有選擇清單時，保持分類為空
                         this.locationCategories = [];
@@ -542,9 +589,44 @@
                     } catch (error) {
                         console.error('Error updating wishlist:', error);
                     }
+                },
+                //根據選定的標籤，設置<input>元素
+                updateSelectedLocationCategory() {
+                    //根據選定的清單，將其設置於<input>元素供用戶修改
+                    this.selectedLocationCategory = this.locationCategories.find(l => l.id === this.selectedLocationCategoryId) || null;
+                },
+                //修改標籤
+                async saveLocationCategory() {
+                    if (!this.selectedLocationCategory) {
+                        console.error('No location category selected');
+                        return;
+                    }
+
+                    try {
+                        // 构建请求数据
+                        const updateData = {
+                            id: this.selectedLocationCategoryId,
+                            wishlistId: this.selectedWishlistId,
+                            name: this.selectedLocationCategory.name,
+                            icon: this.selectedLocationCategory.icon,
+                            color: this.selectedLocationCategory.color
+                        };
+                        console.log('Update data:', updateData);
+                        //console(updateData);
+                        const response = await axios.put(`${baseAddress}/api/Wishlist/UpdateLocationCategory/${this.selectedLocationCategory.id}`, updateData);
+                        Swal.fire({
+                            title: "修改成功!",
+                            icon: "success"
+                        });
+
+                        await this.fetchWishlists(); 
+                    } catch (error) {
+                        //console("icon:", updateData.icon);
+                        console.error('Error updating location category:', error.response ? error.response.data : error.message);
+                    }
                 }
             }
-        };
+            };
         Vue.createApp(vueApp).mount('#appSidebar');
     });
 </script>
