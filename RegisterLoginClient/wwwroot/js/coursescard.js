@@ -4,7 +4,7 @@ function createCourseCard(course, isGroup = false) {
     courseItem.className = 'item course_card_owl_item';
     var picture = course.picture ? course.picture : '/images/course/course_01.jpg';
     var detailsUrl = `https://localhost:7215/Schdules/ScduleDetials/${course.id}`;
-    courseItem.innerHTML = `    
+    courseItem.innerHTML = courseItem.innerHTML = `    
     <div class="course_card">
     <div class="course_card_container">
         <div class="course_card_top">

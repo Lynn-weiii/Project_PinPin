@@ -1,4 +1,7 @@
-﻿/* 固定按钮样式 */
+﻿
+
+
+/* 固定按钮样式 */
 .fixed-button {
     position: fixed;
     bottom: 20px;
@@ -27,12 +30,16 @@
 #search_input {
     z-index: 999;
     width: 300px; /* 可以根据需要调整宽度 */
-    margin: 10px; /* 添加一些边距使其不紧贴边缘 */
+    margin: 10px; 
 }
 
     #search_input input {
         width: 100%;
+        border: 2px solid black;
     }
+
+
+
 
 /* 大屏幕设备 */
 @media (min-width: 998.1px) {
@@ -161,4 +168,102 @@
         color: black;
         text-decoration: none;
         cursor: pointer;
+    }
+
+    /*google map informadal*/
+.info-window {
+    font-family: Arial, sans-serif;
+    /*line-height: 1.35;*/
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 300px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    background-color: white;
+}
+
+    .info-window img {
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    .info-window .details {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .info-window .rating {
+        color: #FFD700;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .info-window .star-rating {
+        display: flex;
+        align-items: center;
+    }
+
+        .info-window .star-rating span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+    .info-window .star-rating .full {
+        background-image: url('/images/star-full.svg');
+    }
+
+    .info-window .star-rating .half {
+        background-image: url('/images/star-half.svg');
+    }
+
+    .info-window .star-rating .empty {
+        background-image: url('/images/star-empty.svg');
+    }
+
+    .info-window .address {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .info-window .btn-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-window .btn-primary {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #FFA500;
+        color: white;
+        text-decoration: none;
+        border-radius: 50%;
+        padding: 5px;
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+        .info-window .btn-primary:hover {
+            background-color: #FF8C00;
+        }
+
+    .info-window .location {
+        display: flex;
+        align-items: center;
+        background-color: #F0F0F0;
+        border-radius: 20px;
+        padding: 5px 10px;
+        font-size: 14px;
+        color: #555;
     }
