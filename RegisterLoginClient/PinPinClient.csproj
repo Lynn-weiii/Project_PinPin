@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\SchduleIndex.css" />
     <_ContentIncludedByDefault Remove="wwwroot\js\ExpenseMain.js" />
   </ItemGroup>
 

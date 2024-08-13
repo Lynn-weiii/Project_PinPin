@@ -1,17 +1,24 @@
 ﻿@section Styles {
     <link href="~/css/animate.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
+        /* 調整 hero-section */
         .hero-section {
-            height: calc(100vh - 88px);
+            height: calc(100vh - 88px); /* 高度減去頂部導航欄的高度 */
             position: relative;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; /* 垂直居中內容 */
+            justify-content: center; /* 水平居中內容 */
             text-align: center;
             color: white;
             overflow: hidden;
         }
 
+            /* Hero 背景圖 */
             .hero-section::before {
                 content: '';
                 position: absolute;
@@ -19,13 +26,13 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-image: url("images/3.1.jpg");
                 background-size: cover;
                 background-position: center;
                 z-index: 0;
-                animation: zoomIn 20s infinite;
+                animation: backgroundAnimation 20s infinite; /* 背景圖輪播動畫 */
             }
 
+            /* Hero 層疊背景色 */
             .hero-section::after {
                 content: '';
                 position: absolute;
@@ -33,45 +40,157 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
+                background-color: rgba(0, 0, 0, 0.5); /* 黑色半透明遮罩 */
                 z-index: 1;
             }
 
+            /* Hero 內部內容 */
             .hero-section > div {
                 position: relative;
-                z-index: 2;
+                z-index: 2; /* 確保內容在背景上方 */
             }
 
+            /* 調整 row 為 Flexbox */
+            .hero-section .row {
+                display: flex;
+                justify-content: center; /* 水平居中內容 */
+                gap: 10px; /* 按鈕之間的間距不超過10px */
+                flex-wrap: wrap; /* 當屏幕寬度不足時，換行 */
+            }
+
+            /* 調整按鈕的列寬 */
+            .hero-section .col {
+                flex: 1 1 45%; /* 基礎寬度45%，可以在屏幕縮小時自動調整 */
+                display: flex;
+                justify-content: center; /* 按鈕水平居中 */
+            }
+
+            /* 按鈕樣式 */
             .hero-section .btn {
-                margin: 0 10px;
+                display: flex;
+                justify-content: center; /* 按鈕內部圖片水平居中 */
+                align-items: center; /* 按鈕內部圖片垂直居中 */
+                transition: transform 0.3s ease, box-shadow 0.3s ease; /* 平滑的過渡效果 */
+                border-radius: 6px;
+                background: transparent; /* 確保背景透明 */
+                width: 100%; /* 按鈕寬度占父容器的100% */
+                max-width: 200px; /* 按鈕的最大寬度，防止過大 */
             }
 
+                /* 按鈕內部圖片樣式 */
+                .hero-section .btn img {
+                    max-width: 100%; /* 圖片寬度占據按鈕的100% */
+                    height: auto; /* 保持圖片的縱橫比 */
+                }
 
-        @@keyframes zoomIn {
+                    /* 按鈕圖片懸停效果 */
+                    .hero-section .btn img:hover {
+                        transform: scale(1.05); /* 圖片放大 5% */
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影 */
+                    }
+
+            /* Hero 文字樣式 */
+            .hero-section p {
+                font-size: 48px;
+                font-family: "Noto Sans TC", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: 700;
+            }
+
+        /* 背景圖輪播動畫 */
+        @@keyframes backgroundAnimation {
             0% {
-                transform: scale(1);
+                background-image: url("images/3.1.jpg");
             }
 
-            50% {
-                transform: scale(1.1);
+            33% {
+                background-image: url("images/3.2.jpg");
+            }
+
+            66% {
+                background-image: url("images/3.3.jpg");
             }
 
             100% {
-                transform: scale(1);
+                background-image: url("images/3.1.jpg"); /* 確保輪播回到初始圖片 */
             }
         }
+
+        /* 調整響應式 logo 樣式 */
+        .responsive-logo {
+            width: 100%; /* 使圖像寬度占據父容器的100% */
+            max-width: 720px; /* 設置最大寬度為800px */
+            height: auto; /* 保持圖像的縱橫比 */
+            margin: 0 auto; /* 自動水平居中 */
+            /* transform: translateY(-10%); */ /* 僅 Y 方向的平移 */
+        }
+
+        /* 中等屏幕下的最大寬度調整 */
+        @@media (max-width: 1200px) {
+            .responsive-logo {
+                max-width: 620px; /* 中等屏幕下的最大寬度 */
+                transform: translateX(8%); /* 調整平移以適應較小的屏幕 */
+            }
+            /* 在 1200px 以下的屏幕上，按鈕圖片樣式調整 */
+            .hero-section .btn {
+                width: 100%; /* 按鈕寬度占父容器的100% */
+                max-width: 150px; /* 調整按鈕的最大寬度 */
+            }
+        }
+
+        /* 移動設備下的最大寬度調整 */
+        @@media (max-width: 768px) {
+            .responsive-logo {
+                max-width: 520px; /* 移動設備下的最大寬度 */
+                transform: translateY(10%) translateX(5%); /* 再次調整平移 */
+            }
+            /* 在 768px 以下的屏幕上，按鈕樣式調整 */
+            .hero-section .btn {
+                width: 100%; /* 按鈕寬度占父容器的100% */
+                max-width: 120px; /* 調整按鈕的最大寬度 */
+            }
+        }
+
+        /* 更小的移動設備下的最大寬度調整 */
+        @@media (max-width: 576px) {
+            .responsive-logo {
+                max-width: 420px; /* 更小的移動設備下的最大寬度 */
+                transform: translateY(-2%) translateX(1%); /* 適應更小的屏幕 */
+            }
+            /* 在 576px 以下的屏幕上，按鈕樣式調整 */
+            .hero-section .btn {
+                width: 100%; /* 按鈕寬度占父容器的100% */
+                max-width: 100px; /* 調整按鈕的最大寬度 */
+            }
+        }
+        /* 調整屏幕翻轉的狀況 */
+        @@media (orientation: landscape) and (max-height: 500px) {
+            .hero-section {
+                height: calc(100vh - 50px); /* 調整高度減去頂部導航欄的高度 */
+            }
+
+                .hero-section .row {
+                    gap: 5px; /* 調整按鈕之間的間距 */
+                }
+
+                .hero-section .btn {
+                    max-width: 150px; /* 調整按鈕的最大寬度 */
+                }
+        }
+
     </style>
 }
-
 <main class="hero-section">
     <div>
-        <h1 class="fs-1 fw-bold">將自己的腳印銘刻在世界</h1>
-        <p class="fs-5">
-            當你在世界各地留下足跡，不只是旅行，而是在編織屬於自己的冒險故事。探索未知，發現美麗，讓每一步都成為難忘的回憶。
-        </p>
-        <div>
-            <a href="#" class="btn btn-success btn-lg">開始規劃</a>
-            <a href="#" class="btn btn-success btn-lg">搜尋景點</a>
+        <div class="row mb-1" id="entrylogo">
+            <img src="~/images/entrylogolight.png" class="responsive-logo" />
+        </div>
+        
+        <div class="row" >
+            <div class="col" id="indexmenu">
+                <a href="Schdules" class="btn animate__flipInX"><img src="~/images/schdule.png" alt="Schedule" /></a>
+                <a href="SearchSpots" class="btn animate__flipInX"><img src="~/images/serchview.png" alt="Search View" /></a>
+            </div>
         </div>
     </div>
 </main>

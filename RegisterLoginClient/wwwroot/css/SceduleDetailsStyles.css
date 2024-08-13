@@ -1,7 +1,7 @@
 ﻿/******************/
 
 /*****************/
-.fixed-button {
+    .fixed-button {
     position: fixed;
     bottom: 20px;
     left: 20px;
@@ -13,39 +13,163 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
+    }
 
     .fixed-button:hover {
         background-color: #0056b3;
     }
 
-/* 針對大於等於 998px 的設備 */
-@media (min-width: 997.98px) {
-    .row-cols-md-2 {
+    #map {
+        height: 100vh; /* 高度设为视口高度 */
+        width: 100%; /* 宽度设为 100% */
+        box-sizing: border-box; /* 包含边距和边框 */
+    }
+
+    /* 針對大於等於 998px 的設備 */
+    @media (min-width: 998.1px) {
+        .row-cols-md-2 {
+            display: flex;
+            height: 100vh; /* 高度滿版 */
+        }
+
+        #plannertable {
+            flex: 0 0 30%; /* 佔據 30% */
+            max-width: 30%;
+            box-sizing: border-box; /* 包含邊距和邊框 */
+        }
+
+        #map {
+            flex: 0 0 70%; /* 佔據 70% */
+            max-width: 70%;
+            box-sizing: border-box; /* 包含邊距和邊框 */
+            z-index: 1;
+        }
+    }
+
+    /* 針對小於 998px 的設備 */
+    @media (max-width: 998px) {
+            #map {
+                display: none; /* 隱藏地圖 */
+                z-index: 1;
+            }
+
+            #plannertable {
+                width: 100%; /* 行程表寬度滿版 */
+            }
+        }
+
+    /* 主题名称区 */
+    .theme-header {
+        position: relative;
+        background: rgba(0, 0, 0, 0.4) url('') no-repeat center center; /* 40% 灰色遮罩 */
+        background-size: cover; /* 确保背景图像覆盖整个元素 */
+        height: 180px; /* 根据需要调整高度 */
+        color: white;
         display: flex;
-        height: 100vh; /* 高度滿版 */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%; /* 确保宽度填满父元素 */
     }
 
-    #plannertable {
-        flex: 0 0 30%; /* 佔據 30% */
-        max-width: 30%;
-        box-sizing: border-box; /* 包含邊距和邊框 */
+    .theme-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4); /* 40% 灰色透明度 */
+        z-index: 1; /* 确保覆盖层在背景图像之上 */
     }
 
-    #map {
-        flex: 0 0 70%; /* 佔據 70% */
-        max-width: 70%;
-        box-sizing: border-box; /* 包含邊距和邊框 */
+    .theme-header h1 {
+        font-size: 2em;
+        margin: 0;
     }
+
+    #theme-name {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        font-size: 30px;
+        font-family: "Noto Sans TC", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 700;
+        z-index:1
+    }
+
+/* 按鈕樣式 */
+.theme-header .btn {
+    position: absolute;
+    top: 10px; /* 距離頂部10像素 */
+    right: 10px; /* 距離右側10像素 */
+    border: none; /* 移除边框 */
+    color: white; /* 文字顏色為白色 */
+    font-weight: bold; /* 文字加粗 */
+    background: transparent; /* 使背景透明 */
 }
 
-/* 針對小於 998px 的設備 */
-@media (max-width: 997.98px) {
-    #map {
-        display: none; /* 隱藏地圖 */
+#theme-header .btn:hover, #theme-header .btn:focus, #theme-header .btn:active {
+    border: none; /* 不显示边框 */
+    color: white; /* 文字顏色為白色 */
+    transform: scale(1.10); /* 略微放大 */
+    outline: none; /* 移除focus时的外边框 */
+    box-shadow: none; /* 移除可能的阴影效果 */
+}
+
+/*地圖上的搜尋INPUT*/
+
+#search_input {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 5;
+    width: calc(100% - 20px);
+    max-width: 10%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform:translateY(100%);
+}
+
+#mapsection.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+#mapsection.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+
+}
+
+#mapsection.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+    #mapsection.close:hover,
+    #mapsection.close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
     }
 
-    #plannertable {
-        width: 100%; /* 行程表寬度滿版 */
-    }
-}
+
+
+   
