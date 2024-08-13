@@ -94,7 +94,6 @@ function handleResponseErrors(response) {
 //#endregion
 
 //#region google API
-
 let map, marker, autocomplete, infowindow, position, service, keyword, searchTimeout, idleListener,globalName,globalScheduleId;
 let markers = []; 
 
@@ -146,8 +145,15 @@ async function initMap(scheduleId, name, position) {
         markers.push(marker);
 
         console.log('Autocomplete place selected:', { place, name, scheduleId });
-        infowindow.setContent(createInfoWindowContent(place, name, scheduleId));
+        const content = createInfoWindowContent(place, name, scheduleId);
+        infowindow.setContent(content);
         infowindow.open(map, marker);
+
+        // 移除旧的监听器，防止重复监听
+        document.querySelector('#add-place-btn').removeEventListener('click', addPlaceToScheduleHandler);
+
+        // 添加新的监听器
+        document.querySelector('#add-place-btn').addEventListener('click', addPlaceToScheduleHandler);
 
         const keyword = document.getElementById('search_input_field').value;
         performNearbySearch(place.geometry.location, keyword, name, scheduleId);
@@ -180,8 +186,7 @@ async function initMap(scheduleId, name, position) {
         // 在创建 InfoWindow 后，调用 geocodeLatLng 获取更多信息
         geocodeLatLng(event.latLng);
     });
-}
-function clearMarkers() {
+} function clearMarkers() {
     markers.forEach((marker) => {
         if (marker) {
             marker.map = null;
@@ -189,8 +194,7 @@ function clearMarkers() {
     });
     markers = [];
 }
-async function performNearbySearch(location, keyword, name, scheduleId) {
-    console.log('performNearbySearch called with:', { location, keyword, name, scheduleId });
+async function performNearbySearch(location, keyword, name, scheduleId) {    
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const request = {
         location: location,
@@ -245,6 +249,14 @@ async function performNearbySearch(location, keyword, name, scheduleId) {
         $('#search_input_field').val('');
     });
 }
+function addPlaceToScheduleHandler(event) {
+    const button = event.currentTarget;
+    const lat = button.getAttribute('data-lat');
+    const lng = button.getAttribute('data-lng');
+    const placeId = button.getAttribute('data-place-id');
+    const scheduleId = button.getAttribute('data-id');
+    addPlaceToSchedule(lat, lng, placeId, scheduleId);
+}
 async function geocodeLatLng(latlng) {
     const name = globalName;
     const scheduleId = globalScheduleId;
@@ -266,19 +278,18 @@ async function geocodeLatLng(latlng) {
                             markers.push(marker);
 
                             console.log('Creating info window with:', { place, name, scheduleId });
-                            // 调用 createInfoWindowContent 前添加调试信息
-                            console.log('Before calling createInfoWindowContent:', { place, name, scheduleId });
-
-                            // 调用 createInfoWindowContent 函数
                             const content = createInfoWindowContent(place, name, scheduleId);
+                            console.log('Info window content:', content);
 
                             // 设置信息窗口内容并打开
                             infowindow.setContent(content);
                             infowindow.open(map, marker);
 
-                            document.querySelector('#add-place-btn').addEventListener('click', function () {
-                                addPlaceToSchedule(place.geometry.location.lat(), place.geometry.location.lng(), place.place_id, scheduleId);
-                            });
+                            // 移除旧的监听器，防止重复监听
+                            document.querySelector('#add-place-btn').removeEventListener('click', addPlaceToScheduleHandler);
+
+                            // 添加新的监听器
+                            document.querySelector('#add-place-btn').addEventListener('click', addPlaceToScheduleHandler);
                         } else {
                             window.alert("No results found");
                         }
@@ -292,37 +303,19 @@ async function geocodeLatLng(latlng) {
 }
 function createInfoWindowContent(place, name, scheduleId) {
     console.log('createInfoWindowContent called with:', { scheduleId, name });
-    let content = '<div class="info-window">';
+    let content = '<div class="info-window" style="width: 350px;">';
+
     if (place.photos && place.photos.length > 0) {
-        content += `<img src="${place.photos[0].getUrl({ maxWidth: 300, maxHeight: 150 })}" alt="${place.name}"><br>`;
+        content += `<img src="${place.photos[0].getUrl({ maxWidth: 350 })}" alt="${place.name}" style="width: 350px;height: auto; display: block; margin: 0 auto;"><br>`;
     }
-    content += `<div class="details">${place.name}</div>`;
-    content += `<div class="rating">${place.rating ? getStarRating(place.rating) : 'N/A'} (${place.user_ratings_total || 0})</div>`;
-    content += `<div class="address">${place.vicinity || place.formatted_address}</div>`;
-    content += `<div class="btn-container">
-                    <div class="location">${name}</div>
-                    <a href="#" class="btn-primary" data-id="${scheduleId}" id="add-place-btn">
-                        +
-                    </a>
-                    <span>加入行程</span>
-                </div>`;
-    content += '</div>';
-    return content;
-}
-function createInfoWindowContent(place, name, scheduleId) {
-    console.log('createInfoWindowContent called with:', { scheduleId, name });
-    let content = '<div class="info-window">';
-    if (place.photos && place.photos.length > 0) {
-        content += `<img src="${place.photos[0].getUrl({ maxWidth: 300, maxHeight: 150 })}" alt="${place.name}"><br>`;
-    }
-    content += `<div class="details">${place.name}</div>`;
-    content += `<div class="rating">${place.rating ? getStarRating(place.rating) : 'N/A'} (${place.user_ratings_total || 0})</div>`;
-    content += `<div class="address">${place.vicinity || place.formatted_address}</div>`;
-    content += `<div class="btn-container">
-                    <div class="location">${name}</div>
-                    <a href="#" class="btn-primary" data-id="${scheduleId}" id="add-place-btn">
-                        +
-                    </a>
+
+    content += `<div class="details" style="margin-top: 10px;"><strong>${place.name}</strong></div>`;
+    content += `<div class="rating" style="margin-top: 5px;">${place.rating ? getStarRating(place.rating) : 'N/A'} (${place.user_ratings_total || 0})</div>`;
+    content += `<div class="address" style="margin-top: 5px;">${place.vicinity || place.formatted_address}</div>`;
+    content += `<div class="btn-container" style="display: flex; align-items: center; margin-top: 10px;">
+                    <button class="btn-primary" id="wishlist-btn" style="background-color: gold; border: none; border-radius: 50%; width: 30px; height: 30px; margin-right: 10px;">⭐</button>
+                    <span style="margin-right: 20px;">加入願望</span>
+                    <button class="btn-primary" id="add-place-btn" data-lat="${place.geometry.location.lat()}" data-lng="${place.geometry.location.lng()}" data-place-id="${place.place_id}" data-id="${scheduleId}" style="background-color: green; border: none; border-radius: 50%; width: 30px; height: 30px; margin-right: 10px;">+</button>
                     <span>加入行程</span>
                 </div>`;
     content += '</div>';
