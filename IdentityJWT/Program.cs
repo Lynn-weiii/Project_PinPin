@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PinPinServer.Hubs;
 using PinPinServer.Models;
 using PinPinServer.Services;
 using Swashbuckle.AspNetCore.Filters;
@@ -16,38 +17,6 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 builder.Services.AddDbContext<PinPinContext>(options => { options.UseSqlServer(builder.Configuration.GetConnectionString("PinPinSQL")); });
 builder.Services.AddScoped<AuthGetuserId>();
 
-//註冊天氣服務    
-builder.Services.AddHttpClient<WeatherService>(client =>
-{
-    client.BaseAddress = new Uri("https://api.openweathermap.org");
-});
-
-
-builder.Services.AddSingleton<WeatherService>(provider =>
-{
-    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(WeatherService));
-    return new WeatherService(builder.Configuration["AppSettings:WeatherApiKey"], httpClient);
-});
-
-//註冊匯率服務
-builder.Services.AddHttpClient<ChangeRateService>(client =>
-{
-    client.BaseAddress = new Uri("https://v6.exchangerate-api.com");
-});
-builder.Services.AddSingleton<ChangeRateService>(provider =>
-{
-    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(ChangeRateService));
-    return new ChangeRateService(builder.Configuration["AppSettings:ExChangeRateApiKey"], httpClient);
-});
-
-builder.Services.AddControllers();
-builder.Services.AddHttpClient();
-builder.Services.AddMemoryCache();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-
 var PinPinPolicy = "PinPinPolicy";
 builder.Services.AddCors(options =>
 {
@@ -56,6 +25,13 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("*").WithMethods("*").WithHeaders("*");
     });
 });
+
+builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //JWT驗證用
 builder.Services.AddSwaggerGen(options =>
@@ -83,6 +59,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
+builder.Services.AddSignalR();
+
+//註冊天氣服務    
+builder.Services.AddHttpClient<WeatherService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.openweathermap.org");
+});
+
+
+builder.Services.AddSingleton<WeatherService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(WeatherService));
+    return new WeatherService(builder.Configuration["AppSettings:WeatherApiKey"], httpClient);
+});
+
+//註冊匯率服務
+builder.Services.AddHttpClient<ChangeRateService>(client =>
+{
+    client.BaseAddress = new Uri("https://v6.exchangerate-api.com");
+});
+builder.Services.AddSingleton<ChangeRateService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(ChangeRateService));
+    return new ChangeRateService(builder.Configuration["AppSettings:ExChangeRateApiKey"], httpClient);
+});
 
 builder.Services.AddHttpContextAccessor();
 
@@ -104,5 +105,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<ChatHub>("/ChatHub");
 
 app.Run();
