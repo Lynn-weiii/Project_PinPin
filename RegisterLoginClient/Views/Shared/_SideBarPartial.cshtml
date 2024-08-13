@@ -118,89 +118,91 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <!-- 編輯Modal頁籤 start-->
-                    <ul class="nav nav-tabs" id="editWishlistModalLabel">
+                    <ul class="nav nav-tabs" id="editWishlistModalLabel" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" aria-current="page" href="#editWishlistTab">願望清單</a>
+                            <a class="nav-link active" data-bs-toggle="tab" href="#editWishlistTab" role="tab">願望清單</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#editLocationCategoryTab">標籤</a>
+                            <a class="nav-link" data-bs-toggle="tab" href="#editLocationCategoryTab" role="tab">標籤</a>
                         </li>
                     </ul>
                     <!-- 編輯Modal頁籤 end-->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <!--編輯願望清單-->
-                <div id="editWishlistTab" class="tab-pane fade show active">
-                    <!-- 顯示畫面 -->
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="wishlist">選擇清單:</label>
-                            <select id="wishlist" class="form-control" v-model="selectedWishlistId" v-on:change="updateSelectedWishlist">
-                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
-                                    {{ wishlist.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div v-if="selectedWishlist">
-                            <label for="editWishlistName">編輯名稱:</label>
-                            <input id="editWishlistName" v-model="selectedWishlist.name" class="form-control">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" v-on:click="saveWishlist">儲存</button>
-                    </div>
-                </div>
-                <!--編輯標籤-->
-                <div id="editLocationCategoryTab" class="tab-pane fade">
-                    <!-- 顯示畫面 -->
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="wishlist">選擇清單:</label>
-                            <select id="wishlist" class="form-control" v-model="selectedWishlistId" v-on:change="changeOption">
-                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
-                                    {{ wishlist.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="location">選擇分類:</label>
-                            <select id="location" class="form-control" v-model="selectedLocationCategoryId" v-on:change="updateSelectedLocationCategory">
-                                <option v-for="location in locationCategories" :key="location.id" :value="location.id">
-                                    {{ location.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div v-if="selectedLocationCategory">
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!--編輯願望清單-->
+                    <div id="editWishlistTab" class="tab-pane fade show active" role="tabpanel">
+                        <!-- 顯示畫面 -->
+                        <div class="modal-body">
                             <div class="mb-3">
-                                <label for="editLocationCategory">編輯標籤名稱:</label>
-                                <input id="editLocationCategory" v-model="selectedLocationCategory.name" class="form-control">
+                                <label for="wishlist">選擇清單:</label>
+                                <select id="wishlist" class="form-control" v-model="selectedWishlistId" v-on:change="updateSelectedWishlist">
+                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                        {{ wishlist.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div v-if="selectedWishlist">
+                                <label for="editWishlistName">編輯名稱:</label>
+                                <input id="editWishlistName" v-model="selectedWishlist.name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" v-on:click="saveWishlist">儲存</button>
+                        </div>
+                    </div>
+                    <!--編輯標籤-->
+                    <div id="editLocationCategoryTab" class="tab-pane fade" role="tabpanel">
+                        <!-- 顯示畫面 -->
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="wishlist">選擇清單:</label>
+                                <select id="wishlist" class="form-control" v-model="selectedWishlistId" v-on:change="changeOption">
+                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                        {{ wishlist.name }}
+                                    </option>
+                                </select>
                             </div>
                             <div class="mb-3">
-                                <label for="editLocationIcon">編輯標籤圖示:</label>
+                                <label for="location">選擇分類:</label>
+                                <select id="location" class="form-control" v-model="selectedLocationCategoryId" v-on:change="updateSelectedLocationCategory">
+                                    <option v-for="location in locationCategories" :key="location.id" :value="location.id">
+                                        {{ location.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div v-if="selectedLocationCategory">
+                                <div class="mb-3">
+                                    <label for="editLocationCategory">編輯標籤名稱:</label>
+                                    <input id="editLocationCategory" v-model="selectedLocationCategory.name" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editLocationIcon">編輯標籤圖示:</label>
                                     <div id="editLocationIcon" class="d-flex flex-wrap">
                                         <div v-for="icon in icons" :key="icon.value" class="me-3 mb-2">
                                             <label>
-                                            <input type="radio" name="categoryIcon" :value="icon.value" v-model="selectedLocationCategory.icon" :id="icon.value" required>
+                                                <input type="radio" name="categoryIcon" :value="icon.value" v-model="selectedLocationCategory.icon" :id="icon.value" required>
                                                 <span class="round button">
                                                     <i :class="icon.value" class="fs-4 me-2"></i>
                                                 </span>
                                             </label>
                                         </div>
                                     </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editLocationColor">編輯標籤顏色:</label>
-                                <input id="editLocationColor" v-model="selectedLocationCategory.color" class="form-control" type="color">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editLocationColor">編輯標籤顏色:</label>
+                                    <input id="editLocationColor" v-model="selectedLocationCategory.color" class="form-control" type="color">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" v-on:click="saveLocationCategory">儲存</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" v-on:click="saveLocationCategory">儲存</button>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -603,7 +605,6 @@
                     }
 
                     try {
-                        // 构建请求数据
                         const updateData = {
                             id: this.selectedLocationCategoryId,
                             wishlistId: this.selectedWishlistId,
@@ -611,22 +612,19 @@
                             icon: this.selectedLocationCategory.icon,
                             color: this.selectedLocationCategory.color
                         };
-                        console.log('Update data:', updateData);
-                        //console(updateData);
                         const response = await axios.put(`${baseAddress}/api/Wishlist/UpdateLocationCategory/${this.selectedLocationCategory.id}`, updateData);
                         Swal.fire({
                             title: "修改成功!",
                             icon: "success"
                         });
 
-                        await this.fetchWishlists(); 
+                        await this.fetchWishlists();
                     } catch (error) {
-                        //console("icon:", updateData.icon);
                         console.error('Error updating location category:', error.response ? error.response.data : error.message);
                     }
                 }
             }
-            };
+        };
         Vue.createApp(vueApp).mount('#appSidebar');
     });
 </script>
