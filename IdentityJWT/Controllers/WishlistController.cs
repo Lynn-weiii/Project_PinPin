@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Net.Http;
 using PinPinServer.Models.DTO;
 using PinPinServer.Services;
+using PinPinServer.Utilities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -72,7 +73,6 @@ namespace PinPinServer.Controllers
             return Ok(result);
 
         }
-
 
         //加入願望清單
         //POST:api/Wishlist/AddtoWishlistDetail
@@ -240,7 +240,7 @@ namespace PinPinServer.Controllers
         [HttpPost("CreateLocationCategory")]
         public async Task<ActionResult<LocationCategory>> CreateLocationCategory(LocationCategory locationCategory)
         {
-            if (locationCategory == null || string.IsNullOrWhiteSpace(locationCategory.Name) || string.IsNullOrWhiteSpace(locationCategory.Color))
+            if (locationCategory == null || string.IsNullOrWhiteSpace(locationCategory.Name) || !Validator.IsValidHexColor(locationCategory.Color))
             {
                 return BadRequest("Invalid location category data.");
             }

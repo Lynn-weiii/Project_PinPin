@@ -242,11 +242,10 @@
                                 </div>
                             </div>
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="submit" class="btn btn-primary" v-on:click="createWishlistWithCategory">新增</button>
                 </div>
             </div>
         </div>
@@ -279,8 +278,10 @@
                                 </option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">移除</button>
                     </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" v-on:click="deleteWishlistWithCategory">移除</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -328,9 +329,10 @@
                     wishlists: [],
                     newWishlistName: '',
                     newCategoryName: '',
-                    newCategoryColor: '',
-                    newCategoryIcon: 'fa-solid fa-bowl-food', // 初始選中的圖示
+                    newCategoryColor: '#000000',
+                    newCategoryIcon: 'fa-solid fa-map', // 初始選中的圖示
                     icons: [
+                        { value: 'fa-solid fa-map' },
                         { value: 'fa-solid fa-bowl-food' },
                         { value: 'fa-solid fa-tree' },
                         { value: 'fa-solid fa-person-swimming' },
@@ -476,28 +478,23 @@
                         const newLocationCategory = {
                             wishlistId: createdWishlist.id,
                             name: this.newCategoryName,
-                            color: this.newCategoryColor || "Color",
-                            icon: this.newCategoryIcon || "Icon"
+                            color: this.newCategoryColor,
+                            icon: this.newCategoryIcon
                         };
-                        console.log('Creating LocationCategory with data:', newLocationCategory);
+                        //console.log('Creating LocationCategory with data:', newLocationCategory);
 
                         const categoryResponse = await axios.post(`${baseAddress}/api/Wishlist/CreateLocationCategory`, newLocationCategory);
                         const createdLocationCategory = categoryResponse.data;
-                        console.log('Created LocationCategory:', createdLocationCategory);
+                        //console.log('Created LocationCategory:', createdLocationCategory);
                         Swal.fire({
                             title: "新增成功!",
                             icon: "success"
-                        })
-                        // .then(() => {
-                        //     var myModalEl = document.getElementById('createWishlistModal');
-                        //     var modal = bootstrap.Modal.getInstance(myModalEl);
-                        //     if (modal) {
-                        //         modal.hide();
-                        //     }
-                        // });
+                        }).then(() => {
+                            this.closeCreateModal();
+                        });
 
                         await this.fetchWishlists();
-                        console.log('Wishlists fetched successfully.');
+                        //console.log('Wishlists fetched successfully.');
 
                     } catch (error) {
                         if (error.response) {
@@ -524,13 +521,22 @@
                             //提示用戶刪除清單會連動刪除標籤及行程
                             // 刪除整個願望清單及其所有標籤
                             await axios.delete(`${baseAddress}/api/Wishlist/DeleteWishlist/${this.selectedWishlistId}`);
-                            console.log("願望清單及其所有標籤已刪除!");
+                            Swal.fire({
+                                title: "刪除成功!",
+                                icon: "success"
+                            }).then(() => {
+                                this.closeDeleteModal();
+                            });
                         } else {
                             //提示用戶會連動刪除行程
                             // 刪除選定的標籤
                             await axios.delete(`${baseAddress}/api/Wishlist/DeleteLocationCategory/${this.selectedLocationCategoryId}`);
-                            console.log("選定標籤已刪除!");
-                            console.log(this.selectedLocationCategoryId);
+                            Swal.fire({
+                                title: "刪除成功!",
+                                icon: "success"
+                            }).then(() => {
+                                this.closeDeleteModal();
+                            });
                         }
 
                         // 刪除後更新願望清單和標籤
@@ -586,7 +592,9 @@
                         Swal.fire({
                             title: "修改成功!",
                             icon: "success"
-                        })
+                        }).then(() => {
+                            this.closeEditModal();
+                        });
                         await this.fetchWishlists(); // 更新清單
                     } catch (error) {
                         console.error('Error updating wishlist:', error);
@@ -616,12 +624,48 @@
                         Swal.fire({
                             title: "修改成功!",
                             icon: "success"
+                        }).then(() => {
+                            this.closeEditModal();
                         });
 
                         await this.fetchWishlists();
                     } catch (error) {
-                        console.error('Error updating location category:', error.response ? error.response.data : error.message);
+                        console.error('Error updating location category:', error);
                     }
+                },
+                //關閉modal
+                closeCreateModal() {
+                    // Close the modal using Vue.js method
+                    const createModalElement = document.getElementById('createWishlistModal');
+                    const createModal = bootstrap.Modal.getInstance(createModalElement);
+                    createModal.hide();
+
+                    // Trigger the sidebar offcanvas
+                    const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
+                    const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement) || new bootstrap.Offcanvas(sidebarOffcanvasElement);
+                    sidebarOffcanvas.show();
+                },
+                closeDeleteModal() {
+                    // Close the modal using Vue.js method
+                    const deleteModalElement = document.getElementById('deleteWishlistModal');
+                    const deleteModal = bootstrap.Modal.getInstance(deleteModalElement);
+                    deleteModal.hide();
+
+                    // Trigger the sidebar offcanvas
+                    const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
+                    const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement) || new bootstrap.Offcanvas(sidebarOffcanvasElement);
+                    sidebarOffcanvas.show();
+                },
+                closeEditModal() {
+                    // Close the modal using Vue.js method
+                    const editModalElement = document.getElementById('editWishlistModal');
+                    const editModal = bootstrap.Modal.getInstance(editModalElement);
+                    editModal.hide();
+
+                    // Trigger the sidebar offcanvas
+                    const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
+                    const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement) || new bootstrap.Offcanvas(sidebarOffcanvasElement);
+                    sidebarOffcanvas.show();
                 }
             }
         };
