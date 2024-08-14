@@ -206,12 +206,10 @@ namespace PinPinServer.Controllers
             return Content("願望清單修改成功！");
         }
 
-
         private bool WishlistExists(int id)
         {
             return _context.Wishlists.Any(e => e.Id == id);
         }
-
 
         //刪除願望清單Ok
         // DELETE:api/Wishlist/DeleteWishlist/{id}

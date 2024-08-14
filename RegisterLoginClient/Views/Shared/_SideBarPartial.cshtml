@@ -87,10 +87,10 @@
                             </div>
                         </div>
                         <!--編輯願望清單/標籤按鈕-->
-                        <div>
-                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i></button>
-                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#editWishlistModal"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#deleteWishlistModal"><i class="fa-solid fa-trash-can"></i></button>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#createWishlistModal"><i class="fa-solid fa-plus"></i> 新增</button>
+                            <button class="btn btn-outline-primary ms-2" type="button" data-bs-toggle="modal" data-bs-target="#editWishlistModal"><i class="fa-solid fa-pen"></i> 編輯</button>
+                            <button class="btn btn-outline-primary ms-2" type="button" data-bs-toggle="modal" data-bs-target="#deleteWishlistModal"><i class="fa-solid fa-trash-can"></i> 刪除</button>
                         </div>
                     </div>
                     <!-- accordion end -->
@@ -149,8 +149,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                            <button type="button" class="btn btn-primary" v-on:click="saveWishlist">儲存</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> 取消</button>
+                            <button type="button" class="btn btn-primary" v-on:click="saveWishlist"><i class="fa-solid fa-box-archive"></i> 儲存</button>
                         </div>
                     </div>
                     <!--編輯標籤-->
@@ -198,8 +198,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                            <button type="button" class="btn btn-primary" v-on:click="saveLocationCategory">儲存</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> 取消</button>
+                            <button type="button" class="btn btn-primary" v-on:click="saveLocationCategory"><i class="fa-solid fa-box-archive"></i> 儲存</button>
                         </div>
                     </div>
                 </div>
@@ -216,10 +216,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form v-on:submit.prevent="createWishlistWithCategory">
+                    <form v-on:submit.prevent="handleSubmit">
                         <div class="mb-3">
-                            <label for="wishlistName" class="form-label">願望清單名稱</label>
-                            <input type="text" class="form-control" id="wishlistName" v-model="newWishlistName" required>
+                            <label for="wishlist">選擇清單:</label>
+                            <select id="wishlist" class="form-control" v-model="selectedWishlistId">
+                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                        {{ wishlist.name }}
+                                    </option>
+                                    <option :value="null">--新增願望清單--</option>
+                            </select>
+                        </div>
+                        <div v-if="selectedWishlistId === null">
+                            <label for="createWishlistName">新增願望清單:</label>
+                            <input id="createWishlistName" v-model="newWishlistName" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label for="categoryName" class="form-label">標籤名稱</label>
@@ -245,7 +254,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" v-on:click="createWishlistWithCategory">新增</button>
+                    <button type="submit" class="btn btn-primary" v-on:click="handleSubmit"><i class="fa-solid fa-plus"></i> 新增</button>
                 </div>
             </div>
         </div>
@@ -279,9 +288,9 @@
                             </select>
                         </div>
                     </form>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" v-on:click="deleteWishlistWithCategory">移除</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" v-on:click="deleteWishlistWithCategory"><i class="fa-solid fa-trash-can"></i> 刪除</button>
                 </div>
             </div>
         </div>
@@ -347,7 +356,7 @@
                 };
             },
             async mounted() {
-                console.log('Vue instance mounted!');
+
 
                 //未登入提示
                 const userId = getUserIdFromToken();
@@ -371,7 +380,19 @@
                 }).catch(error => {
                     console.error('Error loading data:', error);
                 });
-            },
+
+                //重置createWishlistModal畫面
+                const createWishlistModalElement = document.getElementById('createWishlistModal');
+                createWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
+
+                //重置deleteWishlistModal畫面
+                const deleteWishlistModalElement = document.getElementById('deleteWishlistModal');
+                deleteWishlistModalElement.addEventListener('show.bs.modal', this.resetDeleteForm);
+
+                //重置editWishlistModal畫面
+                const editWishlistModalElement = document.getElementById('editWishlistModal');
+                editWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
+            },  
             methods: {
                 async fetchWishlists() {
                     const userId = getUserIdFromToken();
@@ -460,6 +481,16 @@
                     }
                 },
                 //新增願望清單及標籤
+                async handleSubmit() {
+                    if (this.selectedWishlistId === null) {
+                        await this.createWishlistWithCategory();
+                        console.log("handleSubmit selectedWishlistId is null");
+                    }
+                    else{
+                        await this.createCategoryForWishlist();
+                        console.log("handleSubmit selectedWishlistId is not null");
+                    }
+                },
                 async createWishlistWithCategory() {
                     const userId = getUserIdFromToken();
                     if (!userId) {
@@ -468,24 +499,22 @@
                     }
 
                     try {
-                        // Create Wishlist
+                        // 新增願望清單
                         const newWishlist = { id: 0, userId: userId, name: this.newWishlistName };
                         const wishlistResponse = await axios.post(`${baseAddress}/api/Wishlist/CreateWishlist`, newWishlist);
                         const createdWishlist = wishlistResponse.data;
 
                         console.log(createdWishlist);
-                        // Create LocationCategory
+                        // 新增標籤
                         const newLocationCategory = {
                             wishlistId: createdWishlist.id,
                             name: this.newCategoryName,
                             color: this.newCategoryColor,
                             icon: this.newCategoryIcon
                         };
-                        //console.log('Creating LocationCategory with data:', newLocationCategory);
 
                         const categoryResponse = await axios.post(`${baseAddress}/api/Wishlist/CreateLocationCategory`, newLocationCategory);
                         const createdLocationCategory = categoryResponse.data;
-                        //console.log('Created LocationCategory:', createdLocationCategory);
                         Swal.fire({
                             title: "新增成功!",
                             icon: "success"
@@ -494,7 +523,6 @@
                         });
 
                         await this.fetchWishlists();
-                        //console.log('Wishlists fetched successfully.');
 
                     } catch (error) {
                         if (error.response) {
@@ -506,6 +534,28 @@
                         } else {
                             console.error('Error message:', error.message);
                         }
+                    }
+                },
+                //僅新增標籤
+                async createCategoryForWishlist() {
+                    const newLocationCategory = {
+                        wishlistId: this.selectedWishlistId,
+                        name: this.newCategoryName,
+                        color: this.newCategoryColor,
+                        icon: this.newCategoryIcon
+                    };
+                    console.log("createCategoryForWishlist!!!");
+                    try {
+                        await axios.post(`${baseAddress}/api/Wishlist/CreateLocationCategory`, newLocationCategory);
+                        Swal.fire({
+                            title: "新增成功!",
+                            icon: "success"
+                        }).then(() => {
+                            this.closeCreateModal();
+                        });
+                        await this.fetchWishlists();
+                    } catch (error) {
+                        console.error('Error creating category:', error);
                     }
                 },
                 //刪除願望清單及標籤
@@ -666,8 +716,32 @@
                     const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
                     const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement) || new bootstrap.Offcanvas(sidebarOffcanvasElement);
                     sidebarOffcanvas.show();
-                }
+                },
+                resetWishlistForm() {
+                    // 重置 createWishlistModal 的表單數據
+                    this.newWishlistName = '';
+                    this.newCategoryName = '';
+                    this.newCategoryColor = '#000000';
+                    this.newCategoryIcon = 'fa-solid fa-map';
+                    this.selectedWishlistId = null;
+                },
+                resetDeleteForm() {
+                    // 重置 deleteWishlistModal 的表單數據
+                    this.selectedWishlistId = null;
+                    this.selectedLocationCategoryId = null;
+                },
+                resetEditForm() {
+                    // 重置 deleteWishlistModal 的表單數據
+                    this.newWishlistName = '';
+                    this.newCategoryName = '';
+                    this.newCategoryColor = '#000000';
+                    this.newCategoryIcon = 'fa-solid fa-map';
+                    this.selectedWishlistId = null;
+                    this.selectedWishlist.name = null;
+                    this.selectedLocationCategoryId = null;
+                },
             }
+
         };
         Vue.createApp(vueApp).mount('#appSidebar');
     });
