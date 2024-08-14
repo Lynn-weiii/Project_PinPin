@@ -28,7 +28,8 @@ namespace PinPinServer.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<string>> GetChatRoom(int scheduleId) {
+        public async Task<ActionResult<List<ChatRoomDTO>>> GetChatRoom(int scheduleId)
+        {
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 

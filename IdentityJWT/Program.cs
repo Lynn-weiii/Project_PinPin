@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: PinPinPolicy, policy =>
     {
-        policy.WithOrigins("*").WithMethods("*").WithHeaders("*");
+        policy.WithOrigins("https://localhost:7215").WithMethods("*").WithHeaders("*").AllowCredentials(); ;
     });
 });
 
