@@ -61,17 +61,56 @@ namespace PinPinServer.Controllers
         }
 
         [HttpPost("SendMessage")]
-        public async Task<ActionResult> SendMessage(int scheduleId, string message)
+        public async Task<ActionResult> SendMessage([FromBody] SendMessageDTO dto)
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 
+            //驗證傳入模型是否正確
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors.Select(err => err.ErrorMessage).ToList()
+                );
+
+                return BadRequest(new { Error = errors });
+            }
+
             //檢查有無在此行程表
-            bool isInSchedule = await _context.ScheduleGroups.AnyAsync(sg => sg.ScheduleId == scheduleId && sg.UserId == userID);
+            bool isInSchedule = await _context.ScheduleGroups.AnyAsync(sg => sg.ScheduleId == dto.ScheduleId && sg.UserId == userID);
             if (!isInSchedule) return Forbid("You can't search not your group");
 
-            await _hubContext.Clients.Group($"Group_{scheduleId}").SendAsync("ReceiveMessage", userID, message);
-            return Ok("Message sent successfully.");
+            try
+            {
+                ChatroomChat chatroomChat = new ChatroomChat
+                {
+                    UserId = userID.Value,
+                    ScheduleId = dto.ScheduleId,
+                    Message = dto.Message,
+                };
+                await _context.ChatroomChats.AddAsync(chatroomChat);
+                await _context.SaveChangesAsync();
+
+                chatroomChat = await _context.ChatroomChats.Include(c => c.User).FirstAsync(c => c.Id == chatroomChat.Id);
+
+                ChatRoomDTO newDto = new ChatRoomDTO
+                {
+                    Id = chatroomChat.Id,
+                    UserId = chatroomChat.UserId,
+                    UserName = chatroomChat.User.Name,
+                    CreatedAt = chatroomChat.CreatedAt,
+                    Message = chatroomChat.Message,
+                    IsFocus = chatroomChat.IsFocus,
+                };
+
+                await _hubContext.Clients.Group($"Group_{dto.ScheduleId}").SendAsync("ReceiveMessage", newDto);
+                return Ok("Message sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

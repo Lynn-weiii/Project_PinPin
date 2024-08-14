@@ -118,7 +118,7 @@
                     <div id="chatroom" v-if="isChooseChatroom" class="d-flex flex-column flex-grow-1 overflow-hidden">
                         <div class="chatroom-container flex-grow-1 d-flex flex-column h-100">
                             <!-- Chat Messages -->
-                            <div class="chatroom-messages p-3 border rounded overflow-auto flex-grow-1">
+                            <div ref="chatroomMessages" class="chatroom-messages p-3 border rounded overflow-auto flex-grow-1">
                                 <div v-for="message in messages" :key="message.id" :class="['d-flex', message.userName == userdata.name ? 'justify-content-end' : 'justify-content-start']">
                                     <div :class="['d-flex', message.userName == userdata.name ? 'flex-row-reverse align-items-start' : 'align-items-start']">
                                         <!-- User Avatar -->
@@ -358,16 +358,20 @@
                         .withUrl(`${baseAddress}/ChatHub`)
                         .build();
                     this.connection.on("JoinGroupSuccess", (message) => {
-                        console.log(message);
+                        //console.log(message);
                     });
 
                     this.connection.on("JoinGroupFailed", (errorMessage) => {
                         console.error(errorMessage);
                     });
 
+                    this.connection.on("ReceiveMessage", (message) => {
+                        this.messages.push(message);
+                        console.log(this.messages)
+                    });
 
                     await this.connectionStart();
-                    await this.joinGroup(6, 1)
+                    await this.joinGroup(6, 1);
                 });
             },
             methods: {
@@ -585,6 +589,7 @@
                         );
                         const data = response.data;
                         this.messages = data;
+                        this.scrollToBottom();
                     } catch (error) {
                         console.log(error);
                     }
@@ -606,13 +611,11 @@
                 },
                 async sendMessage(scheduleId, message) {
                     try {
-                        console.log(scheduleId);
-                        console.log(message);
                         const response = await axios.post(
                             `${baseAddress}/api/chatroom/SendMessage`,
                             {
-                                scheduleId: scheduleId,
-                                message: `${message}`
+                                scheduleId: parseInt(scheduleId),
+                                message: message
                             },
                             {
                                 headers: {
@@ -631,6 +634,12 @@
                     const hours = date.getHours().toString().padStart(2, '0');
                     const minutes = date.getMinutes().toString().padStart(2, '0');
                     return `${hours}: ${minutes}`;
+                },
+                scrollToBottom() {
+                    this.$nextTick(() => {
+                        const chatroomMessages = this.$refs.chatroomMessages;
+                        chatroomMessages.scrollTop = chatroomMessages.scrollHeight;
+                    })
                 },
             }
         };
