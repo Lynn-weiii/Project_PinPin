@@ -1,4 +1,5 @@
-﻿@section Styles{
+﻿
+@section Styles{
 <!-- CSS  -->
 <link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
 <link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
@@ -163,7 +164,6 @@
                         <thead>
                             <tr>
                                 <th style="text-align:center; vertical-align: middle;">成員</th>
-                                <th data-id="1" style="text-align:center; vertical-align: middle;">行程<br />僅檢視</th>
                                 <th data-id="2" style="text-align:center; vertical-align: middle;">行程<br />可編輯</th>
                                 <th data-id="5" style="text-align:center; vertical-align: middle;">群組<br />邀請成員</th>
                                 <th data-id="3" style="text-align:center; vertical-align: middle;">群組<br />移除成員</th>
@@ -177,8 +177,8 @@
                         </tbody>
                     </table>
                     <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-sm" id="authright_save">修改</button>
-                        <button class="btn btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
+                        <button class="btn btn-primary btn-sm" id="authright_save">修改</button>
+                        <button class="btn btn-secondary btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
                     </div>
                 </div>
             </div>
@@ -198,7 +198,7 @@
                     <form id="checkmail" class="form-group needs-validation" novalidate autocomplete="off">
                         <div class="form-row d-flex align-items-start needs-validation mt-2 mb-2 ">
                             <input type="email" class="form-control mx-1" id="txtMail" style="width:80%;border-radius:14px;"  autocomplete="off" required-pattern="^[\w-\.]+@("@")([\w-]+\.)+[\w-]{2,4}$">
-                            <button type="submit" class="form-control" id="invite_btn" style="width:auto;border-radius:14px;">加入</button>
+                            <button type="submit" class="form-control btn btn-primary mx-1" id="invite_btn" style="width:auto;border-radius:14px;">加入</button>
                         </div>
                         <div class="form-row d-flex align-items-center mt-2 mb-2 mx-2">
                             <input type="checkbox" class="form-check-input" data-AuthorityCategoryId="2" id="defalutauthority" />
@@ -230,7 +230,7 @@
 
     @section Scripts{
     <!-- Scripts-->
-    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type = "text/javascript" asp - append - version="true" ></script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type = "text/javascript" asp-append-version="true" ></script>
     <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
     <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -241,7 +241,7 @@
     <script src="~/js/coursescard.js" type="text/javascript"></script>
     <script src="~/js/popular_courses_slider.js" type="text/javascript"></script>
     <script src="~/js/authoritytables.js" type="text/javascript"></script>
-    </script>
+
     <script>
         $(document).ready(async function () {
             //#region 加載 Google Maps API
@@ -293,40 +293,59 @@
                     $('#course-container').hide();
                     goToLoginPage();
                     return;
-                } else if (allSchedulesResponse.status === 204) {
-                    $('#course-container').hide();
-                    $('#emptyschedule').show();
-                } else if (allSchedulesResponse.ok) {
-                    var allData = await allSchedulesResponse.json();
-                    var mainSchedules = allData.filter(schedule => schedule.isHost === true);
-                    var groupSchedules = allData.filter(schedule => schedule.isHost === false);
+                }
+                else if (allSchedulesResponse.ok) {
+                    // 解析 JSON 数据
+                    const responseData = await allSchedulesResponse.json();
+                    console.log('Response Data:', responseData); // 输出响应数据
 
-                    if (mainSchedules.length > 0) {
-                        $('#course-container').show();
-                        renderCourses(mainSchedules);
-                    } else {
+                    const data = responseData.mainSchedules || [];
+                    const data2 = responseData.groupSchedules || [];
+
+                    console.log('Main Schedules:', data.length); // 输出主要行程数据
+                    console.log('Group Schedules:', data2.length); // 输出群组行程数据
+
+                    
+                    if (Array.isArray(data)) {
+                        if (data.length > 0) {
+                            $('#course-container').show();
+                            renderCourses(data);
+                        } else {
+                            $('#course-container').hide();
+                            $('#emptyschedule').show();
+                        }
+                    } else if (typeof data === 'string' && data.includes('趕快規劃新行程吧')) {
                         $('#course-container').hide();
                         $('#emptyschedule').show();
                     }
 
-                    if (groupSchedules.length > 0) {
-                        $('#group_course-container').show();
-                        groupCourses(groupSchedules);
-                    } else {
+
+                    if (Array.isArray(data2)) {
+                        if (data2.length > 0) {
+                            $('#group_course-container').show();
+                            groupCourses(data2);
+                        } else {
+                            $('#group_course-container').hide();
+                            $('#emptygroup').show();
+                        }
+                    } else if (typeof data2 === 'string' && data2.includes('目前沒有參加的旅遊群組')) {
                         $('#group_course-container').hide();
                         $('#emptygroup').show();
                     }
                 }
-
-            }
-            catch (error) {
-                console.log(error);
+                else if (response.status === 204) {
+                    $('#course-container').hide();
+                    $('#emptyschedule').show();
+                    $('#group_course-container').hide();
+                    $('#emptygroup').show();
+                }
+            } catch (error) {
+                console.log('Error fetching schedules:', error);
                 $('#course-container').hide();
                 $('#group_course-container').hide();
                 $('#emptygroup').hide();
                 $('#emptyschedule').hide();
-            }
-            finally {
+            } finally {
                 setTimeout(() => {
                     console.log('Calling initPopularCoursesSlider');
                     initPopularCoursesSlider();
@@ -344,10 +363,12 @@
             //#region 編輯詳細行程
             $(document).off('click').on('click', '.edit_btn', function (event) {
                 var fun = $(this).data('fun');
-                var editId = $(this).data('id');
-                if (fun === 'EditGroupSch' || fun === 'EditMainSch') {
-                    var url = '@Url.Action("ScduleDetials", "Schdules")' + '?id=' + editId;
+                var editId = $(this).data('id');                
+                if (typeof editId !== 'undefined') {
+                    var url = '@Url.Action("ScduleDetials", "Schdules")' + '?scheduleId=' + encodeURIComponent(editId);
                     window.location.href = url;
+                } else {
+                    alert('Missing required data.');
                 }
                 alert('go schedule detail');
             });
@@ -433,6 +454,7 @@
                         break;
 
                     case 'InviteMember':
+                       
                         await handleInviteMember(schedule_id);
                         break;
 
@@ -448,6 +470,12 @@
                     case 'CheckManager':
                         await LoadGroupMembers(gschedule_id);
                         break;
+
+                    case 'groupInviteMember':
+                        console.log(`get ginviteam member & gschedule_id:${gschedule_id}`);
+                        await handleGroupInviteMember(gschedule_id);
+                        break;
+
 
                     default:
                         console.warn(`Unknown function: ${fun}`);
@@ -511,10 +539,30 @@
                         var UserId = $(this).find('[data-authorityuserid]').data('authorityuserid');
                         var ScheduleId = $(this).find('[data-scheduleid]').data('scheduleid');
                         var checkedCheckboxes = $(this).find('.form-check-input:checked');
-                        var AuthorityCategoryIds = checkedCheckboxes.map(function () {
-                            return $(this).data('authority-id');
-                        }).get();
+                        var AuthorityCategoryIds = [];
+                        checkedCheckboxes.each(function () {
+                            var $checkbox = $(this);
+                            var authorityId = $checkbox.data('authority-id');
 
+                            if (authorityId >= 3 && authorityId <= 7) {
+                                AuthorityCategoryIds.push(authorityId);
+                            }
+                            if (authorityId === 2) {
+                                AuthorityCategoryIds.push(2);
+                            }
+                        });
+
+                        // 处理 id 为 2 的复选框的未勾选情况
+                        if (checkedCheckboxes.filter('[data-authority-id="2"]').length === 0) {
+                            AuthorityCategoryIds.push(1);
+                        }
+
+                        // 输出结果
+                        console.log({
+                            UserId: UserId,
+                            ScheduleId: ScheduleId,
+                            AuthorityCategoryIds: AuthorityCategoryIds
+                        });
                         var userData = {
                             'ScheduleId': ScheduleId,
                             'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [],
@@ -742,7 +790,80 @@
                             "ScheduleId": schedule_id,
                             "AuthorityCategoryId": AuthorityCategoryId,
                         };
-                        console.log(JSON.stringify(Body));
+                        console.log(` handleInviteMember:${JSON.stringify(Body)}`);
+
+                        var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
+                            method: "POST",
+                            body: JSON.stringify(Body),
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        var responseData = await response.json();
+
+                        if (response.status === 200) {
+                            await Swal.fire({
+                                icon: "success",
+                                title: responseData.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                        else if (response.status === 400) {
+                            $('.owl-carousel').trigger('stop.owl.autoplay');
+                            Swal.fire({
+                                title: responseData.message,
+                                icon: "warning"
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: '請再重新試一次!',
+                                icon: "error"
+                            });
+                            console.log(responseData.message);
+                        }
+                    }
+                    catch (error) {
+                        console.log('錯誤:', error);
+                        Swal.fire({
+                            title: '請再重新試一次!',
+                            icon: "error"
+                        });
+                    }
+                    finally {
+                        $('#invitemember_modal').modal('hide');
+                        $('#txtMail').val('');
+                    }
+                });
+            }
+
+            //groupinvited
+            async function handleGroupInviteMember(gschedule_id) {
+                $('#checkmail').off('submit').on('submit', async function (event) {
+                    event.preventDefault();
+                    var Email = document.getElementById('txtMail');
+
+                    if (!Email.checkValidity()) {
+                        Swal.fire({
+                            title: "Error",
+                            text: '請確認好友的帳號(請輸入email)',
+                            icon: 'error'
+                        });
+                        return;
+                    }
+
+                    var checkbox = document.getElementById('defalutauthority');
+                    var AuthorityCategoryId = checkbox.checked ? checkbox.getAttribute('data-authoritycategoryid') : 1;
+                    try {
+                        var Body = {
+                            "Email": Email.value.trim(),
+                            "ScheduleId": gschedule_id,
+                            "AuthorityCategoryId": AuthorityCategoryId,
+                        };
+                        console.log(` GroupMember:${JSON.stringify(Body)}`);
 
                         var response = await fetch(`${baseAddress}/api/ScheduleGroups/Invitemember`, {
                             method: "POST",

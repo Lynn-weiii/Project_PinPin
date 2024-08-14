@@ -119,6 +119,12 @@ namespace PinPinTest.Controllers
         [HttpPost("Invitemember")]
         public async Task<IActionResult> Invitemember([FromBody] InviteMemeberDTO inviteMemeberDTO)
         {
+            int amount = await _context.ScheduleGroups.Where(s => s.ScheduleId == inviteMemeberDTO.ScheduleId && s.LeftDate == null).CountAsync();
+            if (amount >= 6)
+            {
+                return BadRequest(new { message = "群組人數已滿" });
+            }
+
             try
             {
                 var member = await _context.Users

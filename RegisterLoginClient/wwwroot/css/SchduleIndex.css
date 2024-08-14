@@ -16,13 +16,14 @@
     text-decoration: none;
 }
 
-#createbtn, #newschbtn, #authright_save, #authright_cancel, #invite_btn {
-    color: #F0F0F0;
+#newschbtn {
+    background-color: var(--bs-primary);
+    color:var(--bs-light);
+
 }
 
 #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
-    background: #F0F0F0;
-    color: #638889;
+    transform: scale(1.15);
     border-bottom: 1px solid #7B7B7B;
 }
 

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PinPinClient.Models;
 using System.Diagnostics;
-using System.Security.Claims;
 
 namespace PinPinClient.Controllers
 {
@@ -40,17 +39,6 @@ namespace PinPinClient.Controllers
         }
 
         //public IActionResult MemberInfo(ClaimsPrincipal user)
-        public IActionResult Schdules() //by bao
-        {
-            return View();
-        }
-
-        public IActionResult AddSchmodal() //by bao
-        {
-            return PartialView();
-        }
-
-
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

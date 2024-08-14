@@ -1,6 +1,6 @@
 ﻿@{
     ViewBag.Title = "Schedule Details";
-    var scheduleId = ViewBag.ScheduleId;
+    var scheduleId = ViewBag.scheduleId;
 }
 
 @section Styles{
@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
+    <link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
+
 }
 
 
@@ -16,12 +19,27 @@
     <div class="row row-cols-md-2 g-0">
         @*# region行程表*@
         <div class="col-12 col-md-4" id="plannertable" style="border:2px solid #f6f4e8;">
-            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;">
-                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none">編輯</button>
+            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden;">
+                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschdule">編輯</button>
                 <h5 id="theme-name"></h5>
+                <div id="travelduring">
+                    @* //做兩個input放起始日，預設是readonly，直到schtitle_edit_btn被click才能修改日期 *@
+                    @* <div class="row">
+                        <label for="search_input" class="form-label mb-2">旅程日期</label>
+                        <div class="col-5">
+                            <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" />
+                        </div>
+                        <div class="col-2 text-center align-center pt-1 pb-1">
+                            <i class="fa-solid fa-arrow-right fa-xl"></i>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" />
+                        </div>
+                    </div> *@
+                </div>
             </div>
             <div class="carousel-container" id="carousel-container">
-                <!-- 根據日程日期生成的輪播內容 -->
+
             </div>
             <div class="row" id="plannertables">
                 <input id="Lat" type="hidden" name="lat">
@@ -41,12 +59,63 @@
         @*#endgion*@
     </div>
 </div>
+@*#region 變更主題名稱*@
+<div class="modal fade" id="modifiedschdule" tabindex="-1" aria-labelledby="modifiedschduleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center" id="modifiedschduleLabel">建立新行程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="container-fluid modal-body">
+                <form id="modifiedschdule" novalidate autocomplete="off">
+                    <!-- 行程 -->
+                    <div class="mb-3">
+                        <label for=""></label>
+                        <label for="Name" class="form-label mb-2">行程名稱</label>
+                        <input id="ScheduleName" type="text" class="form-control mb-1" name="Name" placeholder="行程主題" required>
+                        <input id="Lat" type="hidden" name="lat">
+                        <input id="Lng" type="hidden" name="lng">
+                        <input id="place_id" type="hidden" name="place_id">
+                        <input id="picture_url" type="hidden" name="picture_url">
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <label for="modified_search_input" class="form-label mb-2">旅程日期</label>
+                            <div class="col-5">
+                                <input type="text" name="StartTime" id="el1" class="form-control text-center" />
+                            </div>
+                            <div class="col-2 text-center align-center pt-1 pb-1">
+                                <i class="fa-solid fa-arrow-right fa-xl"></i>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" name="EndTime" id="el2" class="form-control text-center" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="createbtn">完成</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*#endgion*@    
 
 @section Scripts {
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
     <script src="~/js/schduledetails.js"></script>
     <script>
         $(document).ready(function () {
             LoadScheduleInfo(@scheduleId);
+
+            $('#modifiedschdule').on('shown.bs.modal', function () {
+                initMap();
+            });
+
         });
     </script>
     

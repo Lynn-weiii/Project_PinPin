@@ -1,9 +1,8 @@
 ﻿
-function createCourseCard(course, isGroup = false) {
+function createCourseCard(course) {
     var courseItem = document.createElement('div');
     courseItem.className = 'item course_card_owl_item';
     var picture = course.picture ? course.picture : '/images/course/course_01.jpg';
-    var detailsUrl = `https://localhost:7215/Schdules/ScduleDetials/${course.id}`;
     courseItem.innerHTML = courseItem.innerHTML = `    
     <div class="course_card">
     <div class="course_card_container">
@@ -20,7 +19,7 @@ function createCourseCard(course, isGroup = false) {
                     </ul>
                 </div>
             </div>            
-                <a type="buttom" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}">
+                <a type="buttom" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}" data-caneditdetail="${course.caneditdetail}" data-starttime="${course.startTime}" data-endtime="${course.endTime}" data-name="${course.name}"> 
                 <div class="course_card_pic">
                     <img src="${picture}" style="width:430px;height:286px">
                 </div>
@@ -51,7 +50,10 @@ function createGroupCourseCard(gcourse) {
     var gcourseItem = document.createElement('div');
     gcourseItem.className = 'item course_card_owl_item';
     var gpicture = gcourse.picture ? gcourse.picture : '/images/course/course_01.jpg';
-    
+    var inviteMemberItem ='';
+    if (gcourse.caninvited == true) {
+        inviteMemberItem = `<li><a class="memberdrop dropdown-item" data-fun="groupInviteMember" data-id="${gcourse.id}" data-bs-toggle="modal" data-bs-target="#invitemember_modal">邀請成員</a></li>`;
+    }
     gcourseItem.innerHTML = `
         <div class="course_card">
             <div class="course_card_container">
@@ -62,12 +64,13 @@ function createGroupCourseCard(gcourse) {
                                 <i class="fa fa-ellipsis"></i>
                             </div>
                             <ul class="dropdown-menu" aria-labelledby="courseDropdown-${gcourse.id}">
-                                <li><a class="memberdrop dropdown-item" data-fun="CheckManager" data-id="${gcourse.id}" data-name="${gcourse.name}">查看成員</a></li>
+                                <li><a class="memberdrop dropdown-item" data-fun="CheckManager" data-gsche="${gcourse.id}" data-name="${gcourse.name}">查看成員</a></li>
+                                ${inviteMemberItem} <!-- Conditionally added menu item -->
                                 <li><a class="memberdrop dropdown-item" data-fun="Exit" data-exitid="${gcourse.userId}" data-name="${gcourse.name}">離開</a></li>
                             </ul>
                         </div>
                     </div>
-                    <a href="#" class="course_card_link edit_btn" data-fun="EditGroupSch" data-id="${gcourse.id}">
+                    <a href="#" class="course_card_link edit_btn" data-fun="EditGroupSch" data-id="${gcourse.id}" data-caneditdetail="${gcourse.caneditdetail}">
                         <div class="course_card_pic">
                             <img src="${gpicture}" style="width:430px;height:286px">
                         </div>
@@ -80,9 +83,9 @@ function createGroupCourseCard(gcourse) {
                                 <span>by ${gcourse.userName}</span>
                             </div>
                             <div class="course_card_rating d-flex flex-row align-items-center">
-                                <h5>${gcourse.startTime}</h5>
+                                <h5 data-starttime="${gcourse.starTime}" data-endtime="${gcourse.endtime}">${gcourse.startTime}</h5>
                                 <h5 style="padding:5px;"><i class="fa-solid fa-arrow-right" style="color: #0e4e3b;"></i></h5>
-                                <h5>${gcourse.endTime}</h5>
+                                <h5data-starttime="${gcourse.endTime}">${gcourse.endTime}</h5>
                             </div>
                         </div>
                     </a>
@@ -90,11 +93,13 @@ function createGroupCourseCard(gcourse) {
             </div>
         </div>
     `;
+
     return gcourseItem;
 }
 
 
 function renderCourses(data) {
+    console.log(`renderCourses get data: ${data}`);
     var container = document.getElementById('course-container');
     container.innerHTML = '';
 
@@ -115,6 +120,7 @@ function renderCourses(data) {
 
 
 function groupCourses(data2) {
+    console.log(`groupCourses get data: ${data2}`);
     var gcontainer = document.getElementById('group_course-container');
     gcontainer.innerHTML = '';
     data2.forEach(gcourse => {

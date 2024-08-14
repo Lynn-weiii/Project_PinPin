@@ -43,5 +43,7 @@ namespace PinPinServer.Models.DTO
         public bool? caneditdetail { get; set; }
 
         public bool? isHost { get; set; }
+
+        public bool? caninvited { get; set; }
     }
 }

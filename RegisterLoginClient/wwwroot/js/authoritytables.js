@@ -12,11 +12,6 @@
         </td>
         <td style="text-align:center;vertical-align: middle">
         <div class="form-check">
-        <input class="form-check-input" type="checkbox" data-authority-id="1" ${authorityCategoryIds.includes(1) ? 'checked' : ''}>
-        </div>
-        </td>
-        <td style="text-align:center;vertical-align: middle">
-        <div class="form-check">
         <input class="form-check-input" type="checkbox" data-authority-id="2" ${authorityCategoryIds.includes(2) ? 'checked' : ''}>
         </div>
         </td>

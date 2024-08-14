@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\ScheduleData.cs" />
     <Compile Remove="Views\Schdules\Index.cshtml.cs" />
     <Content Remove="bundleconfig.json" />
     <Content Remove="Views\Home\Schedule.cshtml" />

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PinPinServer.Models;
 using PinPinServer.Models.DTO;
+using PinPinServer.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,12 +17,14 @@ namespace PinPinServer.Controllers
         private readonly IConfiguration _configuration;
         private readonly PinPinContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
+        AuthGetuserId _getUserId;
 
-        public WishlistController(PinPinContext context, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public WishlistController(PinPinContext context, IConfiguration configuration, IHttpClientFactory httpClientFactory, AuthGetuserId getuserId)
         {
             _context = context;
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
+            _getUserId = getuserId;
         }
 
         //取得user所有願望清單
@@ -29,6 +32,7 @@ namespace PinPinServer.Controllers
         [HttpGet("GetAllWishlist/{userId}")]
         public async Task<ActionResult<IEnumerable<WishlistDTO>>> GetAllWishlist(int userId)
         {
+
             var wishlists = await _context.Wishlists
         .Include(w => w.LocationCategories)
         .Include(w => w.WishlistDetails)
@@ -67,7 +71,65 @@ namespace PinPinServer.Controllers
             return Ok(result);
 
         }
+        #region Schdule Detail 調用願望清單列表
+        //取得user所有願望清單列表
+        //GET:api/Wishlist/GetWishList
+        [HttpGet("GetWishList")]
+        public async Task<IActionResult> GetWishList()
+        {
+            try
+            {
+                int jwtuserID = _getUserId.PinGetUserId(User).Value;
+                if (jwtuserID == 0)
+                {
+                    return Unauthorized(new { message = "請先登入會員" });
+                }
 
+                var wishlists = await _context.Wishlists
+                            .Include(w => w.LocationCategories)
+                            .Include(w => w.WishlistDetails)
+                            .Where(w => w.UserId == jwtuserID)
+                            .ToListAsync();
+
+                if (wishlists == null || !wishlists.Any())
+                {
+                    return NotFound();
+                }
+
+                var result = wishlists.Select(w => new WishlistDTO
+                {
+                    Id = w.Id,
+                    UserId = w.UserId,
+                    Name = w.Name,
+                    LocationCategories = w.LocationCategories.Select(lc => new LocationCategoryDTO
+                    {
+                        Id = lc.Id,
+                        WishlistId = lc.WishlistId,
+                        Name = lc.Name,
+                        Color = lc.Color
+                    }).ToList(),
+                    WishlistDetails = w.WishlistDetails.Select(d => new WishlistDetailDTO
+                    {
+                        WishlistId = d.WishlistId,
+                        Name = d.Name,
+                        LocationLng = d.LocationLng,
+                        LocationLat = d.LocationLat,
+                        GooglePlaceId = d.GooglePlaceId,
+                        LocationCategoryId = d.LocationCategoryId,
+                        CreatedAt = d.CreatedAt
+                    }).ToList() // 新增這一行
+                }).ToList();
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GetWishList{ex.Message}");
+                return StatusCode(500, new { message = "發生錯誤，請洽系統管理員!" });
+            }
+
+        }
+        #endregion
 
         //加入願望清單
         //POST:api/Wishlist/AddtoWishlistDetail

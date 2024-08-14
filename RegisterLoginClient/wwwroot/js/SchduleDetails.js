@@ -1,4 +1,6 @@
-﻿//#region 加載 Google Maps API
+﻿
+
+//#region 加載 Google Maps API
 (function (g) {
     var h, a, k, p = "The Google Maps JavaScript API",
         c = "google",
@@ -48,31 +50,54 @@ async function LoadScheduleInfo(scheduleId) {
             if (results.length > 0) {
                 const lastResult = results[results.length - 1];
 
-                const { name, lat, lng, placeId, picture } = lastResult;
+                const { name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle } = lastResult;
                 const parsedLat = parseFloat(lat);
                 const parsedLng = parseFloat(lng);
+                console.log(name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle);
                 if (isNaN(parsedLat) || isNaN(parsedLng)) {
                     console.error('Invalid coordinates:', { lat, lng });
                     alert('Invalid location coordinates received.');
                     return;
                 }
+
+                // 设置背景图片
                 if (document.getElementById('theme-header')) {
                     document.getElementById('theme-header').style.backgroundImage = `url('${picture}')`;
                 }
 
-                position = { lat: parsedLat, lng: parsedLng };
+                // 定义位置对象
+                const position = { lat: parsedLat, lng: parsedLng };
 
+                
                 if (document.getElementById('theme-name')) {
                     document.getElementById('theme-name').innerText = name;
+                }    
+                initMap(scheduleId, name, position); 
+                if (canedittitle == true) {
+                    $('#schtitle_edit_btn').show();
                 }
-                initMap(scheduleId, name, position);
+                else {
+                    console.log('canedittitle is false')
+                }
+
+                var content = document.getElementById('carousel-container');
+                content.innerHTML = `
+                    <div class="row">
+                        <p>Schedule Details</p>
+                        <p>Start Time: ${startTime}</p>
+                        <p>End Time: ${endTime}</p>
+                        <p>Can Edit: ${caneditdetail ? "可以編輯" : "不能編輯"}</p>
+                        <p>Schedule Id: ${scheduleId}</p>
+                    </div>
+                `;
             }
+            takewishlist();
         } else {
             handleResponseErrors(response);
         }
     } catch (error) {
-        alert('伺服器錯誤，請稍後再試');
-        console.log(error.message);
+/*        alert('伺服器錯誤，請稍後再試');*/
+        console.log(`LoadScheduleInfo error: ${error.message}`);
     }
 }
 function handleResponseErrors(response) {
@@ -96,7 +121,6 @@ function handleResponseErrors(response) {
 //#region google API
 let map, marker, autocomplete, infowindow, position, service, keyword, searchTimeout, idleListener,globalName,globalScheduleId;
 let markers = []; 
-
 async function initMap(scheduleId, name, position) {
     console.log('initMap:', { scheduleId, name, position });
     globalName = name;
@@ -107,7 +131,7 @@ async function initMap(scheduleId, name, position) {
 
     map = new Map(document.getElementById("map"), {
         center: position,
-        zoom: 15,
+        zoom: 14,
         mapId: "d4432686758d8acc",
     });
 
@@ -115,7 +139,7 @@ async function initMap(scheduleId, name, position) {
     geocoder = new Geocoder();
 
     service = new google.maps.places.PlacesService(map);
-
+    
     const autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input_field'));
     autocomplete.bindTo('bounds', map);
 
@@ -133,7 +157,7 @@ async function initMap(scheduleId, name, position) {
             map.fitBounds(place.geometry.viewport);
         } else {
             map.setCenter(place.geometry.location);
-            map.setZoom(17);
+            map.setZoom(13);
         }
 
         const marker = new AdvancedMarkerElement({
@@ -186,7 +210,8 @@ async function initMap(scheduleId, name, position) {
         // 在创建 InfoWindow 后，调用 geocodeLatLng 获取更多信息
         geocodeLatLng(event.latLng);
     });
-} function clearMarkers() {
+}
+function clearMarkers() {
     markers.forEach((marker) => {
         if (marker) {
             marker.map = null;
@@ -249,14 +274,6 @@ async function performNearbySearch(location, keyword, name, scheduleId) {
         $('#search_input_field').val('');
     });
 }
-function addPlaceToScheduleHandler(event) {
-    const button = event.currentTarget;
-    const lat = button.getAttribute('data-lat');
-    const lng = button.getAttribute('data-lng');
-    const placeId = button.getAttribute('data-place-id');
-    const scheduleId = button.getAttribute('data-id');
-    addPlaceToSchedule(lat, lng, placeId, scheduleId);
-}
 async function geocodeLatLng(latlng) {
     const name = globalName;
     const scheduleId = globalScheduleId;
@@ -303,20 +320,28 @@ async function geocodeLatLng(latlng) {
 }
 function createInfoWindowContent(place, name, scheduleId) {
     console.log('createInfoWindowContent called with:', { scheduleId, name });
-    let content = '<div class="info-window" style="width: 350px;">';
+    let content = '<div class="info-window">';
 
     if (place.photos && place.photos.length > 0) {
-        content += `<img src="${place.photos[0].getUrl({ maxWidth: 350 })}" alt="${place.name}" style="width: 350px;height: auto; display: block; margin: 0 auto;"><br>`;
+        content += `<img src="${place.photos[0].getUrl({ maxWidth: 280 })}" alt="${place.name}" class="info-window-photo"><br>`;
     }
 
-    content += `<div class="details" style="margin-top: 10px;"><strong>${place.name}</strong></div>`;
-    content += `<div class="rating" style="margin-top: 5px;">${place.rating ? getStarRating(place.rating) : 'N/A'} (${place.user_ratings_total || 0})</div>`;
-    content += `<div class="address" style="margin-top: 5px;">${place.vicinity || place.formatted_address}</div>`;
-    content += `<div class="btn-container" style="display: flex; align-items: center; margin-top: 10px;">
-                    <button class="btn-primary" id="wishlist-btn" style="background-color: gold; border: none; border-radius: 50%; width: 30px; height: 30px; margin-right: 10px;">⭐</button>
-                    <span style="margin-right: 20px;">加入願望</span>
-                    <button class="btn-primary" id="add-place-btn" data-lat="${place.geometry.location.lat()}" data-lng="${place.geometry.location.lng()}" data-place-id="${place.place_id}" data-id="${scheduleId}" style="background-color: green; border: none; border-radius: 50%; width: 30px; height: 30px; margin-right: 10px;">+</button>
-                    <span>加入行程</span>
+    content += `<div class="details"><strong>${place.name}</strong></div>`;
+    content += `<div class="rating-container">
+                    <div class="rating">
+                        <span class="average-rating">${place.rating || 'N/A'}</span>
+                        ${place.rating ? getStarRating(place.rating) : ''}
+                    </div>
+                    <div class="reviews">(${place.user_ratings_total || 0} 則評價)</div>
+                </div>`;
+    content += `<div class="address">${place.vicinity || place.formatted_address}</div>`;
+    content += `<div class="btn-container">
+                    <button class="btn btn-primary" id="add-place-btn" data-id="${scheduleId}" onclick="addPlaceToSchedule('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}', '${scheduleId}')">+</button>
+                    <span>${name}</span>
+                    <button class="btn btn-primary" id="wishlist-btn" ONCLICK="addtowishlist()"><i class="fa-light fa-plus"></i></button>
+                    <div id="wishlistoption">
+                    <select id="wishlistcontent">
+                    </div>
                 </div>`;
     content += '</div>';
     return content;
@@ -341,5 +366,36 @@ function getStarRating(rating) {
 async function addPlaceToSchedule(lat, lng, placeId, scheduleId) {
     alert(`添加到行程: Lat ${lat}, Lng ${lng}, Place ID ${placeId}, Schedule ID ${scheduleId}`);
 }
-
+async function addtowishlist() {
+    alert(`添加到願望清單!`);
+}
 //#endregion
+
+//async function takewishlist() {
+//    try {
+//        const response = await fetch(`${baseAddress}/api/Wishlist/GetWishList`, {
+//            method: 'GET',
+//            headers: {
+//                'Authorization': `Bearer ${token}`,
+//                'Content-Type': 'application/json'
+//            }
+//        });
+
+//        if (response.ok) {
+//            const results = await response.json();
+//            console.log(results);
+//            const content = document.getElementById('wishlistcontent');
+//            content.innerHTML = '';  // 清空之前的内容
+
+//            results.forEach(element => {
+//                const option = document.createElement('option');
+//                option
+//            });
+//        } else {
+//            handleResponseErrors(response);
+//        }
+//    } catch (error) {
+//        console.error('Error fetching wishlist:', error);
+//    }
+//}
+
