@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PinPinServer.Models;
 using PinPinServer.Models.DTO;
 using PinPinServer.Services;
+using PinPinServer.Utilities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -128,9 +129,6 @@ namespace PinPinServer.Controllers
                 return StatusCode(500, new { message = "發生錯誤，請洽系統管理員!" });
             }
 
-        }
-        #endregion
-
         //加入願望清單
         //POST:api/Wishlist/AddtoWishlistDetail
         [HttpPost("AddtoWishlistDetail")]
@@ -219,19 +217,31 @@ namespace PinPinServer.Controllers
             //return Content("新增成功!");
         }
 
+        
         //修改願望清單OK
-        /*"id","userId","name"*/
         //PUT:api/Wishlist/UpdateWishlist/{id}
         [HttpPut("UpdateWishlist/{id}")]
-        public async Task<IActionResult> UpdateWishlist(int id, Wishlist wishlist)
+        public async Task<IActionResult> UpdateWishlist(int id, [FromBody] WishlistUpdateDTO updateDTO)
         {
-            if (id != wishlist.Id)
+            // 取得userId
+            var user = await _context.Users.FindAsync(updateDTO.UserId);
+            if (user == null)
             {
-                return BadRequest();
+                return BadRequest("無此用戶");
             }
 
-            _context.Entry(wishlist).State = EntityState.Modified;
+            // 取得願望清單
+            var wishlist = await _context.Wishlists.FindAsync(id);
+            if (wishlist == null || wishlist.UserId != updateDTO.UserId)
+            {
+                return BadRequest("無此願望清單或無修改權限");
+            }
 
+            // 更新願望清單
+            wishlist.Name = updateDTO.Name;
+
+            // 儲存修改
+            _context.Entry(wishlist).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -250,11 +260,11 @@ namespace PinPinServer.Controllers
 
             return Content("願望清單修改成功！");
         }
+
         private bool WishlistExists(int id)
         {
             return _context.Wishlists.Any(e => e.Id == id);
         }
-
 
         //刪除願望清單Ok
         // DELETE:api/Wishlist/DeleteWishlist/{id}
@@ -283,7 +293,7 @@ namespace PinPinServer.Controllers
         [HttpPost("CreateLocationCategory")]
         public async Task<ActionResult<LocationCategory>> CreateLocationCategory(LocationCategory locationCategory)
         {
-            if (locationCategory == null || string.IsNullOrWhiteSpace(locationCategory.Name) || string.IsNullOrWhiteSpace(locationCategory.Color))
+            if (locationCategory == null || string.IsNullOrWhiteSpace(locationCategory.Name) || !Validator.IsValidHexColor(locationCategory.Color))
             {
                 return BadRequest("Invalid location category data.");
             }
@@ -323,15 +333,22 @@ namespace PinPinServer.Controllers
         //"id","wishlistId","name","color","icon"
         //PUT:api/Wishlist/UpdateLocationCategory/{id}
         [HttpPut("UpdateLocationCategory/{id}")]
-        public async Task<IActionResult> UpdateLocationCategory(int id, [FromBody] LocationCategory locationCategory)
+        public async Task<IActionResult> UpdateLocationCategory(int id,[FromBody]LocationCategoryDTO locationCategoryDTO)
         {
-            if (id != locationCategory.Id)
+            // 取得標籤
+            var locationCategory = await _context.LocationCategories.FindAsync(id);
+            if (locationCategory == null || locationCategory.WishlistId != locationCategoryDTO.WishlistId)
             {
-                return BadRequest("ID mismatch.");
+                return BadRequest("無此標籤");
             }
 
-            _context.Entry(locationCategory).State = EntityState.Modified;
+            // 更新標籤
+            locationCategory.Name = locationCategoryDTO.Name;
+            locationCategory.Icon = locationCategoryDTO.Icon;
+            locationCategory.Color = locationCategoryDTO.Color;
 
+            // 保存更改
+            _context.Entry(locationCategory).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();

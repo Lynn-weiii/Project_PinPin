@@ -131,6 +131,8 @@
                 const logOut = () => {
                     localStorage.removeItem('token');
                     token = null;
+                    isLogin.value = false;  // 更新 isLogin 狀態
+                    window.location.reload();  // 或者直接刷新頁面
                 }
 
                 onMounted(() => {
