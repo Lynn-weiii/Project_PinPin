@@ -220,10 +220,10 @@
                         <div class="mb-3">
                             <label for="wishlist">選擇清單:</label>
                             <select id="wishlist" class="form-control" v-model="selectedWishlistId">
-                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
-                                        {{ wishlist.name }}
-                                    </option>
-                                    <option :value="null">--新增願望清單--</option>
+                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                    {{ wishlist.name }}
+                                </option>
+                                <option :value="null">--新增願望清單--</option>
                             </select>
                         </div>
                         <div v-if="selectedWishlistId === null">
@@ -356,8 +356,6 @@
                 };
             },
             async mounted() {
-
-
                 //未登入提示
                 const userId = getUserIdFromToken();
                 if (userId) {
@@ -391,8 +389,8 @@
 
                 //重置editWishlistModal畫面
                 const editWishlistModalElement = document.getElementById('editWishlistModal');
-                editWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
-            },  
+                editWishlistModalElement.addEventListener('show.bs.modal', this.resetEditForm);
+            },
             methods: {
                 async fetchWishlists() {
                     const userId = getUserIdFromToken();
@@ -486,7 +484,7 @@
                         await this.createWishlistWithCategory();
                         console.log("handleSubmit selectedWishlistId is null");
                     }
-                    else{
+                    else {
                         await this.createCategoryForWishlist();
                         console.log("handleSubmit selectedWishlistId is not null");
                     }
@@ -683,6 +681,9 @@
                         console.error('Error updating location category:', error);
                     }
                 },
+                //加入行程
+                //移除願望清單中的行程
+
                 //關閉modal
                 closeCreateModal() {
                     // Close the modal using Vue.js method
@@ -717,6 +718,7 @@
                     const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement) || new bootstrap.Offcanvas(sidebarOffcanvasElement);
                     sidebarOffcanvas.show();
                 },
+                //重置表單
                 resetWishlistForm() {
                     // 重置 createWishlistModal 的表單數據
                     this.newWishlistName = '';
@@ -732,13 +734,14 @@
                 },
                 resetEditForm() {
                     // 重置 deleteWishlistModal 的表單數據
-                    this.newWishlistName = '';
-                    this.newCategoryName = '';
-                    this.newCategoryColor = '#000000';
-                    this.newCategoryIcon = 'fa-solid fa-map';
                     this.selectedWishlistId = null;
-                    this.selectedWishlist.name = null;
                     this.selectedLocationCategoryId = null;
+                    if (this.selectedLocationCategoryId != null) {
+                        this.selectedWishlist.name = '';
+                        this.selectedLocationCategory.name = '';
+                        this.selectedLocationCategory.icon = 'fa-solid fa-map';
+                        this.selectedLocationCategory.color = '#000000';
+                    }
                 },
             }
 
