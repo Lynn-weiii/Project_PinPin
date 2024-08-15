@@ -1,7 +1,4 @@
-﻿<!--
-
-Styles -->
-<style >
+﻿
 .btn-custom {
     background-color: #638889;
     color: #F0F0F0;
@@ -24,11 +21,11 @@ Styles -->
     color: #F0F0F0;
 }
 
-    #newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
-        background: #F0F0F0;
-        color: #638889;
-        border-bottom: 1px solid #7B7B7B;
-    }
+#newschbtn:hover, #createbtn:hover, #authright_save:hover, #authright_cancel:hover, #invite_btn:hover {
+    background: #F0F0F0;
+    color: #638889;
+    border-bottom: 1px solid #7B7B7B;
+}
 
 .pac-container {
     z-index: 9999 !important;
@@ -91,6 +88,7 @@ Styles -->
     width: 100% !important;
     align-items: center;
 }
+
 
 #emptyschedule, #emptygroup, #errmsg2, #errmsg1 {
     display: none;
@@ -178,4 +176,3 @@ Styles -->
     color: #FCF8F3;
 }
 /*#endregion*/
-</style >

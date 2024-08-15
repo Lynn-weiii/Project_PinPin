@@ -18,84 +18,84 @@
             overflow: hidden;
         }
 
-            /* Hero 背景圖 */
-            .hero-section::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-size: cover;
-                background-position: center;
-                z-index: 0;
-                animation: backgroundAnimation 20s infinite; /* 背景圖輪播動畫 */
-            }
+        /* Hero 背景圖 */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            animation: backgroundAnimation 20s infinite; /* 背景圖輪播動畫 */
+        }
 
-            /* Hero 層疊背景色 */
-            .hero-section::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5); /* 黑色半透明遮罩 */
-                z-index: 1;
-            }
+        /* Hero 層疊背景色 */
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 黑色半透明遮罩 */
+            z-index: 1;
+        }
 
-            /* Hero 內部內容 */
-            .hero-section > div {
-                position: relative;
-                z-index: 2; /* 確保內容在背景上方 */
-            }
+        /* Hero 內部內容 */
+        .hero-section > div {
+            position: relative;
+            z-index: 2; /* 確保內容在背景上方 */
+        }
 
-            /* 調整 row 為 Flexbox */
-            .hero-section .row {
-                display: flex;
-                justify-content: center; /* 水平居中內容 */
-                gap: 10px; /* 按鈕之間的間距不超過10px */
-                flex-wrap: wrap; /* 當屏幕寬度不足時，換行 */
-            }
+        /* 調整 row 為 Flexbox */
+        .hero-section .row {
+            display: flex;
+            justify-content: center; /* 水平居中內容 */
+            gap: 10px; /* 按鈕之間的間距不超過10px */
+            flex-wrap: wrap; /* 當屏幕寬度不足時，換行 */
+        }
 
-            /* 調整按鈕的列寬 */
-            .hero-section .col {
-                flex: 1 1 45%; /* 基礎寬度45%，可以在屏幕縮小時自動調整 */
-                display: flex;
-                justify-content: center; /* 按鈕水平居中 */
-            }
+        /* 調整按鈕的列寬 */
+        .hero-section .col {
+            flex: 1 1 45%; /* 基礎寬度45%，可以在屏幕縮小時自動調整 */
+            display: flex;
+            justify-content: center; /* 按鈕水平居中 */
+        }
 
-            /* 按鈕樣式 */
-            .hero-section .btn {
-                display: flex;
-                justify-content: center; /* 按鈕內部圖片水平居中 */
-                align-items: center; /* 按鈕內部圖片垂直居中 */
-                transition: transform 0.3s ease, box-shadow 0.3s ease; /* 平滑的過渡效果 */
-                border-radius: 6px;
-                background: transparent; /* 確保背景透明 */
-                width: 100%; /* 按鈕寬度占父容器的100% */
-                max-width: 200px; /* 按鈕的最大寬度，防止過大 */
-            }
+        /* 按鈕樣式 */
+        .hero-section .btn {
+            display: flex;
+            justify-content: center; /* 按鈕內部圖片水平居中 */
+            align-items: center; /* 按鈕內部圖片垂直居中 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* 平滑的過渡效果 */
+            border-radius: 6px;
+            background: transparent; /* 確保背景透明 */
+            width: 100%; /* 按鈕寬度占父容器的100% */
+            max-width: 200px; /* 按鈕的最大寬度，防止過大 */
+        }
 
-                /* 按鈕內部圖片樣式 */
-                .hero-section .btn img {
-                    max-width: 100%; /* 圖片寬度占據按鈕的100% */
-                    height: auto; /* 保持圖片的縱橫比 */
-                }
+        /* 按鈕內部圖片樣式 */
+        .hero-section .btn img {
+            max-width: 100%; /* 圖片寬度占據按鈕的100% */
+            height: auto; /* 保持圖片的縱橫比 */
+        }
 
-                    /* 按鈕圖片懸停效果 */
-                    .hero-section .btn img:hover {
-                        transform: scale(1.05); /* 圖片放大 5% */
-                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影 */
-                    }
+        /* 按鈕圖片懸停效果 */
+        .hero-section .btn img:hover {
+            transform: scale(1.05); /* 圖片放大 5% */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影 */
+        }
 
-            /* Hero 文字樣式 */
-            .hero-section p {
-                font-size: 48px;
-                font-family: "Noto Sans TC", sans-serif;
-                font-optical-sizing: auto;
-                font-weight: 700;
-            }
+        /* Hero 文字樣式 */
+        .hero-section p {
+            font-size: 48px;
+            font-family: "Noto Sans TC", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 700;
+        }
 
         /* 背景圖輪播動畫 */
         @@keyframes backgroundAnimation {
