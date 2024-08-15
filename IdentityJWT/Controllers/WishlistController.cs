@@ -72,7 +72,7 @@ namespace PinPinServer.Controllers
             return Ok(result);
 
         }
-        #region Schdule Detail 調用願望清單列表
+
         //取得user所有願望清單列表
         //GET:api/Wishlist/GetWishList
         [HttpGet("GetWishList")]
