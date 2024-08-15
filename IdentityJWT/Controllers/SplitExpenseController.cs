@@ -290,7 +290,6 @@ namespace PinPinServer.Controllers
                 );
 
                 return BadRequest(new { Error = errors });
-
             }
 
             var groupUserList = await _context.ScheduleGroups

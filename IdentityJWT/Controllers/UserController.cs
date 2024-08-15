@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
 using PinPinServer.Models;
 using PinPinServer.Models.DTO;
 using PinPinServer.Services;
@@ -68,8 +68,10 @@ namespace PinPinTest.Controllers
             return Ok(userDTOs);
         }
 
+
         //GET:api/user/GetUserIdName
         [HttpGet("GetUserIdName")]
+        [Authorize]
         public async Task<ActionResult> GetUserIdName()
         {
             int? userID = _getUserId.PinGetUserId(User).Value;
@@ -78,8 +80,8 @@ namespace PinPinTest.Controllers
 
             return Ok(new
             {
-                id= user.Id,
-                name= user.Name,
+                id = user.Id,
+                name = user.Name,
             });
         }
     }
