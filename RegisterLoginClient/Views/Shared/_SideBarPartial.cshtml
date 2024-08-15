@@ -367,11 +367,13 @@
 
                     this.connection.on("ReceiveMessage", (message) => {
                         this.messages.push(message);
-                        console.log(this.messages)
                     });
 
                     await this.connectionStart();
-                    await this.joinGroup(6, 1);
+                    for (const schdule in this.schdules) 
+                    {
+                        await this.joinGroup(schdule, this.userdata.id)
+                    }
                 });
             },
             methods: {
@@ -406,7 +408,6 @@
                     })
                     const data = response.data;
                     this.userdata = data;
-                    console.log(this.userdata)
                 },
                 setSelectedCategory(wishlist, locationCategoryId) {
                     wishlist.selectedCategoryId = locationCategoryId;
@@ -604,7 +605,7 @@
                 },
                 async joinGroup(groupId, userId) {
                     try {
-                        await this.connection.invoke("JoinGroup", groupId, userId);
+                        await this.connection.invoke("JoinGroup", parseInt(groupId), userId);
                     } catch (err) {
                         console.error("Error joining group:", err);
                     }
