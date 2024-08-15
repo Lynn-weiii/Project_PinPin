@@ -5,7 +5,7 @@
     border: 1px solid #ced4da;
 }
 
-/* 地图样式 */
+/* #region 地圖樣式 */
 #map {
     width: 100%;
     height: 100vh;
@@ -54,8 +54,9 @@
         width: 100%; /* 行程表宽度满版 */
     }
 }
+/*#endregion*/
 
-/* 主题名称区 */
+/*#region  主题名稱 */
 .theme-header {
     position: relative;
     background: rgba(0, 0, 0, 0.4) url('') no-repeat center center; /* 40% 灰色遮罩 */
@@ -96,8 +97,9 @@
     font-weight: 700;
     z-index: 1;
 }
+/*#endregion*/
 
-/* 按钮样式 */
+/*#region 行程列表表頭*/
 .theme-header .btn, #schtitle_edit_btn {
     position: absolute;
     top: 10px; /* 距离顶部 10 像素 */
@@ -116,8 +118,9 @@
 
     box-shadow: none; /* 移除可能的阴影效果 */
 }
+/*#endregion*/
 
-/* 模态框样式 */
+/*#region 地圖 */
 #mapsection.modal {
     display: none;
     position: fixed;
@@ -151,8 +154,9 @@
     text-decoration: none;
     cursor: pointer;
 }
+/*#endregion*/
 
-/*google map informadal*/
+/*#region google map informadal*/
 .info-window {
     width: 280px;
     padding: 5px;
@@ -261,3 +265,123 @@
     color: gray;
     margin-right: 20px;
 }
+/*#endregion*/
+
+/*#region 行程列表*/
+:root {
+    --darkgreen: #435a4f;
+    --white: #f6f4e8;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body,
+.tabs-to-dropdown .dropdown-toggle,
+.tabs-to-dropdown .dropdown-item {
+    font-size: 1.3rem;
+}
+
+.tabs-to-dropdown .nav-wrapper {
+    padding: 0;
+    box-shadow: none;
+}
+
+    .tabs-to-dropdown .nav-wrapper a {
+        color: var(--darkgreen);
+    }
+
+.tabs-to-dropdown .nav-pills {
+    border-bottom: 1px solid #ddd;
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+    .tabs-to-dropdown .nav-pills .nav-link {
+        color: var(--darkgreen);
+        background-color: var(--white);
+        border: none;
+        border-radius: 0;
+        margin-right: 0;
+        padding: 5px 10px;
+        font-size: 1rem;
+        height: 40px;
+        line-height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .tabs-to-dropdown .nav-pills .nav-link.active {
+            background-color: var(--darkgreen);
+            color: var(--white);
+        }
+
+.tabs-to-dropdown .tab-content .container-fluid {
+    max-width: 1250px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    background: #f6f4e8;
+    border-radius: 5px;
+    padding: 1rem;
+}
+
+    .schedule-item img {
+        width: 80px;
+        height: 80px;
+        border-radius: 5px;
+        margin-right: 1rem;
+    }
+
+    .schedule-item .time {
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    .schedule-item .location {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .schedule-item .duration {
+        color: #666;
+    }
+
+.tab-content {
+    padding: 10px;
+}
+
+.nav-scroller {
+    position: relative;
+    z-index: 2;
+    height: 3.5rem;
+    overflow-y: hidden;
+}
+
+    .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-scroller .nav-link {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: .875rem;
+    }
+/*#endregion*/

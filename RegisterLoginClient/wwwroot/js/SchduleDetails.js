@@ -59,7 +59,7 @@ async function LoadScheduleInfo(scheduleId) {
                     alert('Invalid location coordinates received.');
                     return;
                 }
-
+                generateTabs(name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle);
                 // 设置背景图片
                 if (document.getElementById('theme-header')) {
                     document.getElementById('theme-header').style.backgroundImage = `url('${picture}')`;
@@ -68,35 +68,25 @@ async function LoadScheduleInfo(scheduleId) {
                 // 定义位置对象
                 const position = { lat: parsedLat, lng: parsedLng };
 
-                
+
                 if (document.getElementById('theme-name')) {
                     document.getElementById('theme-name').innerText = name;
-                }    
-                initMap(scheduleId, name, position); 
+                }
+                initMap(scheduleId, name, position);
                 if (canedittitle == true) {
                     $('#schtitle_edit_btn').show();
                 }
                 else {
                     console.log('canedittitle is false')
                 }
-
-                var content = document.getElementById('carousel-container');
-                content.innerHTML = `
-                    <div class="row">
-                        <p>Schedule Details</p>
-                        <p>Start Time: ${startTime}</p>
-                        <p>End Time: ${endTime}</p>
-                        <p>Can Edit: ${caneditdetail ? "可以編輯" : "不能編輯"}</p>
-                        <p>Schedule Id: ${scheduleId}</p>
-                    </div>
-                `;
+                
+                
+            } else {
+                handleResponseErrors(response);
             }
-            takewishlist();
-        } else {
-            handleResponseErrors(response);
         }
     } catch (error) {
-/*        alert('伺服器錯誤，請稍後再試');*/
+        /*alert('伺服器錯誤，請稍後再試');*/
         console.log(`LoadScheduleInfo error: ${error.message}`);
     }
 }
@@ -201,7 +191,7 @@ async function initMap(scheduleId, name, position) {
     // 添加地图点击事件监听器
     map.addListener('click', function (event) {
         console.log('Map clicked:', { lat: event.latLng.lat(), lng: event.latLng.lng(), name, scheduleId });
-        infowindow.close(); // 关闭之前的 InfoWindow
+        infowindow.close(); 
         const content = createInfoWindowContent({ name: '', geometry: { location: event.latLng } }, name, scheduleId);
         infowindow.setContent(content);
         infowindow.setPosition(event.latLng);
@@ -248,17 +238,16 @@ async function performNearbySearch(location, keyword, name, scheduleId) {
                     position: place.geometry.location,
                     title: place.name,
                 });
-                marker.placeInfo = { name, scheduleId }; // 存储 name 和 scheduleId 到标记对象
+                marker.placeInfo = { name, scheduleId }; 
                 markers.push(marker);
 
                 google.maps.event.addListener(marker, 'click', function () {
-                    console.log('Marker clicked:', { place, name, scheduleId });
                     infowindow.setContent(createInfoWindowContent(place, name, scheduleId));
                     infowindow.open(map, marker);
 
-                    document.querySelector('#add-place-btn').addEventListener('click', function () {
-                        addPlaceToSchedule(place.geometry.location.lat(), place.geometry.location.lng(), place.place_id, scheduleId);
-                    });
+                    //document.querySelector('#add-place-btn').addEventListener('click', function () {
+                    //    addPlaceToSchedule(place.geometry.location.lat(), place.geometry.location.lng(), place.place_id, scheduleId);
+                    //});
                 });
             });
 
@@ -268,7 +257,11 @@ async function performNearbySearch(location, keyword, name, scheduleId) {
             }
         } else {
             console.error('Nearby Search failed:', status);
-            alert('找不到相關地點。請重新輸入。');
+            Swal.fire({
+                title: "Error",
+                text: '找不到相關地點。請重新輸入。',
+                icon: 'error'
+            });
         }
 
         $('#search_input_field').val('');
@@ -291,22 +284,14 @@ async function geocodeLatLng(latlng) {
                                 position: latlng,
                                 map: map
                             });
-                            marker.placeInfo = { name, scheduleId }; // 存储 name 和 scheduleId 到标记对象
+                            marker.placeInfo = { name, scheduleId }; 
                             markers.push(marker);
 
-                            console.log('Creating info window with:', { place, name, scheduleId });
                             const content = createInfoWindowContent(place, name, scheduleId);
-                            console.log('Info window content:', content);
-
-                            // 设置信息窗口内容并打开
                             infowindow.setContent(content);
                             infowindow.open(map, marker);
 
-                            // 移除旧的监听器，防止重复监听
-                            document.querySelector('#add-place-btn').removeEventListener('click', addPlaceToScheduleHandler);
 
-                            // 添加新的监听器
-                            document.querySelector('#add-place-btn').addEventListener('click', addPlaceToScheduleHandler);
                         } else {
                             window.alert("No results found");
                         }
@@ -319,7 +304,6 @@ async function geocodeLatLng(latlng) {
     });
 }
 function createInfoWindowContent(place, name, scheduleId) {
-    console.log('createInfoWindowContent called with:', { scheduleId, name });
     let content = '<div class="info-window">';
 
     if (place.photos && place.photos.length > 0) {
@@ -338,14 +322,12 @@ function createInfoWindowContent(place, name, scheduleId) {
     content += `<div class="btn-container">
                     <button class="btn btn-primary" id="add-place-btn" data-id="${scheduleId}" onclick="addPlaceToSchedule('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}', '${scheduleId}')">+</button>
                     <span>${name}</span>
-                    <button class="btn btn-primary" id="wishlist-btn" ONCLICK="addtowishlist()"><i class="fa-light fa-plus"></i></button>
-                    <div id="wishlistoption">
-                    <select id="wishlistcontent">
-                    </div>
+                    <button class="btn btn-primary" id="wishlist-btn" onclick="ShowWishList('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}','${place.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList"><i class="fas fa-star"></i></button>
                 </div>`;
     content += '</div>';
     return content;
 }
+
 function getStarRating(rating) {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5 ? 1 : 0;
@@ -363,39 +345,82 @@ function getStarRating(rating) {
     starsHtml += '</div>';
     return starsHtml;
 }
+//#endregion
 async function addPlaceToSchedule(lat, lng, placeId, scheduleId) {
     alert(`添加到行程: Lat ${lat}, Lng ${lng}, Place ID ${placeId}, Schedule ID ${scheduleId}`);
 }
-async function addtowishlist() {
-    alert(`添加到願望清單!`);
+
+async function AddPointcreatedWishlist(lat, lng, placeId, name) {
+    alert(`新增愛心點: Lat ${lat}, Lng ${lng}, Place ID ${placeId}`)
 }
-//#endregion
 
-//async function takewishlist() {
-//    try {
-//        const response = await fetch(`${baseAddress}/api/Wishlist/GetWishList`, {
-//            method: 'GET',
-//            headers: {
-//                'Authorization': `Bearer ${token}`,
-//                'Content-Type': 'application/json'
-//            }
-//        });
+async function ShowWishList(lat, lng, placeId,name) {
+    var response = await fetch(`${baseAddress}/api/Wishlist/GetAllWishlist`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
 
-//        if (response.ok) {
-//            const results = await response.json();
-//            console.log(results);
-//            const content = document.getElementById('wishlistcontent');
-//            content.innerHTML = '';  // 清空之前的内容
+    });
 
-//            results.forEach(element => {
-//                const option = document.createElement('option');
-//                option
-//            });
-//        } else {
-//            handleResponseErrors(response);
-//        }
-//    } catch (error) {
-//        console.error('Error fetching wishlist:', error);
-//    }
-//}
+    if (response.ok) {
+        var wishlistOptions = await response.json();
+        var wishlistContent = document.getElementById('wishlist_content');
+        var locationCategoriesContent = document.getElementById('location_categories_content');
+
+        wishlistContent.innerHTML = ''; 
+        locationCategoriesContent.innerHTML = '';
+
+        wishlistOptions.forEach(optionData => {
+            var option = document.createElement('option');
+            option.textContent = optionData.name;
+            option.setAttribute('data-wishlistname', optionData.name);
+            option.setAttribute('data-wishlistid', optionData.id);
+            option.setAttribute('data-lat', lat);
+            option.setAttribute('data-lng', lng);
+            option.setAttribute('data-placeid', placeId);
+            option.setAttribute('data-name', name);
+            option.value = optionData.id;
+            wishlistContent.appendChild(option);
+        });
+
+        wishlistContent.addEventListener('change', function () {
+            var selectedWishlistId = this.value;
+            locationCategoriesContent.innerHTML = '';
+                
+            var selectedWishlist = wishlistOptions.find(wishlist => wishlist.id == selectedWishlistId);
+            if (selectedWishlist && selectedWishlist.locationCategories) {
+                selectedWishlist.locationCategories.forEach(categoryData => {
+                    var categoryOption = document.createElement('option');
+                    categoryOption.textContent = categoryData.name;
+                    categoryOption.setAttribute('data-locationcategoryid', categoryData.id);
+                    categoryOption.value = categoryData.id;
+                    locationCategoriesContent.appendChild(categoryOption);
+                });
+            }
+        });
+        wishlistContent.dispatchEvent(new Event('change'));
+    } else {
+        console.error('Failed to fetch wishlist data');
+    }
+}
+
+//#region 行程列表
+
+    function generateTabs(name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle) {
+
+        var start = new Date(startTime);
+        var end = new Date(endTime);
+        var divamount = (end - start) / (1000 * 60 * 60 * 24) + 1;
+        console.log(`generateTabs:${start}/${end}/${divamount}`);
+        
+                 
+
+            
+     
+    }
+    //#endregion
+
+
 
