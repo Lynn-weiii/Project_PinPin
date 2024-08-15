@@ -498,8 +498,6 @@
                 });
             },
 
-
-            },
             methods: {
                 async fetchWishlists() {
                     const userId = getUserIdFromToken();
@@ -769,6 +767,38 @@
                     } catch (err) {
                         console.error("Error joining group:", err);
                     }
+                },
+                async sendMessage(scheduleId, message) {
+                    try {
+                        const response = await axios.post(
+                            `${baseAddress}/api/chatroom/SendMessage`,
+                            {
+                                scheduleId: parseInt(scheduleId),
+                                message: message
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            }
+                        );
+
+                    } catch (error) {
+                        console.log(error);
+                    }
+                },
+                formatTime(dateTimeString) {
+                    const date = new Date(dateTimeString);
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    return `${hours}: ${minutes}`;
+                },
+                scrollToBottom() {
+                    this.$nextTick(() => {
+                        const chatroomMessages = this.$refs.chatroomMessages;
+                        chatroomMessages.scrollTop = chatroomMessages.scrollHeight;
+                    })
                 },
                 updateSelectedWishlist() {
                     //根據選定的清單，將其設置於<input>元素供用戶修改
