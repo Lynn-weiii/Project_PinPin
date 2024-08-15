@@ -1,6 +1,6 @@
 ﻿@{
     ViewBag.Title = "Schedule Details";
-    var scheduleId = ViewBag.ScheduleId;
+    var scheduleId = ViewBag.scheduleId;
 }
 
 @section Styles{
@@ -9,246 +9,219 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
+    <link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
+
 }
 
 
-<div class="container-fluid" style="margin:1px;padding:0;">
+<div class="container-fluid" style="margin:1px;padding:0;overflow:hidden;">
     <div class="row row-cols-md-2 g-0">
         @*# region行程表*@
         <div class="col-12 col-md-4" id="plannertable" style="border:2px solid #f6f4e8;">
-            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;">
-                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none">編輯</button>
+            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden;">
+                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschdule">編輯</button>
                 <h5 id="theme-name"></h5>
+                <div id="travelduring">
+                    @* //做兩個input放起始日，預設是readonly，直到schtitle_edit_btn被click才能修改日期 *@
+                    @* <div class="row">
+                        <label for="search_input" class="form-label mb-2">旅程日期</label>
+                        <div class="col-5">
+                            <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" />
+                        </div>
+                        <div class="col-2 text-center align-center pt-1 pb-1">
+                            <i class="fa-solid fa-arrow-right fa-xl"></i>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" />
+                        </div>
+                    </div> *@
+                </div>
             </div>
-            <div class="carousel-container" id="carousel-container">
-                <!-- 根據日程日期生成的輪播內容 -->
+            @* @*#region 行程列表*@
+@*             <div class="col-12 col-md-4">
+            <div class="container">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="tabs-to-dropdown">
+                            <div class="nav-wrapper d-flex align-items-center justify-content-between">
+                                <div class="nav-scroller">
+                                    <ul class="nav nav-pills" id="schdule-pills-tab" role="tablist">
+                                        <!-- Tabs will be inserted here by JavaScript -->
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab-content" id="schdule-pills-tabContent">
+                                <!-- Tab contents will be inserted here by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row" id="plannertables">
-                <!--GOGOGOGO-->
-                <input id="search_input" type="text" class="form-control mb-1" placeholder="目的地" required>
                 <input id="Lat" type="hidden" name="lat">
                 <input id="Lng" type="hidden" name="lng">
                 <input id="place_id" type="hidden" name="place_id">
                 <input id="picture_url" type="hidden" name="picture_url">
             </div>
         </div>
+        </div> *@ *@
         @*#endgion*@
-        @*#region 地圖*@                  
-        <div class="col-12 col-md-8" id="map"></div>
+        @*#region 地圖*@        
+        <div class="col-12 col-md-8">
+            <div id="search_input" class="position-absolute top-5 end-0 p-2">
+                <input id="search_input_field" type="text" class="form-control mb-1" placeholder="目的地" required>
+            </div>
+            <div id="map"></div>
+        </div>
         @*#endgion*@
+    </div>
+</div>
+@*#region 變更主題名稱*@
+<div class="modal fade" id="modifiedschdule" tabindex="-1" aria-labelledby="modifiedschduleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title w-100 text-center" id="modifiedschduleLabel">建立新行程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="container-fluid modal-body">
+                <form id="modifiedschdule" novalidate autocomplete="off">
+                    <!-- 行程 -->
+                    <div class="mb-3">
+                        <label for=""></label>
+                        <label for="Name" class="form-label mb-2">行程名稱</label>
+                        <input id="ScheduleName" type="text" class="form-control mb-1" name="Name" placeholder="行程主題" required>
+                        <input id="Lat" type="hidden" name="lat">
+                        <input id="Lng" type="hidden" name="lng">
+                        <input id="place_id" type="hidden" name="place_id">
+                        <input id="picture_url" type="hidden" name="picture_url">
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <label for="modified_search_input" class="form-label mb-2">旅程日期</label>
+                            <div class="col-5">
+                                <input type="text" name="StartTime" id="el1" class="form-control text-center" />
+                            </div>
+                            <div class="col-2 text-center align-center pt-1 pb-1">
+                                <i class="fa-solid fa-arrow-right fa-xl"></i>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" name="EndTime" id="el2" class="form-control text-center" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="createbtn">完成</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*#endgion*@    
+
+@*願望清單選單*@
+<div class="modal fade" id="PopWishList" tabindex="-1" aria-labelledby="PopWishList_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title">將地點加入願望清單</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="wishlist_list">
+                    <div class="row">
+                        <select id="wishlist_content" class="form-select mb-3">
+                            <option value="0">----- 請選擇願望清單 -----</option>                        
+                        </select>
+                        <select id="location_categories_content" class="form-select mb-3">
+                            <option value="0">----- 請選擇標籤 -----</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="d-flex justify-content-end mt-3 col">
+                        <button class="btn btn-primary btn-sm" id="addwishlist">加入願望清單</button>
+                        <button class="btn btn-secondary btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
+                    </div>
+                </div>
+                    
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        //#region 加載 Google Maps API
-        (function (g) {
-            var h, a, k, p = "The Google Maps JavaScript API",
-                c = "google",
-                l = "importLibrary",
-                q = "__ib__",
-                m = document,
-                b = window;
-            b = b[c] || (b[c] = {});
-            var d = b.maps || (b.maps = {}),
-                r = new Set(),
-                e = new URLSearchParams(),
-                u = () => h || (h = new Promise(async (f, n) => {
-                    a = m.createElement("script");
-                    e.set("libraries", [...r].join(","));
-                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                    e.set("callback", c + ".maps." + q);
-                    e.set("language", "zh-TW");
-                    e.set("region", "TW");
-                    a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
-                    d[q] = f;
-                    a.onerror = () => h = n(Error(p + " could not load."));
-                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                    m.head.append(a);
-                }));
-            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
-        })({
-            key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
-            v: "weekly",
-            libraries: "places,geometry,drawing,visualization"
-        });
-        //#endregion
-    </script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="~/js/schduledetails.js"></script>
     <script>
         $(document).ready(function () {
-            let map, marker, autocomplete, infowindow, position;
-            //#region 匯入時的資料
-            async function LoadScheduleInfo(scheduleId) {
-                try {
-                    const response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.ok) {
-                        const results = await response.json();
-                        console.log('API Results:', results);
-
-                        if (results.length > 0) {
-                            const lastResult = results[results.length - 1];
-
-                            const { name, lat, lng, placeId, picture } = lastResult;
-                            console.log('Name:', name);
-                            console.log('Lat:', lat);
-                            console.log('Lng:', lng);
-                            console.log('Place ID:', placeId);
-                            console.log('Picture:', picture);
-                            const parsedLat = parseFloat(lat);
-                            const parsedLng = parseFloat(lng);
-                            if (isNaN(parsedLat) || isNaN(parsedLng)) {
-                                console.error('Invalid coordinates:', { lat, lng });
-                                alert('Invalid location coordinates received.');
-                                return;
-                            }
-                            if (document.getElementById('theme-header')) {
-                                document.getElementById('theme-header').style.backgroundImage = `url('${picture}')`;
-                            }
-
-                            position = { lat: parsedLat, lng: parsedLng };
-                            console.log('Position:', position);
-
-                            if (document.getElementById('theme-name')) {
-                                document.getElementById('theme-name').innerText = name;
-                            }
-
-                            initMap();
-                        }
-                    } else {
-                        handleResponseErrors(response);
-                    }
-                } catch (error) {
-                    alert('伺服器錯誤，請稍後再試');
-                    console.log(error.message);
-                }
-            }
-
-            function handleResponseErrors(response) {
-                switch (response.status) {
-                    case 204:
-                        alert('無法找到相關日程資訊!');
-                        break;
-                    case 401:
-                        alert('請重新登入再使用功能!');
-                        goToLoginPage();
-                        break;
-                    default:
-                        response.json().then(errorResult => {
-                            alert(errorResult.message || '發生錯誤');
-                        });
-                        break;
-                }
-            }
-            //#endregion
-
-            //#region Google Maps API
-            async function initMap() {
-                if (!position) {
-                    console.error('位置未設置。');
-                    return;
-                }
-
-                console.log('在 initMap 中收到的位置:', position);  // Log the position object
-
-                const { Map } = await google.maps.importLibrary("maps");
-                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
-                map = new Map(document.getElementById("map"), {
-                    center: position,
-                    zoom: 15,
-                    mapId: "d4432686758d8acc",
-                });
-
-                if (position) {
-                    const center = new google.maps.LatLng(position.lat, position.lng);
-                    const bounds = new google.maps.LatLngBounds();
-                    bounds.extend(center);
-                    map.fitBounds(bounds);
-                }
-
-                setupAutocomplete();  // Call setupAutocomplete here to ensure it runs after map is initialized
-            }
-
-            function setupAutocomplete() {
-                if (!google || !google.maps || !google.maps.places) {
-                    console.error('Google Maps API not fully loaded.');
-                    return;
-                }
-
-                autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input'), {
-                    types: ['establishment']
-                });
-
-                autocomplete.addListener('place_changed', onPlaceChanged);
-            }
-
-            function onPlaceChanged() {
-                const place = autocomplete.getPlace();
-
-                if (!place.geometry) {
-                    console.error("No details available for input: '" + place.name + "'");
-                    return;
-                }
-
-                const lat = place.geometry.location.lat();
-                const lng = place.geometry.location.lng();
-
-                if (isNaN(lat) || isNaN(lng)) {
-                    console.error('Invalid coordinates:', { lat, lng });
-                    alert('Invalid location coordinates received.');
-                    return;
-                }
-
-                map.setCenter(place.geometry.location);
-                map.setZoom(15);
-
-                if (marker) {
-                    marker.setMap(null);
-                }
-
-                marker = new google.maps.Marker({
-                    map: map,
-                    position: place.geometry.location
-                });
-
-                document.getElementById('Lat').value = lat;
-                document.getElementById('Lng').value = lng;
-                document.getElementById('place_id').value = place.place_id;
-                document.getElementById('picture_url').value = place.photos ? place.photos[0].getUrl() : '';
-            }
-
-            function showModal(place) {
-                const modal = document.getElementById('locationModal');
-                const span = document.getElementsByClassName('close')[0];
-
-                document.getElementById('locationName').innerText = place.name;
-                document.getElementById('locationAddress').innerText = place.formatted_address;
-                document.getElementById('locationRating').innerText = `Rating: ${place.rating}`;
-
-                modal.style.display = "block";
-
-                span.onclick = function () {
-                    modal.style.display = "none";
-                }
-
-                window.onclick = function (event) {
-                    if (event.target == modal) {
-                        modal.style.display = "none";
-                    }
-                }
-            }
-            //#endregion
-
             LoadScheduleInfo(@scheduleId);
+
+            //#region 把地點加入願望清單
+            $('#addwishlist').on('click', function () {
+                var wishlistSelected = $('#wishlist_content option:selected');
+                var locationcategorySelected = $('#location_categories_content option:selected');
+                var wishlistId = $(wishlistSelected).attr('data-wishlistid');
+                var locationcategoryId = $(locationcategorySelected).attr('data-locationcategoryid');
+                var lat = $(wishlistSelected).attr('data-lat');
+                var lng = $(wishlistSelected).attr('data-lng');
+                var place_id = $(wishlistSelected).attr('data-placeid');
+                var createat = Date.now();
+                var name = $(wishlistSelected).attr('data-name').toString();
+                var body = {
+                    "wishlistId": wishlistId,
+                    "locationCategoryId": locationcategoryId,
+                    "locationLng": lng,
+                    "locationLat": lat,
+                    "googlePlaceId": place_id,
+                    "name": name,
+                    "create_at": createat
+                };
+
+                fetch(`${baseAddress}/api/Wishlist/AddtoWishlistDetail`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: "success",
+                                title: `景點已加入清單`,
+                                showConfirmButton: false,
+                                timer: 800
+                            });
+                        } else {
+                            return response.json().then(data => {
+                                Swal.fire({
+                                    title: "Oops!",
+                                    text: `${data.message}`,
+                                    icon: 'warning',
+                                    showConfirmButton: false
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.log('wishlist add error', error);
+                        Swal.fire({
+                            title: "錯誤",
+                            text: "添加到願望清單時發生錯誤。",
+                            icon: 'error',
+                            showConfirmButton: true
+                        });
+                    });
+            });
         });
+
     </script>
+    
 }
 
 

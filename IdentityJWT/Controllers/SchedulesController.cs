@@ -57,10 +57,9 @@ namespace PinPinServer.Controllers
                     SharedUserIDs = s.ScheduleGroups
                         .Select(sg => (int?)sg.UserId)
                         .ToList(),
-                    canedittitle = s.ScheduleGroups.Any(s => s.IsHoster),
-                    caneditdetail = s.ScheduleGroups.Any(s => s.ScheduleId == scheduleId && s.LeftDate == null && s.UserId == jwtuserID) && s.ScheduleAuthorities.Any(sa => sa.ScheduleId == scheduleId && (sa.AuthorityCategoryId == 2 || sa.AuthorityCategoryId == 8))
-                })
-                .ToListAsync();
+                    canedittitle = s.ScheduleAuthorities.Where(sa => sa.ScheduleId == scheduleId && sa.UserId == jwtuserID).All(sa => sa.AuthorityCategoryId == 8),
+                    caneditdetail = s.ScheduleAuthorities.Where(sa => sa.ScheduleId == scheduleId && sa.UserId == jwtuserID).Any(sa => (sa.AuthorityCategoryId == 2) || (sa.AuthorityCategoryId == 8))
+                }).ToListAsync();
 
                 if (scheduledetails == null || !scheduledetails.Any())
                 {
@@ -117,7 +116,9 @@ namespace PinPinServer.Controllers
                         PlaceId = s.PlaceId,
                         lng = s.Lng,
                         lat = s.Lat,
-                        isHost = s.ScheduleGroups.Select(s => s.IsHoster).FirstOrDefault(),
+                        canedittitle = true,
+                        caneditdetail = true,
+                        isHost = true,
                         SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
                         SharedUserNames = s.ScheduleGroups.Select(s => (string?)s.User.Name).Distinct().ToList(),
                     }).ToListAsync();
@@ -148,6 +149,10 @@ namespace PinPinServer.Controllers
                         PlaceId = s.PlaceId,
                         lng = s.Lng,
                         lat = s.Lat,
+                        isHost = false,
+                        caninvited = s.ScheduleAuthorities.All(sa => sa.AuthorityCategoryId == 2),
+                        canedittitle = false,
+                        caneditdetail = s.ScheduleGroups.All(s => s.ScheduleId == s.Id && s.LeftDate == null && s.UserId == userID) && s.ScheduleAuthorities.All(sa => sa.ScheduleId == s.Id && (sa.AuthorityCategoryId == 2 || sa.AuthorityCategoryId == 8)),
                         SharedUserIDs = s.ScheduleGroups.Select(sg => (int?)sg.UserId).ToList(),
                         SharedUserNames = s.ScheduleGroups
                             .Where(sg => sg.UserId != userID)
@@ -156,17 +161,25 @@ namespace PinPinServer.Controllers
                             .ToList(),
                     }).ToListAsync();
 
-                // 合併兩個列表
-                allSchedules.AddRange(mainSchedules);
-                allSchedules.AddRange(groupSchedules);
 
-                if (!allSchedules.Any())
+                if (mainSchedules.Any() && groupSchedules.Any())
                 {
-                    Console.WriteLine("查無使用者相關紀錄");
-                    return NoContent();
+                    return Ok(new { MainSchedules = mainSchedules, GroupSchedules = groupSchedules });
+                }
+                else if (mainSchedules.Any() && !groupSchedules.Any())
+                {
+                    return Ok(new { GroupSchedules = "目前沒有參加的旅遊群組", MainSchedules = mainSchedules });
+                }
+                else if (!mainSchedules.Any() && groupSchedules.Any())
+                {
+
+                    return Ok(new { MainSchedules = "趕快規劃新行程吧", GroupSchedules = groupSchedules });
+                }
+                else
+                {
+                    return NotFound(new { message = "尚無新創的旅遊行程及參與的旅遊群組" });
                 }
 
-                return Ok(allSchedules);
             }
             catch (Exception ex)
             {

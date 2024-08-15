@@ -18,28 +18,40 @@ namespace PinPinServer.Controllers
         private readonly IConfiguration _configuration;
         private readonly PinPinContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
+        AuthGetuserId _getUserId;
 
-        public WishlistController(PinPinContext context, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public WishlistController(PinPinContext context, IConfiguration configuration, IHttpClientFactory httpClientFactory, AuthGetuserId getuserId)
         {
             _context = context;
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
+            _getUserId = getuserId;
         }
 
         //取得user所有願望清單
-        //GET:api/Wishlist/GetAllWishlist/{userId}
-        [HttpGet("GetAllWishlist/{userId}")]
-        public async Task<ActionResult<IEnumerable<WishlistDTO>>> GetAllWishlist(int userId)
+        //GET:api/Wishlist/GetAllWishlist/{userId?}
+        [HttpGet("GetAllWishlist/{userId?}")]
+        public async Task<ActionResult<IEnumerable<WishlistDTO>>> GetAllWishlist(int? userId)
         {
+            if (userId == null)
+            {
+                int jwtuserId = _getUserId.PinGetUserId(User).Value;
+                if (jwtuserId == null)
+                {
+                    return Unauthorized(new { message = "請先登入會員" });
+                }
+                userId = jwtuserId;
+            }
+            //查找user有沒有願望清單
             var wishlists = await _context.Wishlists
-        .Include(w => w.LocationCategories)
-        .Include(w => w.WishlistDetails)
-        .Where(w => w.UserId == userId)
-        .ToListAsync();
+            .Include(w => w.LocationCategories)
+            .Include(w => w.WishlistDetails)
+            .Where(w => w.UserId == userId)
+            .ToListAsync();
 
             if (wishlists == null || !wishlists.Any())
             {
-                return NotFound();
+                return NotFound(new { message = "您尚未建立願望清單" });
             }
 
             var result = wishlists.Select(w => new WishlistDTO
@@ -67,8 +79,8 @@ namespace PinPinServer.Controllers
             }).ToList();
 
             return Ok(result);
-
         }
+
 
         //加入願望清單
         //POST:api/Wishlist/AddtoWishlistDetail
@@ -77,7 +89,7 @@ namespace PinPinServer.Controllers
         {
             if (wishlistDetailDTO == null)
             {
-                return BadRequest("Invalid data.");
+                return BadRequest(new { message = "請再重新試一次" });
             }
 
             //判斷是否已存在清單
@@ -86,7 +98,7 @@ namespace PinPinServer.Controllers
 
             if (existingDetail != null)
             {
-                return BadRequest("This place is already in the wishlist.");
+                return BadRequest(new { message = "已有景點在願望清單內" });
             }
 
             var wishlistDetail = new WishlistDetail
@@ -103,7 +115,7 @@ namespace PinPinServer.Controllers
             _context.WishlistDetails.Add(wishlistDetail);
             await _context.SaveChangesAsync();
 
-            return Ok(wishlistDetail);
+            return Ok();
         }
 
         //取得願望清單細節
@@ -158,7 +170,7 @@ namespace PinPinServer.Controllers
             //return Content("新增成功!");
         }
 
-        
+
         //修改願望清單OK
         //PUT:api/Wishlist/UpdateWishlist/{id}
         [HttpPut("UpdateWishlist/{id}")]

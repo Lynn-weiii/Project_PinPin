@@ -1,140 +1,126 @@
-﻿/******************/
+﻿
+.air-datepicker {
+    z-index: 9999 !important;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+}
 
-/*****************/
-    .fixed-button {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    /* 將 right 改為 left */
-    z-index: 1000;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+/* #region 地圖樣式 */
+#map {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+#search_input {
+    z-index: 999;
+    width: 300px; /* 可以根据需要调整宽度 */
+    margin: 10px; 
+}
+
+#search_input input {
+    width: 100%;
+    border: 2px solid black;
+}
+
+@media (min-width: 998.1px) {
+    .row-cols-md-2 {
+        display: flex;
+        height: 100vh; /* 高度满屏 */
     }
 
-    .fixed-button:hover {
-        background-color: #0056b3;
-    }
-
-    #map {
-        height: 100vh; /* 高度设为视口高度 */
-        width: 100%; /* 宽度设为 100% */
+    #plannertable {
+        flex: 0 0 30%; /* 占据 30% */
+        max-width: 30%;
         box-sizing: border-box; /* 包含边距和边框 */
     }
 
-    /* 針對大於等於 998px 的設備 */
-    @media (min-width: 998.1px) {
-        .row-cols-md-2 {
-            display: flex;
-            height: 100vh; /* 高度滿版 */
-        }
+    #map {
+        flex: 0 0 70%; /* 占据 70% */
+        max-width: 70%;
+        box-sizing: border-box; /* 包含边距和边框 */
+        z-index: 1;
+    }
+}
 
-        #plannertable {
-            flex: 0 0 30%; /* 佔據 30% */
-            max-width: 30%;
-            box-sizing: border-box; /* 包含邊距和邊框 */
-        }
-
-        #map {
-            flex: 0 0 70%; /* 佔據 70% */
-            max-width: 70%;
-            box-sizing: border-box; /* 包含邊距和邊框 */
-            z-index: 1;
-        }
+@media (max-width: 998px) {
+    #map {
+        display: none; /* 隐藏地图 */
+        z-index: 1;
     }
 
-    /* 針對小於 998px 的設備 */
-    @media (max-width: 998px) {
-            #map {
-                display: none; /* 隱藏地圖 */
-                z-index: 1;
-            }
-
-            #plannertable {
-                width: 100%; /* 行程表寬度滿版 */
-            }
-        }
-
-    /* 主题名称区 */
-    .theme-header {
-        position: relative;
-        background: rgba(0, 0, 0, 0.4) url('') no-repeat center center; /* 40% 灰色遮罩 */
-        background-size: cover; /* 确保背景图像覆盖整个元素 */
-        height: 180px; /* 根据需要调整高度 */
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        width: 100%; /* 确保宽度填满父元素 */
+    #plannertable {
+        width: 100%; /* 行程表宽度满版 */
     }
+}
+/*#endregion*/
 
-    .theme-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.4); /* 40% 灰色透明度 */
-        z-index: 1; /* 确保覆盖层在背景图像之上 */
-    }
+/*#region  主题名稱 */
+.theme-header {
+    position: relative;
+    background: rgba(0, 0, 0, 0.4) url('') no-repeat center center; /* 40% 灰色遮罩 */
+    background-size: cover; /* 确保背景图像覆盖整个元素 */
+    overflow:hidden;
+    height: 180px; /* 根据需要调整高度 */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%; /* 确保宽度填满父元素 */
+    border-radius:15px;
+}
 
-    .theme-header h1 {
-        font-size: 2em;
-        margin: 0;
-    }
-
-    #theme-name {
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-        font-size: 30px;
-        font-family: "Noto Sans TC", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 700;
-        z-index:1
-    }
-
-/* 按鈕樣式 */
-.theme-header .btn {
+.theme-header::before {
+    content: '';
     position: absolute;
-    top: 10px; /* 距離頂部10像素 */
-    right: 10px; /* 距離右側10像素 */
-    border: none; /* 移除边框 */
-    color: white; /* 文字顏色為白色 */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4); /* 40% 灰色透明度 */
+    z-index: 1; /* 确保覆盖层在背景图像之上 */
+}
+
+.theme-header h1 {
+    font-size: 2em;
+    margin: 0;
+}
+
+#theme-name {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    font-size: 30px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    z-index: 1;
+}
+/*#endregion*/
+
+/*#region 行程列表表頭*/
+.theme-header .btn, #schtitle_edit_btn {
+    position: absolute;
+    top: 10px; /* 距离顶部 10 像素 */
+    right: 10px; /* 距离右侧 10 像素 */
+    border-radius: 5px;
+    border: 1px solid white;
+    color: white; /* 文字颜色为白色 */
     font-weight: bold; /* 文字加粗 */
     background: transparent; /* 使背景透明 */
 }
 
 #theme-header .btn:hover, #theme-header .btn:focus, #theme-header .btn:active {
-    border: none; /* 不显示边框 */
-    color: white; /* 文字顏色為白色 */
-    transform: scale(1.10); /* 略微放大 */
-    outline: none; /* 移除focus时的外边框 */
+
+    color: white; /* 文字颜色为白色 */
+    transform: scale(1.15); /* 略微放大 */
+
     box-shadow: none; /* 移除可能的阴影效果 */
 }
+/*#endregion*/
 
-/*地圖上的搜尋INPUT*/
-
-#search_input {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 5;
-    width: calc(100% - 20px);
-    max-width: 10%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transform:translateY(100%);
-}
-
+/*#region 地圖 */
 #mapsection.modal {
     display: none;
     position: fixed;
@@ -153,7 +139,6 @@
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
-
 }
 
 #mapsection.close {
@@ -163,13 +148,240 @@
     font-weight: bold;
 }
 
-    #mapsection.close:hover,
-    #mapsection.close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
+#mapsection.close:hover,
+#mapsection.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+/*#endregion*/
+
+/*#region google map informadal*/
+.info-window {
+    width: 280px;
+    padding: 5px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* 确保没有滚动条 */
+}
+
+.info-window-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: contain; /* 等比例缩放并适应容器 */
+    object-position: center; /* 中心对齐 */
+    border-radius: 20px;
+    overflow:hidden;
+}
+
+.info-window .details {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.rating-container .rating {
+    display: flex;
+    align-items: center;
+}
+
+.rating-container .average-rating {
+    font-size: 14px;
+    color: brown;
+    margin-right: 5px;
+}
+
+.rating-container .reviews {
+    margin-left: 5px;
+    font-size: 14px;
+    color: gray;
+}
+
+.star-rating {
+    display: flex;
+}
+
+.star-rating .full,
+.star-rating .half,
+.star-rating .empty {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 2px;
+}
+
+.star-rating .full {
+    background-image: url('/images/star-full.svg');
+}
+
+.star-rating .half {
+    background-image: url('/images/star-half.svg');
+}
+
+.star-rating .empty {
+    background-image: url('/images/star-empty.svg');
+}
+
+.info-window .address {
+    font-size: 12px;
+    color: gray;
+    margin-top: 5px;
+}
+
+.info-window .btn-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.info-window .btn-primary {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.info-window .btn-primary#wishlist-btn {
+    background-color: gold;
+    color: #fff;
+}
+
+.info-window .btn-container span {
+    font-size: 14px;
+    color: gray;
+    margin-right: 20px;
+}
+/*#endregion*/
+
+/*#region 行程列表*/
+:root {
+    --darkgreen: #435a4f;
+    --white: #f6f4e8;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body,
+.tabs-to-dropdown .dropdown-toggle,
+.tabs-to-dropdown .dropdown-item {
+    font-size: 1.3rem;
+}
+
+.tabs-to-dropdown .nav-wrapper {
+    padding: 0;
+    box-shadow: none;
+}
+
+    .tabs-to-dropdown .nav-wrapper a {
+        color: var(--darkgreen);
     }
 
+.tabs-to-dropdown .nav-pills {
+    border-bottom: 1px solid #ddd;
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
 
+    .tabs-to-dropdown .nav-pills .nav-link {
+        color: var(--darkgreen);
+        background-color: var(--white);
+        border: none;
+        border-radius: 0;
+        margin-right: 0;
+        padding: 5px 10px;
+        font-size: 1rem;
+        height: 40px;
+        line-height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-   
+        .tabs-to-dropdown .nav-pills .nav-link.active {
+            background-color: var(--darkgreen);
+            color: var(--white);
+        }
+
+.tabs-to-dropdown .tab-content .container-fluid {
+    max-width: 1250px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    background: #f6f4e8;
+    border-radius: 5px;
+    padding: 1rem;
+}
+
+    .schedule-item img {
+        width: 80px;
+        height: 80px;
+        border-radius: 5px;
+        margin-right: 1rem;
+    }
+
+    .schedule-item .time {
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    .schedule-item .location {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .schedule-item .duration {
+        color: #666;
+    }
+
+.tab-content {
+    padding: 10px;
+}
+
+.nav-scroller {
+    position: relative;
+    z-index: 2;
+    height: 3.5rem;
+    overflow-y: hidden;
+}
+
+    .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-scroller .nav-link {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: .875rem;
+    }
+/*#endregion*/
