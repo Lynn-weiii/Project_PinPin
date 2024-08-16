@@ -59,7 +59,7 @@
                             <h2 class="accordion-header" :id="'flush-heading' + index">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         :data-bs-target="'#flush-collapse' + index" aria-expanded="false"
-                                        :aria-controls="'flush-collapse' + index">
+                                        :aria-controls="'flush-collapse' + index" v-on:click="fetchWishlists()">
                                     {{wishlist.name}}
                                 </button>
                             </h2>
@@ -67,18 +67,31 @@
                                  :aria-labelledby="'flush-heading' + index" data-bs-parent="#wishlistAccordionFlush">
                                 <div class="accordion-body d-flex flex-column" v-for="(locationCategory, lcIndex) in wishlist.locationCategories" :key="locationCategory.id">
                                     <div class="d-grid gap-2">
-                                        <button class="btn btn-outline-primary" type="button" v-on:click="setSelectedCategory(wishlist, locationCategory.id)">{{locationCategory.name}}</button>
+                                        <button class="btn btn-outline-primary" type="button" v-on:click="setSelectedCategory(wishlist, locationCategory.id)" :style="{ color: locationCategory.color, borderColor: locationCategory.color }">
+                                            <i :class="locationCategory.icon"></i>  {{locationCategory.name}}
+                                        </button>
                                     </div>
                                     <!--行程卡片-->
                                     <div class="row" v-if="wishlist.selectedCategoryId === locationCategory.id">
-                                        <div class="col-md-6" v-for="detail in getFilteredDetails(wishlist)" :key="detail.id">
-                                            <div class="card mb-3" style="width: 100%;">
-                                                <img :src="detail.photoUrl" class="card-img-top" alt="...">
+                                        <!-- 判斷行程卡片是否有內容 -->
+                                        <template v-if="getFilteredDetails(wishlist).length > 0">
+                                            <div class="col-md-6" v-for="detail in getFilteredDetails(wishlist)" :key="detail.id">
+                                                <div class="card mb-3" style="width: 100%;">
+                                                    <img :src="detail.photoUrl" class="card-img-top" alt="...">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ detail.name }}</h5>
+                                                        <p class="card-text">{{ detail.address }}</p>
+                                                        <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
+                                                        <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <!-- 如果沒有行程內容，顯示[尚無行程] -->
+                                        <div class="col-md-12" v-else>
+                                            <div class="card mb-3 text-center" style="width: 100%; border-color: #ccc;">
                                                 <div class="card-body">
-                                                    <h5 class="card-title">{{ detail.name }}</h5>
-                                                    <p class="card-text">{{ detail.address }}</p>
-                                                    <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
-                                                    <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
+                                                    <h5 class="card-title">目前沒有行程，趕快搜尋喜歡的地點吧！</h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -317,7 +330,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteWishlistModalLabel">刪除願望清單及標籤</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="setSelectedCategory(wishlist, locationCategoryId)"></button>
                 </div>
                 <div class="modal-body">
                     <form v-on:submit.prevent="deleteWishlistWithCategory">
@@ -396,6 +409,7 @@
                         { value: 'fa-solid fa-map' },
                         { value: 'fa-solid fa-bowl-food' },
                         { value: 'fa-solid fa-tree' },
+                        { value: 'fa-solid fa-mountain-sun' },
                         { value: 'fa-solid fa-person-swimming' },
                         { value: 'fa-solid fa-house' }
                     ],
@@ -439,7 +453,7 @@
                 }).catch(error => {
                     console.error('Error loading data:', error);
                 });
-                    //重置createWishlistModal畫面
+                //重置createWishlistModal畫面
                 const createWishlistModalElement = document.getElementById('createWishlistModal');
                 createWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
 
@@ -491,13 +505,11 @@
                     });
 
                     await this.connectionStart();
-                    for (const schdule in this.schdules) 
-                    {
+                    for (const schdule in this.schdules) {
                         await this.joinGroup(schdule, this.userdata.id)
                     }
                 });
             },
-
             methods: {
                 async fetchWishlists() {
                     const userId = getUserIdFromToken();

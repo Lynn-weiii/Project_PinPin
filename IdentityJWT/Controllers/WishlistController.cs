@@ -64,7 +64,8 @@ namespace PinPinServer.Controllers
                     Id = lc.Id,
                     WishlistId = lc.WishlistId,
                     Name = lc.Name,
-                    Color = lc.Color
+                    Color = lc.Color,
+                    Icon = lc.Icon
                 }).ToList(),
                 WishlistDetails = w.WishlistDetails.Select(d => new WishlistDetailDTO
                 {
