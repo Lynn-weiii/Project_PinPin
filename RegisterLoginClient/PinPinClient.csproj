@@ -61,4 +61,8 @@
     <ProjectReference Include="..\IdentityJWT\PinPinServer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\avatar\" />
+  </ItemGroup>
+
 </Project>

@@ -123,11 +123,10 @@
                                     <div :class="['d-flex', message.userName == userdata.name ? 'flex-row-reverse align-items-start' : 'align-items-start']">
                                         <!-- User Avatar -->
                                         <div class="d-flex flex-column align-items-center" :class="message.userName == userdata.name ? 'ms-2' : 'me-2'">
-                                            <div :class="['rounded-circle', message.userName == userdata.name ? 'bg-primary' : 'bg-danger']"
-                                                 style="width: 40px; height: 40px; flex-shrink: 0;">
+                                            <div class="rounded-circle"
+                                                 style="width: 40px; height: 40px; flex-shrink: 0; overflow: hidden; border: 2px solid #ccc; background-color: transparent;">
+                                                <img :src="getUserPhoto(message.userId)" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
-                                            <!-- User Name -->
-                                            <div class="text-muted" style="font-size: 0.8rem;">{{ message.userName }}</div>
                                         </div>
                                         <!-- Message Content -->
                                         <div>
@@ -347,6 +346,22 @@
         </div>
     </div>
 
+    <!--訊息吐司-->
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div class="toast" ref="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">{{ toastTitle }}</strong>
+                    <small>{{ toastTime }}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ toastMessage }}
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script>
 
@@ -406,13 +421,17 @@
                     locationCategories: [],
                     allLocationCategories: [],
                     //以下為聊天室相關
-                    isChooseChatroom: true,
+                    isChooseChatroom: false,
                     selectedChatroom: "",
                     connection: null,
+                    memberData: [],
                     schdules: [],
                     schduleName: '',
                     newMessage: "",
                     messages: [],
+                    toastTitle: '',
+                    toastMessage: '',
+                    toastTime: '',
                 };
             },
             async mounted() {
@@ -439,7 +458,7 @@
                 }).catch(error => {
                     console.error('Error loading data:', error);
                 });
-                    //重置createWishlistModal畫面
+                //重置createWishlistModal畫面
                 const createWishlistModalElement = document.getElementById('createWishlistModal');
                 createWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
 
@@ -487,12 +506,15 @@
                     });
 
                     this.connection.on("ReceiveMessage", (message) => {
-                        this.messages.push(message);
+                        if (this.selectedChatroom == message.scheduleId) {
+                            this.messages.push(message);
+                        } else {
+                            this.showToast(`${message.userName}(${this.schdules[message.scheduleId]})`, message.message, message.createdAt);
+                        }
                     });
 
                     await this.connectionStart();
-                    for (const schdule in this.schdules) 
-                    {
+                    for (const schdule in this.schdules) {
                         await this.joinGroup(schdule, this.userdata.id)
                     }
                 });
@@ -731,7 +753,27 @@
                 //以下為聊天室相關
                 async selectChatroom(scheduleId) {
                     this.selectedChatroom = scheduleId;
+                    this.isChooseChatroom = true;
+                    await this.axiosGroupMemberData(scheduleId);
                     await this.axiosChatRoom(scheduleId);
+                },
+                async axiosGroupMemberData(scheduleId) {
+                    try {
+                        const response = await axios.get(
+                            `${baseAddress}/api/ScheduleGroups/GetGroupsMembers/${scheduleId}`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            }
+                        );
+                        const datas = response.data;
+                        datas.forEach((data) => {
+                            this.memberData.push({ userId: data.userId, userPhoto: data.userPhoto });
+                        });
+                    } catch (error) {
+                        console.log(error);
+                    }
                 },
                 async axiosChatRoom(scheduleId) {
                     try {
@@ -746,12 +788,18 @@
                                 },
                             }
                         );
-                        const data = response.data;
-                        this.messages = data;
+                        this.messages = response.data;
                         this.scrollToBottom();
                     } catch (error) {
                         console.log(error);
                     }
+                },
+                getUserPhoto(userId) {
+                    const user = this.memberData.find(member => member.userId === userId);
+                    if (user) {
+                        return `data:image/png;base64,${user.userPhoto}`;
+                    }
+                    return '/images/female.png';
                 },
                 async connectionStart() {
                     try {
@@ -783,7 +831,8 @@
                                 }
                             }
                         );
-
+                        this.newMessage = "";
+                        this.scrollToBottom();
                     } catch (error) {
                         console.log(error);
                     }
@@ -803,6 +852,14 @@
                 updateSelectedWishlist() {
                     //根據選定的清單，將其設置於<input>元素供用戶修改
                     this.selectedWishlist = this.wishlists.find(w => w.id === this.selectedWishlistId) || null;
+                },
+                showToast(title, message, time) {
+                    this.toastTitle = title;
+                    this.toastMessage = message;
+                    this.toastTime = this.formatTime(time);
+                    const toastEl = this.$refs.toast;
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
                 },
                 //修改願望清單
                 async saveWishlist() {

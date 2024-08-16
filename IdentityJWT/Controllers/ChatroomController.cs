@@ -45,6 +45,7 @@ namespace PinPinServer.Controllers
                     .Select(cc => new ChatRoomDTO
                     {
                         Id = cc.Id,
+                        ScheduleId = scheduleId,
                         UserId = cc.UserId,
                         UserName = cc.User.Name,
                         CreatedAt = cc.CreatedAt,
@@ -102,6 +103,7 @@ namespace PinPinServer.Controllers
                     CreatedAt = chatroomChat.CreatedAt,
                     Message = chatroomChat.Message,
                     IsFocus = chatroomChat.IsFocus,
+                    ScheduleId = chatroomChat.ScheduleId,
                 };
 
                 await _hubContext.Clients.Group($"Group_{dto.ScheduleId}").SendAsync("ReceiveMessage", newDto);

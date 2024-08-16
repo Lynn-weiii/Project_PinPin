@@ -13,5 +13,7 @@
         public DateTime? CreatedAt { get; set; }
 
         public bool? IsFocus { get; set; } = false;
+
+        public int ScheduleId { get; set; }
     }
 }
