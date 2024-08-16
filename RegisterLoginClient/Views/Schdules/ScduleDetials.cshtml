@@ -18,54 +18,29 @@
 <div class="container-fluid" style="margin:1px;padding:0;overflow:hidden;">
     <div class="row row-cols-md-2 g-0">
         @*# region行程表*@
-        <div class="col-12 col-md-4" id="plannertable" style="border:2px solid #f6f4e8;">
-            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden;">
-                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschdule">編輯</button>
+        <div class="col-12 col-md-5" id="plannertable" style="border:2px solid #f6f4e8;">
+            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden;">                
+                    <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschedule">修改行程名稱/日期</button>
                 <h5 id="theme-name"></h5>
                 <div id="travelduring">
-                    @* //做兩個input放起始日，預設是readonly，直到schtitle_edit_btn被click才能修改日期 *@
-                    @* <div class="row">
-                        <label for="search_input" class="form-label mb-2">旅程日期</label>
-                        <div class="col-5">
-                            <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日期" />
-                        </div>
-                        <div class="col-2 text-center align-center pt-1 pb-1">
-                            <i class="fa-solid fa-arrow-right fa-xl"></i>
-                        </div>
-                        <div class="col-5">
-                            <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="結束日期" />
-                        </div>
-                    </div> *@
                 </div>
             </div>
-            @* @*#region 行程列表*@
-<           <div class="col-12 col-md-4">
-            <div class="container">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="tabs-to-dropdown">
-                            <div class="nav-wrapper d-flex align-items-center justify-content-between">
-                                <div class="nav-scroller">
-                                    <ul class="nav nav-pills" id="schdule-pills-tab" role="tablist">
-                                        <!-- Tabs will be inserted here by JavaScript -->
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="tab-content" id="schdule-pills-tabContent">
-                                <!-- Tab contents will be inserted here by JavaScript -->
-                            </div>
+            <!-- #region 行程列表 -->
+            <div id="show-schedule-row">
+                <!-- 修正此处 -->
+                <div class="tab-wrap">
+                    <div class="tab-navigation scrollbar">
+                        <div class="tabs-container" id="tabs-container">
+                            <!-- Add more tabslabel -->
                         </div>
                     </div>
                 </div>
+                <div class="tab-contents" id="tab-contents">                    
+                    <!-- Add more tab-contents as needed -->
+                </div>
             </div>
-            <div class="row" id="plannertables">
-                <input id="Lat" type="hidden" name="lat">
-                <input id="Lng" type="hidden" name="lng">
-                <input id="place_id" type="hidden" name="place_id">
-                <input id="picture_url" type="hidden" name="picture_url">
-            </div>
-        </div>
-        </div>
+            <!-- #endregion -->
+        </div>        
         @*#endgion*@
         @*#region 地圖*@        
         <div class="col-12 col-md-8">
@@ -78,43 +53,46 @@
     </div>
 </div>
 @*#region 變更主題名稱*@
-<div class="modal fade" id="modifiedschdule" tabindex="-1" aria-labelledby="modifiedschduleLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title w-100 text-center" id="modifiedschduleLabel">建立新行程</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="container-fluid modal-body">
-                <form id="modifiedschdule" novalidate autocomplete="off">
-                    <!-- 行程 -->
-                    <div class="mb-3">
-                        <label for=""></label>
-                        <label for="Name" class="form-label mb-2">行程名稱</label>
-                        <input id="ScheduleName" type="text" class="form-control mb-1" name="Name" placeholder="行程主題" required>
-                        <input id="Lat" type="hidden" name="lat">
-                        <input id="Lng" type="hidden" name="lng">
-                        <input id="place_id" type="hidden" name="place_id">
-                        <input id="picture_url" type="hidden" name="picture_url">
-                    </div>
-                    <div class="mb-3">
-                        <div class="row">
-                            <label for="modified_search_input" class="form-label mb-2">旅程日期</label>
-                            <div class="col-5">
-                                <input type="text" name="StartTime" id="el1" class="form-control text-center" />
-                            </div>
-                            <div class="col-2 text-center align-center pt-1 pb-1">
-                                <i class="fa-solid fa-arrow-right fa-xl"></i>
-                            </div>
-                            <div class="col-5">
-                                <input type="text" name="EndTime" id="el2" class="form-control text-center" />
+<div class="container-fluid modal-body">
+    <div class="modal fade" id="modifiedschedule" tabindex="-1" aria-labelledby="modifiedscheduleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modifiedscheduleLabel">修改行程</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modifiedscheduleForm" novalidate autocomplete="off">
+                        <!-- 行程名稱 -->
+                        <div class="mb-3">
+                            <label for="ScheduleName" id="SchName" class="form-label mb-2 font-size:12px">行程名稱</label>
+                            <input id="ScheduleName" type="text" class="form-control mb-1" name="name" required>
+                            <input id="Lat" type="hidden" name="lat">
+                            <input id="Lng" type="hidden" name="lng">
+                            <input id="place_id" type="hidden" name="place_id">
+                            <input id="picture_url" type="hidden" name="picture_url">
+                        </div>
+                        <!-- 旅程日期 -->
+                        <div class="mb-3">
+                            <div class="row">
+                                <label for="travelTimeLabel" id="travelTimeLabel" class="form-label mb-2  font-size:12px">旅程日期</label>
+                                <div class="col-5">
+                                    <input type="text" name="StartTime" id="el1" class="form-control text-center" placeholder="開始日">
+                                </div>
+                                <div class="col-2 text-center align-center pt-1 pb-1">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+                                <div class="col-5">
+                                    <input type="text" name="EndTime" id="el2" class="form-control text-center" placeholder="结束日期">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="createbtn">完成</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="modifiedschedule_btn" data-schdeuleId="@scheduleId">修改</button>
+                    <button type="button" class="btn btn-secondary btn-sm ms-2" id="modifiedcancelbtn" data-bs-dismiss="modal">取消</button>
+                </div>
             </div>
         </div>
     </div>
@@ -132,10 +110,10 @@
             <div class="modal-body">
                 <div id="wishlist_list">
                     <div class="row">
-                        <select id="wishlist_content" class="form-select mb-3">
+                        <select id="wishlist_content" class="form-select mb-3" autocomplete="off">
                             <option value="0">----- 請選擇願望清單 -----</option>                        
                         </select>
-                        <select id="location_categories_content" class="form-select mb-3">
+                        <select id="location_categories_content" class="form-select mb-3" autocomplete="off">
                             <option value="0">----- 請選擇標籤 -----</option>
                         </select>
                     </div>
@@ -143,7 +121,7 @@
                 <div class="row">
                     <div class="d-flex justify-content-end mt-3 col">
                         <button class="btn btn-primary btn-sm" id="addwishlist">加入願望清單</button>
-                        <button class="btn btn-secondary btn-sm ms-2" id="authright_cancel" data-bs-dismiss="modal">取消</button>
+                        <button class="btn btn-secondary btn-sm ms-2" id="addwoshlist_cancel" data-bs-dismiss="modal">取消</button>
                     </div>
                 </div>
                     
@@ -160,68 +138,22 @@
     <script>
         $(document).ready(function () {
             LoadScheduleInfo(@scheduleId);
+            ListenScheduleListEvent();
 
             //#region 把地點加入願望清單
-            $('#addwishlist').on('click', function () {
-                var wishlistSelected = $('#wishlist_content option:selected');
-                var locationcategorySelected = $('#location_categories_content option:selected');
-                var wishlistId = $(wishlistSelected).attr('data-wishlistid');
-                var locationcategoryId = $(locationcategorySelected).attr('data-locationcategoryid');
-                var lat = $(wishlistSelected).attr('data-lat');
-                var lng = $(wishlistSelected).attr('data-lng');
-                var place_id = $(wishlistSelected).attr('data-placeid');
-                var createat = Date.now();
-                var name = $(wishlistSelected).attr('data-name').toString();
-                var body = {
-                    "wishlistId": wishlistId,
-                    "locationCategoryId": locationcategoryId,
-                    "locationLng": lng,
-                    "locationLat": lat,
-                    "googlePlaceId": place_id,
-                    "name": name,
-                    "create_at": createat
-                };
-
-                fetch(`${baseAddress}/api/Wishlist/AddtoWishlistDetail`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            Swal.fire({
-                                icon: "success",
-                                title: `景點已加入清單`,
-                                showConfirmButton: false,
-                                timer: 800
-                            });
-                        } else {
-                            return response.json().then(data => {
-                                Swal.fire({
-                                    title: "Oops!",
-                                    text: `${data.message}`,
-                                    icon: 'warning',
-                                    showConfirmButton: false
-                                });
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.log('wishlist add error', error);
-                        Swal.fire({
-                            title: "錯誤",
-                            text: "添加到願望清單時發生錯誤。",
-                            icon: 'error',
-                            showConfirmButton: true
-                        });
-                    });
+            $('#PopWishList').on('shown.bs.modal', function () {
+                AddPointToWishList();
             });
-        });
+            //#endregion
 
+            //#region 修改行程主題
+            $('#modifiedschedule').on('shown.bs.modal', function () {
+                initAirDatepicker();
+                UploadScheduleTopic(@scheduleId);
+            });
+            //#endregion
+        });
     </script>
-    
 }
 
 

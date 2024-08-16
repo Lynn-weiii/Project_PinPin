@@ -1,8 +1,6 @@
-﻿
-.btn-custom {
-    background-color: #638889;
-    color: #F0F0F0;
-    width: 100%;
+﻿#schtitle_edit_btn {
+    z-index: 1;
+    display: none; /* 默认隐藏 */
     text-align: center;
 }
 
