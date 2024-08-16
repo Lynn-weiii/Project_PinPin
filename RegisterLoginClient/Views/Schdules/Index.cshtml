@@ -263,48 +263,41 @@
                     goToLoginPage();
                     return;
                 }
-                else if (allSchedulesResponse.ok) { 
+                else if (allSchedulesResponse.ok) {
                     const responseData = await allSchedulesResponse.json();
                     const data = responseData.mainSchedules || [];
-                   
                     const data2 = responseData.groupSchedules || [];
-                    const updatedData = await Promise.all(data.map(async (item) => {
+
+                    // 替换 data 中的 picture
+                    const updatedData = Array.isArray(data) ? await Promise.all(data.map(async (item) => {
                         if (item.placeId) {
                             const photoUrl = await fetchPlacePhotoUrl(item.placeId);
                             item.picture = photoUrl || item.picture; // 如果没有新图片，保留原始图片
                         }
                         return item;
-                    }));
+                    })) : [];
 
                     // 替换 data2 中的 picture
-                    const updatedData2 = await Promise.all(data2.map(async (item) => {
+                    const updatedData2 = Array.isArray(data2) ? await Promise.all(data2.map(async (item) => {
                         if (item.placeId) {
                             const photoUrl = await fetchPlacePhotoUrl(item.placeId);
                             item.picture = photoUrl || item.picture; // 如果没有新图片，保留原始图片
                         }
                         return item;
-                    }));
-                    if (Array.isArray(data)) {
-                        if (data.length > 0) {
-                            $('#course-container').show();
-                            renderCourses(data);
-                        } else {
-                            $('#course-container').hide();
-                            $('#emptyschedule').show();
-                        }
-                    } else if (typeof data === 'string' && data.includes('趕快規劃新行程吧')) {
+                    })) : [];
+
+                    if (updatedData.length > 0) {
+                        $('#course-container').show();
+                        renderCourses(updatedData);
+                    } else {
                         $('#course-container').hide();
                         $('#emptyschedule').show();
                     }
-                    if (Array.isArray(data2)) {
-                        if (data2.length > 0) {
-                            $('#group_course-container').show();
-                            groupCourses(data2);
-                        } else {
-                            $('#group_course-container').hide();
-                            $('#emptygroup').show();
-                        }
-                    } else if (typeof data2 === 'string' && data2.includes('目前沒有參加的旅遊群組')) {
+
+                    if (updatedData2.length > 0) {
+                        $('#group_course-container').show();
+                        groupCourses(updatedData2);
+                    } else {
                         $('#group_course-container').hide();
                         $('#emptygroup').show();
                     }
@@ -327,6 +320,7 @@
                     initPopularCoursesSlider();
                 }, 300);
             }
+
             //#endregion
 
             //#region 取景點照片
