@@ -81,8 +81,8 @@
                                                     <div class="card-body">
                                                         <h5 class="card-title">{{ detail.name }}</h5>
                                                         <p class="card-text">{{ detail.address }}</p>
-                                                        <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
-                                                        <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
+                                                        <button class="btn btn-outline-primary" v-on:click="addtoSchedule()"><i class="fa-solid fa-calendar-days"></i></button>
+                                                        <button class="btn btn-outline-primary" v-on:click="deleteSelectedDetail(detail.id)"><i class="fa-solid fa-trash"></i></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -549,7 +549,8 @@
                 },
                 getFilteredDetails(wishlist) {
                     if (!wishlist.selectedCategoryId) return [];
-                    return wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === wishlist.selectedCategoryId);
+                    const details = wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === wishlist.selectedCategoryId);
+                    return details;
                 },
                 async fetchDetailsForCategory(wishlist, locationCategoryId) {
                     const details = wishlist.wishlistDetails.filter(detail => detail.locationCategoryId === locationCategoryId);
@@ -883,8 +884,34 @@
                     }
                 },
                 //加入行程
+                async addtoSchedule() {
+                    alert("AddtoSchedule");
+                },
                 //移除願望清單中的行程
-
+                async deleteSelectedDetail(detailId) {
+                    try {
+                        const response = await axios.delete(`${baseAddress}/api/Wishlist/DeleteWishlistDetail/${detailId}`);
+                        if (response.status === 200) {
+                            // 删除成功，移除前端列表
+                            this.wishlists.forEach(wishlist => {
+                                const index = wishlist.wishlistDetails.findIndex(detail => detail.id === detailId);
+                                if (index !== -1) {
+                                    wishlist.wishlistDetails.splice(index, 1);
+                                }
+                            });
+                            Swal.fire({
+                                title: "行程已成功刪除",
+                                icon: "success"
+                            })
+                        }
+                    } catch (error) {
+                        console.error('删除行程時出錯', error.message);
+                        Swal.fire({
+                            title: "行程刪除失敗，請稍後再試",
+                            icon: "error"
+                        })
+                    }
+                },
                 //關閉modal
                 closeCreateModal() {
                     // Close the modal using Vue.js method

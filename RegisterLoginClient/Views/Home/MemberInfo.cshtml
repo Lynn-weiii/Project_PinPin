@@ -66,7 +66,11 @@
             //取出token
             const token = localStorage.getItem('token');
             if (!token) {
-                alert('無此權限，請先登入會員');
+                Swal.fire({
+                    title: "無此權限，請先登入會員!",
+                    icon: "error"
+                })
+                //alert('無此權限，請先登入會員');
                 return;
             }
 
@@ -146,7 +150,11 @@
                     }
                 });
                 var data = await result.text();
-                alert(data);
+                //alert(data);
+                Swal.fire({
+                    title: "修改成功",
+                    icon: "success"
+                })
             });
 
             getUserData();

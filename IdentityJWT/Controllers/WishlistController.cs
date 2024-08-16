@@ -69,6 +69,7 @@ namespace PinPinServer.Controllers
                 }).ToList(),
                 WishlistDetails = w.WishlistDetails.Select(d => new WishlistDetailDTO
                 {
+                    Id = d.Id,
                     WishlistId = d.WishlistId,
                     Name = d.Name,
                     LocationLng = d.LocationLng,
