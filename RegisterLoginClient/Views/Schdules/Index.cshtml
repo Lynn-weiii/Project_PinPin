@@ -309,7 +309,7 @@
                         $('#emptygroup').show();
                     }
                 }
-                else if (response.status === 204) {
+                else if (allSchedulesResponse.status === 204) {
                     $('#course-container').hide();
                     $('#emptyschedule').show();
                     $('#group_course-container').hide();
@@ -374,7 +374,7 @@
                 } else {
                     alert('Missing required data.');
                 }
-                alert('go schedule detail');
+               
             });
             //#endregion
 
