@@ -4,7 +4,7 @@ namespace PinPinClient.Controllers
 {
     public class ExpenseController : Controller
     {
-        //GET:Expense/ModalExpense
+        //GET:Expense/ExpenseModal
         public IActionResult ExpenseModal()
         {
             return PartialView("_ExpenseModalPartial");

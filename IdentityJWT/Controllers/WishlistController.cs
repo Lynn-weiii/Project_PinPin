@@ -286,7 +286,7 @@ namespace PinPinServer.Controllers
         //"id","wishlistId","name","color","icon"
         //PUT:api/Wishlist/UpdateLocationCategory/{id}
         [HttpPut("UpdateLocationCategory/{id}")]
-        public async Task<IActionResult> UpdateLocationCategory(int id, [FromBody] LocationCategoryDTO locationCategoryDTO)
+        public async Task<IActionResult> UpdateLocationCategory(int id,[FromBody]LocationCategoryDTO locationCategoryDTO)
         {
             // 取得標籤
             var locationCategory = await _context.LocationCategories.FindAsync(id);

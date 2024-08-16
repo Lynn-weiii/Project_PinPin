@@ -51,7 +51,7 @@
         </div>
         <div class="offcanvas-body tab-content">
             <!--願望清單內容 start-->
-            <div id="wishlistTab" class="tab-pane fade show active">
+            <div id="wishlistTab" class="tab-pane fade show active ">
                 <div v-if="isLoggedIn">
                     <!-- accordion start -->
                     <div class="accordion accordion-flush" id="wishlistAccordionFlush">
@@ -101,13 +101,64 @@
                 </div>
             </div>
             <!--願望清單內容 end-->
-            <div id="chatRoomTab" class="tab-pane fade">
-                @*                 @await Html.PartialAsync("../Chatroom/_ChatRoomPartial") *@
-                @* <!--聊天室群組按鈕start-->
-                <div id="groupList" class="list-group">
-                <!-- 群組按鈕將在這裡動態生成 -->
+            <!-- 聊天室內容 start-->
+            <!-- Offcanvas Body -->
+            <div id="chatRoomTab" class="tab-pane fade d-flex flex-column h-100">
+                <div v-if="isLoggedIn" class="flex-grow-1 d-flex flex-column h-100">
+                    <!-- Schedule List Carousel -->
+                    <div class="owl-carousel owl-theme mb-3" id="SchdulesList">
+                        <div class="item" v-for="(value, key) in schdules" :key="key">
+                            <button :class="['btn', selectedChatroom !== key ? 'btn-outline-primary' : 'btn-primary']"
+                                    v-on:click="selectChatroom(key)">
+                                {{ value }}
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Chat Room -->
+                    <div id="chatroom" v-if="isChooseChatroom" class="d-flex flex-column flex-grow-1 overflow-hidden">
+                        <div class="chatroom-container flex-grow-1 d-flex flex-column h-100">
+                            <!-- Chat Messages -->
+                            <div ref="chatroomMessages" class="chatroom-messages p-3 border rounded overflow-auto flex-grow-1">
+                                <div v-for="message in messages" :key="message.id" :class="['d-flex', message.userName == userdata.name ? 'justify-content-end' : 'justify-content-start']">
+                                    <div :class="['d-flex', message.userName == userdata.name ? 'flex-row-reverse align-items-start' : 'align-items-start']">
+                                        <!-- User Avatar -->
+                                        <div class="d-flex flex-column align-items-center" :class="message.userName == userdata.name ? 'ms-2' : 'me-2'">
+                                            <div :class="['rounded-circle', message.userName == userdata.name ? 'bg-primary' : 'bg-danger']"
+                                                 style="width: 40px; height: 40px; flex-shrink: 0;">
+                                            </div>
+                                            <!-- User Name -->
+                                            <div class="text-muted" style="font-size: 0.8rem;">{{ message.userName }}</div>
+                                        </div>
+                                        <!-- Message Content -->
+                                        <div>
+                                            <div :class="['p-2', 'mb-1', 'rounded-3', message.userName === userdata.name ? 'bg-dark text-white' : 'bg-light']"
+                                                 style="word-wrap: break-word;">
+                                                {{ message.message }}
+                                            </div>
+                                            <!-- Message Time -->
+                                            <div :class="['text-muted', message.userName === userdata.name ? 'text-end' : 'text-start']" style="font-size: 0.8rem;">
+                                                {{ formatTime(message.createdAt) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Input Area -->
+                            <div class="chatroom-input bg-light p-3">
+                                <div class="input-group">
+                                    <input type="text"
+                                           v-model="newMessage"
+                                           class="form-control"
+                                           placeholder="在此輸入聊天訊息" />
+                                    <button class="btn btn-primary" v-on:click="sendMessage(selectedChatroom,newMessage)">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!--聊天室群組按鈕end--> *@
+                <div v-else>
+                    <p>尚未登入，請先登入後查看您的願望清單。</p>
+                </div>
             </div>
         </div>
     </div>
@@ -220,10 +271,10 @@
                         <div class="mb-3">
                             <label for="wishlist">選擇清單:</label>
                             <select id="wishlist" class="form-control" v-model="selectedWishlistId">
-                                    <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
-                                        {{ wishlist.name }}
-                                    </option>
-                                    <option :value="null">--新增願望清單--</option>
+                                <option v-for="wishlist in wishlists" :key="wishlist.id" :value="wishlist.id">
+                                    {{ wishlist.name }}
+                                </option>
+                                <option :value="null">--新增願望清單--</option>
                             </select>
                         </div>
                         <div v-if="selectedWishlistId === null">
@@ -335,6 +386,7 @@
             data() {
                 return {
                     isLoggedIn: false,
+                    userdata: [],
                     wishlists: [],
                     newWishlistName: '',
                     newCategoryName: '',
@@ -352,17 +404,24 @@
                     selectedLocationCategory: null,
                     selectedLocationCategoryId: null,
                     locationCategories: [],
-                    allLocationCategories: []
+                    allLocationCategories: [],
+                    //以下為聊天室相關
+                    isChooseChatroom: true,
+                    selectedChatroom: "",
+                    connection: null,
+                    schdules: [],
+                    schduleName: '',
+                    newMessage: "",
+                    messages: [],
                 };
             },
             async mounted() {
-
-
                 //未登入提示
                 const userId = getUserIdFromToken();
                 if (userId) {
                     this.isLoggedIn = true;
                     await this.fetchWishlists();
+                    await this.axiosUserData();
                 } else {
                     this.isLoggedIn = false;
                     console.log("尚未登入");
@@ -380,8 +439,7 @@
                 }).catch(error => {
                     console.error('Error loading data:', error);
                 });
-
-                //重置createWishlistModal畫面
+                    //重置createWishlistModal畫面
                 const createWishlistModalElement = document.getElementById('createWishlistModal');
                 createWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
 
@@ -391,8 +449,55 @@
 
                 //重置editWishlistModal畫面
                 const editWishlistModalElement = document.getElementById('editWishlistModal');
-                editWishlistModalElement.addEventListener('show.bs.modal', this.resetWishlistForm);
-            },  
+                editWishlistModalElement.addEventListener('show.bs.modal', this.resetEditForm);
+
+                //以下為聊天室相關
+                try {
+                    let response = await axios.get(
+                        `${baseAddress}/api/schedules/GetRelatedSchedules`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    this.schdules = response.data;
+                } catch (error) {
+                    console.log(error);
+                }
+
+                this.$nextTick(async () => {
+                    $('#SchdulesList').owlCarousel({
+                        margin: 10,
+                        loop: false,
+                        autoWidth: true,
+                        items: 4,
+                        dots: false,
+                    });
+
+                    this.connection = new signalR.HubConnectionBuilder()
+                        .withUrl(`${baseAddress}/ChatHub`)
+                        .build();
+                    this.connection.on("JoinGroupSuccess", (message) => {
+                        //console.log(message);
+                    });
+
+                    this.connection.on("JoinGroupFailed", (errorMessage) => {
+                        console.error(errorMessage);
+                    });
+
+                    this.connection.on("ReceiveMessage", (message) => {
+                        this.messages.push(message);
+                    });
+
+                    await this.connectionStart();
+                    for (const schdule in this.schdules) 
+                    {
+                        await this.joinGroup(schdule, this.userdata.id)
+                    }
+                });
+            },
+
             methods: {
                 async fetchWishlists() {
                     const userId = getUserIdFromToken();
@@ -416,6 +521,15 @@
                     } catch (error) {
                         console.error('Error fetching wishlists:', error);
                     }
+                },
+                async axiosUserData() {
+                    const response = await axios.get(`${baseAddress}/api/user/GetUserIdName`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    })
+                    const data = response.data;
+                    this.userdata = data;
                 },
                 setSelectedCategory(wishlist, locationCategoryId) {
                     wishlist.selectedCategoryId = locationCategoryId;
@@ -486,7 +600,7 @@
                         await this.createWishlistWithCategory();
                         console.log("handleSubmit selectedWishlistId is null");
                     }
-                    else{
+                    else {
                         await this.createCategoryForWishlist();
                         console.log("handleSubmit selectedWishlistId is not null");
                     }
@@ -613,6 +727,79 @@
                         this.locationCategories = [];
                     }
                 },
+
+                //以下為聊天室相關
+                async selectChatroom(scheduleId) {
+                    this.selectedChatroom = scheduleId;
+                    await this.axiosChatRoom(scheduleId);
+                },
+                async axiosChatRoom(scheduleId) {
+                    try {
+                        const response = await axios.get(
+                            `${baseAddress}/api/chatroom`,
+                            {
+                                params: {
+                                    scheduleId: scheduleId,
+                                },
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            }
+                        );
+                        const data = response.data;
+                        this.messages = data;
+                        this.scrollToBottom();
+                    } catch (error) {
+                        console.log(error);
+                    }
+                },
+                async connectionStart() {
+                    try {
+                        await this.connection.start();
+                    } catch (err) {
+                        console.error(err);
+                        setTimeout(connectionStart, 5000);
+                    }
+                },
+                async joinGroup(groupId, userId) {
+                    try {
+                        await this.connection.invoke("JoinGroup", parseInt(groupId), userId);
+                    } catch (err) {
+                        console.error("Error joining group:", err);
+                    }
+                },
+                async sendMessage(scheduleId, message) {
+                    try {
+                        const response = await axios.post(
+                            `${baseAddress}/api/chatroom/SendMessage`,
+                            {
+                                scheduleId: parseInt(scheduleId),
+                                message: message
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            }
+                        );
+
+                    } catch (error) {
+                        console.log(error);
+                    }
+                },
+                formatTime(dateTimeString) {
+                    const date = new Date(dateTimeString);
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    return `${hours}: ${minutes}`;
+                },
+                scrollToBottom() {
+                    this.$nextTick(() => {
+                        const chatroomMessages = this.$refs.chatroomMessages;
+                        chatroomMessages.scrollTop = chatroomMessages.scrollHeight;
+                    })
+                },
                 updateSelectedWishlist() {
                     //根據選定的清單，將其設置於<input>元素供用戶修改
                     this.selectedWishlist = this.wishlists.find(w => w.id === this.selectedWishlistId) || null;
@@ -683,6 +870,9 @@
                         console.error('Error updating location category:', error);
                     }
                 },
+                //加入行程
+                //移除願望清單中的行程
+
                 //關閉modal
                 closeCreateModal() {
                     // Close the modal using Vue.js method
@@ -717,6 +907,7 @@
                     const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement) || new bootstrap.Offcanvas(sidebarOffcanvasElement);
                     sidebarOffcanvas.show();
                 },
+                //重置表單
                 resetWishlistForm() {
                     // 重置 createWishlistModal 的表單數據
                     this.newWishlistName = '';
@@ -732,13 +923,14 @@
                 },
                 resetEditForm() {
                     // 重置 deleteWishlistModal 的表單數據
-                    this.newWishlistName = '';
-                    this.newCategoryName = '';
-                    this.newCategoryColor = '#000000';
-                    this.newCategoryIcon = 'fa-solid fa-map';
                     this.selectedWishlistId = null;
-                    this.selectedWishlist.name = null;
                     this.selectedLocationCategoryId = null;
+                    if (this.selectedLocationCategoryId != null) {
+                        this.selectedWishlist.name = '';
+                        this.selectedLocationCategory.name = '';
+                        this.selectedLocationCategory.icon = 'fa-solid fa-map';
+                        this.selectedLocationCategory.color = '#000000';
+                    }
                 },
             }
 

@@ -1,6 +1,5 @@
 ﻿using PinPinServer.Models.DTO.Expense;
 using System.ComponentModel.DataAnnotations;
-using PinPinServer.Models.DTO.Expense;
 
 namespace PinPinServer.Models.DTO
 {

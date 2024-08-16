@@ -48,10 +48,6 @@
     <_ContentIncludedByDefault Remove="wwwroot\css\color.css" />
     <_ContentIncludedByDefault Remove="wwwroot\js\SchduleDetails.js" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="bundleconfig.json" />
     <None Include="wwwroot\js\SchduleDetails.js" />
