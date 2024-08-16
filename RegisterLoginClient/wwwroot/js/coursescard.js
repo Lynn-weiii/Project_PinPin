@@ -21,7 +21,7 @@ function createCourseCard(course) {
             </div>            
                 <a type="buttom" class="course_card_link edit_btn" data-fun="EditMainSch" data-id="${course.id}" data-caneditdetail="${course.caneditdetail}" data-starttime="${course.startTime}" data-endtime="${course.endTime}" data-name="${course.name}"> 
                 <div class="course_card_pic">
-                    <img src="${picture}" style="width:430px;height:286px">
+                    <img src="${picture}?:/images/no-image.jpg" style="width:430px;height:286px">
                 </div>
                 <div class="course_card_content">
                     <div class="course_card_meta d-flex flex-row align-items-center"></div>

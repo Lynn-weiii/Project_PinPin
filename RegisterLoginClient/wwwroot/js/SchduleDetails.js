@@ -33,7 +33,7 @@
 });
 //#endregion
 
-//#region 匯入時的資料
+//#region 初始化
 async function LoadScheduleInfo(scheduleId) {
     try {
         const response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
@@ -46,51 +46,115 @@ async function LoadScheduleInfo(scheduleId) {
 
         if (response.ok) {
             const results = await response.json();
+            const scheduleDateIdInfo = results.sceduleDateIdInfo; // 修正键名
+            const scheduleDetail = results.scheduleDetail;
+            //scheduleDateIdInfo存在sessionstorge
 
-            if (results.length > 0) {
-                const lastResult = results[results.length - 1];
+            const datesArray = Array.isArray(scheduleDateIdInfo) ? scheduleDateIdInfo : [scheduleDateIdInfo];
 
-                const { name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle } = lastResult;
-                const parsedLat = parseFloat(lat);
-                const parsedLng = parseFloat(lng);
-                console.log(name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle);
+            const allDetails = []; // 存储所有详细信息的数组
+
+            let picture, startTime, endTime, name, parsedLat, parsedLng, placeId, caneditdetail, canedittitle;
+
+            if (scheduleDetail) {
+                const detail = Array.isArray(scheduleDetail) ? scheduleDetail[0] : scheduleDetail;
+
+                name = detail.name;
+                lat = detail.lat;
+                lng = detail.lng;
+                placeId = detail.placeId;
+                caneditdetail = detail.caneditdetail;
+                canedittitle = detail.canedittitle;
+                startTime = detail.startTime;
+                endTime = detail.endTime;
+
+                parsedLat = parseFloat(lat);
+                parsedLng = parseFloat(lng);
+
                 if (isNaN(parsedLat) || isNaN(parsedLng)) {
                     console.error('Invalid coordinates:', { lat, lng });
                     alert('Invalid location coordinates received.');
                     return;
                 }
-                generateTabs(name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle);
-                // 设置背景图片
+                picture = await fetchPlacePhotoUrl(placeId);
+                var data = {
+                    name: name,
+                    lat: parsedLat,
+                    lng: parsedLng,
+                    placeId: placeId,
+                    caneditdetail: caneditdetail,  
+                    canedittitle: canedittitle,
+                    startTime: startTime,
+                    endTime: endTime,
+                    picture: picture,
+                    placeId: placeId,
+                    scheduleId: scheduleId
+                }
+
+                generateTabs(data, scheduleDateIdInfo);
+
                 if (document.getElementById('theme-header')) {
                     document.getElementById('theme-header').style.backgroundImage = `url('${picture}')`;
                 }
 
-                // 定义位置对象
-                const position = { lat: parsedLat, lng: parsedLng };
-
+                const travelduring = document.getElementById('travelduring');
+                if (travelduring) {
+                    travelduring.innerHTML = `${startTime} <i class="fa-solid fa-arrow-right"></i> ${endTime}`;
+                }
 
                 if (document.getElementById('theme-name')) {
                     document.getElementById('theme-name').innerText = name;
                 }
-                initMap(scheduleId, name, position);
-                if (canedittitle == true) {
-                    $('#schtitle_edit_btn').show();
+
+                const position = { lat: parsedLat, lng: parsedLng };
+                initMap(scheduleId, name, position, placeId);
+
+                if (canedittitle) {
+                    //#region 主揪可以編輯日程時間的按鈕
+                    /* $('#schtitle_edit_btn').show();*/
+                   //#endregion
+                } else {
+                    console.log('canedittitle is false');
                 }
-                else {
-                    console.log('canedittitle is false')
-                }
-                
-                
             } else {
-                handleResponseErrors(response);
+                console.error('scheduleDetail is undefined or invalid:', scheduleDetail);
+                alert('Received invalid schedule detail data.');
             }
+        } else {
+            console.error('Failed to fetch schedule info:', response.statusText);
         }
     } catch (error) {
-        /*alert('伺服器錯誤，請稍後再試');*/
-        console.log(`LoadScheduleInfo error: ${error.message}`);
+        console.error('Error fetching schedule info:', error);
     }
 }
-function handleResponseErrors(response) {
+
+
+    async function fetchPlacePhotoUrl(placeId) {
+        const { PlacesService } = await google.maps.importLibrary("places");
+        const map = new google.maps.Map(document.createElement('div'));
+        const placesService = new PlacesService(map);
+
+        return new Promise((resolve, reject) => {
+            const request = {
+                placeId: placeId,
+                fields: ['photos']
+            };
+
+            placesService.getDetails(request, (place, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    if (place.photos && place.photos.length > 0) {
+                        const picture = place.photos[0].getUrl();
+                        resolve(picture); // 返回照片 URL
+                    } else {
+                        resolve(null); // 没有照片时返回 null
+                    }
+                } else {
+                    reject('Error fetching place details: ' + status);
+                }
+            });
+        });
+    }
+    function handleResponseErrors(response) {
     switch (response.status) {
         case 204:
             alert('無法找到相關日程資訊!');
@@ -108,17 +172,17 @@ function handleResponseErrors(response) {
 }
 //#endregion
 
-//#region google API
+//#region google API 
 let map, marker, autocomplete, infowindow, position, service, keyword, searchTimeout, idleListener,globalName,globalScheduleId;
 let markers = []; 
-async function initMap(scheduleId, name, position) {
+async function initMap(scheduleId, name, position,placeId) {
     console.log('initMap:', { scheduleId, name, position });
     globalName = name;
     globalScheduleId = scheduleId;
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const { Geocoder } = await google.maps.importLibrary("geocoding");
-
+    var placeId = placeId;
     map = new Map(document.getElementById("map"), {
         center: position,
         zoom: 14,
@@ -348,13 +412,279 @@ function getStarRating(rating) {
 //#endregion
 async function addPlaceToSchedule(lat, lng, placeId, scheduleId) {
     alert(`添加到行程: Lat ${lat}, Lng ${lng}, Place ID ${placeId}, Schedule ID ${scheduleId}`);
+    
 }
 
-async function AddPointcreatedWishlist(lat, lng, placeId, name) {
-    alert(`新增愛心點: Lat ${lat}, Lng ${lng}, Place ID ${placeId}`)
-}
+//#region 產生行程列表 generateTabs(data)
+function generateTabs(data, scheduleDateIdInfo) {
+    var tabsContainer = document.getElementById("tabs-container");
+    tabsContainer.innerHTML = '';
 
-async function ShowWishList(lat, lng, placeId,name) {
+    var tabContents = document.getElementById("tab-contents");
+    tabContents.innerHTML = ''; // 清除之前的內容
+
+    var isFirst = true;
+
+    // 如果 scheduleDateIdInfo 是物件
+    if (typeof scheduleDateIdInfo === 'object' && scheduleDateIdInfo !== null) {
+        Object.keys(scheduleDateIdInfo).forEach((key) => { // 使用 key 作為唯一值
+            const dateStr = scheduleDateIdInfo[key];           
+            const dateObj = new Date(dateStr);
+            if (isNaN(dateObj.getTime())) {
+                console.error(`Invalid date: ${dateStr} for key ${key}`);
+                return;
+            }
+
+            const formattedDate = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
+
+            var tabLabel = document.createElement('div');
+            tabLabel.setAttribute('class', 'tab-label');
+            tabLabel.setAttribute('data-target', `tab${key}-content`);
+            tabLabel.setAttribute('data-schdule_day_id', key);
+            tabLabel.textContent = formattedDate; // 將標籤文字設定為 m/d 格式
+
+            if (isFirst) {
+                tabLabel.classList.add('active');
+                isFirst = false;
+            }
+
+            tabsContainer.appendChild(tabLabel);
+
+            // 生成對應的內容區塊
+            const tabContent = document.createElement('div');
+            tabContent.setAttribute('class', `tab-content ${isFirst ? 'active' : ''}`);
+            tabContent.setAttribute('id', `tab${key}-content`); // 使用 key 作為 id 的一部分
+            tabContent.setAttribute('data-schdule_day_id', key);
+            tabContent.setAttribute('data-placeId', data.placeId);
+
+            tabContent.innerHTML = `
+                <div class="content-item">
+                    <div class="content-item-header">
+                        <span class="content-item-number">${key}</span>
+                        <img src="${data.picture || '/default-image.jpg'}" alt="${data.name || 'default'}" class="content-item-image">
+                    </div>
+                    <div class="content-item-body">
+                        <div class="content-item-time">
+                            <span class="icon">&#128652;</span>
+                            <span class="time">${data.startTime}</span> (自訂)
+                        </div>
+                        <div class="content-item-location">
+                            ${data.name}
+                        </div>
+                        <div class="content-item-detail">
+                            ${data.startTime} 離開
+                        </div>
+                    </div>
+                    <div class="content-item-menu">&#8942;</div>
+                </div>
+            `;
+
+            tabContents.appendChild(tabContent);
+        });
+    } else {
+        console.error('scheduleDateIdInfo is not an array or an object, unable to iterate.');
+    }
+}
+//#endregion
+
+//#region initAirDatepicker()
+function initAirDatepicker() {
+    try {
+        let today = new Date();
+        let dpMin, dpMax;
+        dpMin = new AirDatepicker('#el1', {
+            locale: window.airdatepickerEn,
+            minDate: today,
+            dateFormat(date) {
+                let year = date.getFullYear();
+                let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                let day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            },
+            autoClose: true,
+            onSelect({ date }) {
+                dpMax.update({
+                    minDate: date
+                });
+            }
+        });
+
+        dpMax = new AirDatepicker('#el2', {
+            locale: window.airdatepickerEn,
+            dateFormat(date) {
+                let year = date.getFullYear();
+                let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                let day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            },
+            autoClose: true,
+            onSelect({ date }) {
+                dpMin.update({
+                    maxDate: date
+                });
+            }
+        });
+    } catch (error) {
+        console.log(`datepicker error ${error}`);
+    }
+}
+//#endregion
+
+//#region 行程主題更新 UploadScheduleTopic(scheduleId)__2024/8/16不使用
+//function UploadScheduleTopic(scheduleId) {
+//    var modifiedschedulebtn = document.getElementById("modifiedschedule_btn");
+//    $(modifiedschedulebtn).on('click', function () {
+//        try {
+//            var themeName = $('#theme-name').text();
+//        var name = $('#ScheduleName').val();
+//        if (name == null || name == "") {
+//            Swal.fire({
+//                title: "Oops!",
+//                text: `${data.message}`,
+//                icon: 'warning',
+//                showConfirmButton: false
+//            });
+//        }
+//        //var startTime = $('#el1').val();
+//        //var endTime = $('#el2').val();
+//        // 构建请求体
+//        var body = {
+//            "name": name,                
+//        };
+
+//        console.log('Request body:', body);
+
+
+
+//        fetch(`${baseAddress}/api/Schedules/UpdateSchedule/${scheduleId}`, {
+//            method: "PUT",
+//            body: JSON.stringify(body),
+//            headers: {
+//                'Authorization': `Bearer ${token}`,
+//                'Content-Type': 'application/json'
+//            }
+//        }).then(response => {
+//            if (response.ok) {
+//                Swal.fire({
+//                    icon: "success",
+//                    title: `行程主題已更新`,
+//                    showConfirmButton: false,
+//                    timer: 800
+//                });
+//            } else {
+//                return response.json().then(data => {
+//                    Swal.fire({
+//                        title: "Oops!",
+//                        text: `${data.message}`,
+//                        icon: 'warning',
+//                        showConfirmButton: false
+//                    });
+//                    // 修改这里
+//                });
+//            }
+//        }).catch(error => {               
+//            Swal.fire({
+//                title: "錯誤",
+//                text: "更新行程主題時發生錯誤。",
+//                icon: 'error',
+//                showConfirmButton: true
+//            });
+//        });
+//        } catch (error) {
+//            console.log(`uploadtitle`, error);
+//            Swal.fire({
+//                title: "錯誤",
+//                text: `${response.message}`,
+//                icon: 'error',
+//                showConfirmButton: true
+//            });
+//        }
+//         finally {
+//            $('#modifiedschedule').modal('hide');
+//            setTimeout(() => {
+//                location.reload();
+//            }, 800);
+//        }        
+//    });
+//}
+//#endregion
+
+//#region 把地點加入願望清單 AddPointToWishList()
+async function AddPointToWishList() {
+    $('#addwishlist').off('click').on('click', function () {
+        try {
+            var wishlistSelected = $('#wishlist_content option:selected');
+            var locationcategorySelected = $('#location_categories_content option:selected');
+            var wishlistId = $(wishlistSelected).attr('data-wishlistid');
+            var locationcategoryId = $(locationcategorySelected).attr('data-locationcategoryid');
+            var lat = $(wishlistSelected).attr('data-lat');
+            var lng = $(wishlistSelected).attr('data-lng');
+            var place_id = $(wishlistSelected).attr('data-placeid');
+            var createat = Date.now();
+            var name = $(wishlistSelected).attr('data-name').toString();
+            var body = {
+                "wishlistId": wishlistId,
+                "locationCategoryId": locationcategoryId,
+                "locationLng": lng,
+                "locationLat": lat,
+                "googlePlaceId": place_id,
+                "name": name,
+                "create_at": createat
+            };
+
+            fetch(`${baseAddress}/api/Wishlist/AddtoWishlistDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            }).then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: `景點已加入清單`,
+                        showConfirmButton: false,
+                        timer: 1000
+                    }).then(() => {
+
+                    });
+                } else {
+                    return response.json().then(data => {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: `${data.message}`,
+                            icon: 'warning',
+                            showConfirmButton: false
+                        });
+                    });
+                }
+            }).catch(error => {
+                console.log('wishlist add error', error);
+                Swal.fire({
+                    title: "錯誤",
+                    text: "添加到願望清單時發生錯誤。",
+                    icon: 'error',
+                    showConfirmButton: true
+                });
+            });
+        } catch (error) {
+            console.log('wishlist add error', error);
+            Swal.fire({
+                title: "錯誤",
+                text: "添加到願望清單時發生錯誤。",
+                icon: 'error',
+                showConfirmButton: true
+            });
+        } finally {
+            $('#addwishlist').modal('hide');
+            $('#PopWishList').modal('hide');
+        }
+    });
+}
+//#endregion
+
+//#region 願望清單選單 ShowWishList(lat, lng, placeId,name)
+async function ShowWishList(lat, lng, placeId, name) {
     var response = await fetch(`${baseAddress}/api/Wishlist/GetAllWishlist`, {
         method: 'GET',
         headers: {
@@ -405,22 +735,24 @@ async function ShowWishList(lat, lng, placeId,name) {
         console.error('Failed to fetch wishlist data');
     }
 }
+//#endregion
 
-//#region 行程列表
+//#region 行程tab標籤監聽事件 ListenScheduleListEvent()
+function ListenScheduleListEvent() {
+    const tabs = $('#show-schedule-row .tab-label');
+    const contents = $('#show-schedule-row .tab-content');
 
-    function generateTabs(name, lat, lng, placeId, picture, startTime, endTime, caneditdetail, canedittitle) {
+    tabs.on('click', function () {
+        const target = $(this).data('target');
 
-        var start = new Date(startTime);
-        var end = new Date(endTime);
-        var divamount = (end - start) / (1000 * 60 * 60 * 24) + 1;
-        console.log(`generateTabs:${start}/${end}/${divamount}`);
-        
-                 
+        contents.removeClass('active');
+        $('#' + target).addClass('active');
 
-            
-     
-    }
-    //#endregion
+        tabs.removeClass('active');
+        $(this).addClass('active');
+    });
 
-
-
+    // Initial check for active tab
+    tabs.first().click();
+}
+//#endregion

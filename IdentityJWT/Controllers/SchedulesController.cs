@@ -37,9 +37,9 @@ namespace PinPinServer.Controllers
                 }
                 var scheduledetails = await _context.Schedules
                 .Where(s => s.Id == scheduleId)
-                .Include(s => s.User) // 載入 User 關聯
-                .Include(s => s.ScheduleGroups) // 載入 ScheduleGroups 關聯
-                    .ThenInclude(sg => sg.User) // 載入 ScheduleGroups 內的 User 關聯
+                .Include(s => s.User)
+                .Include(s => s.ScheduleGroups)
+                    .ThenInclude(sg => sg.User)
                 .Include(s => s.ScheduleAuthorities)
                 .Select(s => new ScheduleDTO
                 {
@@ -52,13 +52,14 @@ namespace PinPinServer.Controllers
                     Picture = s.Picture,
                     PlaceId = s.PlaceId,
                     isHost = s.ScheduleGroups.Select(S => S.IsHoster).FirstOrDefault(),
-                    lng = s.Lng, // 確保這裡有 Lng 屬性
-                    lat = s.Lat, // 確保這裡有 Lat 屬性
+                    lng = s.Lng,
+                    lat = s.Lat,
                     SharedUserIDs = s.ScheduleGroups
                         .Select(sg => (int?)sg.UserId)
                         .ToList(),
                     canedittitle = s.ScheduleAuthorities.Where(sa => sa.ScheduleId == scheduleId && sa.UserId == jwtuserID).All(sa => sa.AuthorityCategoryId == 8),
                     caneditdetail = s.ScheduleAuthorities.Where(sa => sa.ScheduleId == scheduleId && sa.UserId == jwtuserID).Any(sa => (sa.AuthorityCategoryId == 2) || (sa.AuthorityCategoryId == 8))
+
                 }).ToListAsync();
 
                 if (scheduledetails == null || !scheduledetails.Any())
@@ -68,7 +69,13 @@ namespace PinPinServer.Controllers
                     return NoContent();
                 }
 
-                return Ok(scheduledetails);
+                var Schedule_Day_Ids = await _context.SchedulePreviews
+                .Where(sp => sp.ScheduleId == scheduleId)
+                .ToDictionaryAsync(sp => sp.Id, sp => sp.Date);
+
+
+                return Ok(new { ScheduleDetail = scheduledetails, SceduleDateIdInfo = Schedule_Day_Ids });
+
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -98,7 +105,6 @@ namespace PinPinServer.Controllers
                     return Unauthorized(new { message = "請先登入會員" });
                 }
 
-                // 獲取用戶創建的主要行程
                 var mainSchedules = await _context.Schedules
                     .Where(s => s.UserId == userID)
                     .Include(s => s.User)
@@ -232,46 +238,68 @@ namespace PinPinServer.Controllers
         }
         #endregion
 
-        #region 修改自行創建主題(僅限sch_userid==userid && authorityid ==8) 2024/8/8尚未完成(可加入detial功能)
-        // PUT: api/Schedules/{id}
+        #region 修改自行創建主題
+        // PUT: api/Schedule/UpdateSchedule/{scheduleId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSchedule(int id, ScheduleDTO schDTO)
+        [HttpPut("UpdateSchedule/{scheduleId}")]
+        public async Task<IActionResult> UpdateSchedule([FromBody] ScheduleDTO schDTO, int scheduleId)
         {
+            int jwtuserID = _getUserId.PinGetUserId(User).Value;
 
-            int userID = _getUserId.PinGetUserId(User).Value;
-            Schedule? sch = await _context.Schedules.FindAsync(id);
+            // 查找 Schedule
+            Schedule? sch = await _context.Schedules.FindAsync(scheduleId);
 
             if (sch == null)
             {
-                return NotFound();
+                return NotFound(new { message = "找不到該行程" });
             }
 
-            sch.Id = schDTO.Id;
+            // 更新 Schedule 主表
+            sch.Id = scheduleId;
             sch.Name = schDTO.Name;
             sch.StartTime = schDTO.StartTime;
             sch.EndTime = schDTO.EndTime;
-            sch.UserId = userID;
-            sch.CreatedAt = schDTO.CreatedAt;
+            sch.UserId = jwtuserID;
+            sch.CreatedAt = DateTime.Now;
             _context.Entry(sch).State = EntityState.Modified;
 
+            #region 要記得把變更行程日期的功能完善(2024/8/16暫不做)
+            //var existingPreviews = _context.SchedulePreviews
+            //    .Where(sp => sp.ScheduleId == scheduleId)
+            //    .ToList();
+
+            //_context.SchedulePreviews.RemoveRange(existingPreviews);
+
+            //// 生成新的日期列表并重新添加 SchedulePreview 记录
+            //var newDates = Enumerable.Range(0, (schDTO.EndTime.ToDateTime(new TimeOnly()) - schDTO.StartTime.ToDateTime(new TimeOnly())).Days + 1)
+            //                  .Select(offset => schDTO.StartTime.AddDays(offset))
+            //                  .ToList();
+
+            //foreach (var date in newDates)
+            //{
+            //    _context.SchedulePreviews.Add(new SchedulePreview
+            //    {
+            //        ScheduleId = scheduleId,
+            //        Date = date,
+            //        CreatedAt = DateTime.Now
+            //    });
+            //}
+            #endregion
             try
             {
                 await _context.SaveChangesAsync();
-                return Ok(new { Message = "行程修改成功!" });
+                return Ok(new { message = "行程已更新" });
             }
-            //這段是啥?
-            //EF存取併發衝突發生時
-            //為了避免併發衝突，通常會使用以下機制之一或組合：
             catch (DbUpdateConcurrencyException)
             {
-                if (!ScheduleExists(id))
+                if (!ScheduleExists(scheduleId))
                 {
-                    return BadRequest("系統發生錯誤");
+                    return BadRequest("系统发生错误");
                 }
                 throw;
             }
         }
+
         #endregion
 
         #region 自行創建主題
@@ -279,85 +307,110 @@ namespace PinPinServer.Controllers
         [HttpPost]
         public async Task<IActionResult> PostSchedule([FromBody] EditScheduleDTO editschDTO)
         {
-            if (editschDTO == null)
+            try
             {
-                return NotFound();
+                if (editschDTO == null)
+                {
+                    return NotFound();
+                }
+
+                int userID = _getUserId.PinGetUserId(User).Value;
+
+                decimal? lat = null;
+                decimal? lng = null;
+                if (!string.IsNullOrEmpty(editschDTO.Lat))
+                {
+                    if (decimal.TryParse(editschDTO.Lat, out var parsedLat))
+                    {
+                        lat = parsedLat;
+                    }
+                    else
+                    {
+                        return BadRequest("Invalid latitude format.");
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(editschDTO.Lng))
+                {
+                    if (decimal.TryParse(editschDTO.Lng, out var parsedLng))
+                    {
+                        lng = parsedLng;
+                    }
+                    else
+                    {
+                        return BadRequest("Invalid longitude format.");
+                    }
+                }
+
+                var schedule = new Schedule
+                {
+                    Id = 0,
+                    Name = editschDTO.Name,
+                    StartTime = editschDTO.StartTime,
+                    EndTime = editschDTO.EndTime,
+                    CreatedAt = DateTime.Now,
+                    UserId = userID,
+                    Lng = lng,
+                    Lat = lat,
+                    PlaceId = editschDTO.PlaceId,
+                    Picture = editschDTO.Pictureurl,
+                };
+
+                _context.Schedules.Add(schedule);
+                await _context.SaveChangesAsync();
+
+                int newScheduleId = schedule.Id;
+                var schedulegroup = new ScheduleGroup
+                {
+                    Id = 0,
+                    ScheduleId = newScheduleId,
+                    UserId = userID,
+                    IsHoster = true,
+                };
+
+                // 添加 ScheduleGroup 並保存更改
+                _context.ScheduleGroups.Add(schedulegroup);
+                await _context.SaveChangesAsync();
+
+                // 創建 ScheduleAuthority 物件
+                var scheduleAuthority = new ScheduleAuthority
+                {
+                    Id = 0,
+                    ScheduleId = newScheduleId,
+                    UserId = userID,
+                    AuthorityCategoryId = 8
+                };
+
+                // 添加 ScheduleAuthority 並保存更改
+                _context.ScheduleAuthorities.Add(scheduleAuthority);
+                await _context.SaveChangesAsync();
+                //計算總共有幾天
+                var editschDTOStartTime = editschDTO.StartTime.ToString();
+                var editschDTOEndTime = editschDTO.EndTime.ToString();
+                int dayamounts = (int)(DateTime.Parse(editschDTOEndTime) - DateTime.Parse(editschDTOStartTime)).TotalDays + 1;
+                SchedulePreview schedulePreview = new SchedulePreview();
+                for (int i = 0; i < dayamounts; i++)
+                {
+                    schedulePreview = new SchedulePreview
+                    {
+                        Id = 0,
+                        ScheduleId = newScheduleId,
+                        Date = editschDTO.StartTime.AddDays(i),
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.SchedulePreviews.Add(schedulePreview);
+                }
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "行程創建成功" }); // 返回成功響應
+
             }
-
-            int userID = _getUserId.PinGetUserId(User).Value;
-
-            decimal? lat = null;
-            decimal? lng = null;
-            if (!string.IsNullOrEmpty(editschDTO.Lat))
+            catch (Exception ex)
             {
-                if (decimal.TryParse(editschDTO.Lat, out var parsedLat))
-                {
-                    lat = parsedLat;
-                }
-                else
-                {
-                    return BadRequest("Invalid latitude format.");
-                }
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, "伺服器發生錯誤，請稍後再試");
             }
-
-            if (!string.IsNullOrEmpty(editschDTO.Lng))
-            {
-                if (decimal.TryParse(editschDTO.Lng, out var parsedLng))
-                {
-                    lng = parsedLng;
-                }
-                else
-                {
-                    return BadRequest("Invalid longitude format.");
-                }
-            }
-
-            var schedule = new Schedule
-            {
-                Id = 0,
-                Name = editschDTO.Name,
-                StartTime = editschDTO.StartTime,
-                EndTime = editschDTO.EndTime,
-                CreatedAt = DateTime.Now,
-                UserId = userID,
-                Lng = lng,
-                Lat = lat,
-                PlaceId = editschDTO.PlaceId,
-                Picture = editschDTO.Pictureurl,
-            };
-
-            _context.Schedules.Add(schedule);
-            await _context.SaveChangesAsync();
-
-            int newScheduleId = schedule.Id;
-            var schedulegroup = new ScheduleGroup
-            {
-                Id = 0,
-                ScheduleId = newScheduleId,
-                UserId = userID,
-                IsHoster = true,
-            };
-
-            // 添加 ScheduleGroup 並保存更改
-            _context.ScheduleGroups.Add(schedulegroup);
-            await _context.SaveChangesAsync();
-
-            // 創建 ScheduleAuthority 物件
-            var scheduleAuthority = new ScheduleAuthority
-            {
-                Id = 0,
-                ScheduleId = newScheduleId,
-                UserId = userID,
-                AuthorityCategoryId = 8
-            };
-
-            // 添加 ScheduleAuthority 並保存更改
-            _context.ScheduleAuthorities.Add(scheduleAuthority);
-            await _context.SaveChangesAsync();
-
-            return Ok(); // 返回成功響應
         }
-
         #endregion
 
         #region 刪除行程主題(user自行創建的)
@@ -415,118 +468,6 @@ namespace PinPinServer.Controllers
         }
         #endregion
 
-        #region 讀取user自己創的行程(暫不調閱)
-        //// GET: api/Schedules/MainSchedules
-        //[HttpGet("MainSchedules")]
-        //public async Task<IActionResult> GetUserMainSchedule()
-        //{
-        //    //IEnumerable<ScheduleDTO> schedules = Enumerable.Empty<ScheduleDTO>();
-        //    try
-        //    {
-        //        int userID = _getUserId.PinGetUserId(User).Value;
-        //        if (userID == 0)
-        //        {
-        //            return Unauthorized(new { message = "請先登入會員" });
-        //        }
-        //        var schedules = await _context.Schedules
-        //        .Where(s => s.UserId == userID)
-        //        .Include(s => s.User)
-        //        .Include(s => s.ScheduleGroups)
-        //        .Select(s => new ScheduleDTO
-        //        {
-        //            Id = s.Id,
-        //            HostId = s.UserId,
-        //            Name = s.Name,
-        //            StartTime = s.StartTime,
-        //            EndTime = s.EndTime,
-        //            CreatedAt = s.CreatedAt,
-        //            UserName = s.User.Name,
-        //            Picture = s.Picture,
-        //            PlaceId = s.PlaceId,
-        //            lng = s.Lng, // 確保這裡有 Lng 屬性
-        //            lat = s.Lat, // 確保這裡有 Lat 屬性
-        //            SharedUserIDs = s.ScheduleGroups.Select(s => (int?)s.UserId).ToList(),
-        //            SharedUserNames = s.ScheduleGroups.Select(s => (string?)s.User.Name).Distinct().ToList(),
-        //        }).ToListAsync();
-
-        //        if (schedules == null || !schedules.Any())
-        //        {
-
-        //            Console.WriteLine("查無使用者相關紀錄");
-        //            return NoContent();
-        //        }
-
-        //        return Ok(schedules);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Exception: {ex}");
-        //        throw new Exception("伺服器發生錯誤，請稍後再試");
-        //    }
-
-        //}
-        #endregion
-
-        #region 讀取user被邀請的行程(暫不調閱)
-        //// GET: api/Schedules/SchedulesGroup
-        //[HttpGet("SchedulesGroup")]
-        //public async Task<IActionResult> GetUserSchedulesGroup()
-        //{
-        //    List<int> scheduleIds = new List<int>();
-        //    List<ScheduleDTO> gschedules = new List<ScheduleDTO>();
-        //    try
-        //    {
-        //        int userID = _getUserId.PinGetUserId(User).Value;
-
-        //        scheduleIds = await _context.ScheduleGroups
-        //         .Where(sg => sg.UserId == userID && sg.IsHoster == false && !sg.LeftDate.HasValue)
-        //         .Select(sg => sg.ScheduleId)
-        //         .Distinct()
-        //         .ToListAsync();
-
-        //        gschedules = await _context.Schedules
-        //            .Where(s => scheduleIds.Contains(s.Id))
-        //            .Include(s => s.User)
-        //            .Include(s => s.ScheduleGroups)
-        //            .ThenInclude(sg => sg.User)
-        //            .Where(s => !s.ScheduleGroups.Any(sg => sg.LeftDate.HasValue))
-        //            .Select(s => new ScheduleDTO
-        //            {
-        //                Id = s.Id,
-        //                HostId = userID,
-        //                Name = s.Name,
-        //                StartTime = s.StartTime,
-        //                EndTime = s.EndTime,
-        //                CreatedAt = s.CreatedAt,
-        //                UserName = s.User.Name,
-        //                Picture = s.Picture,
-        //                PlaceId = s.PlaceId,
-        //                lng = s.Lng, // 確保這裡有 Lng 屬性
-        //                lat = s.Lat, // 確保這裡有 Lat 屬性
-        //                SharedUserIDs = s.ScheduleGroups.Select(sg => (int?)sg.UserId).ToList(),
-        //                SharedUserNames = s.ScheduleGroups
-        //                    .Where(sg => sg.UserId != userID)
-        //                    .Select(sg => (string?)sg.User.Name)
-        //                    .Distinct()
-        //                    .ToList(),
-        //            })
-        //            .ToListAsync();
-
-        //        if (gschedules == null || !gschedules.Any())
-        //        {
-        //            Console.WriteLine("查無使用者相關紀錄");
-        //            return NoContent();
-        //        }
-
-        //        return Ok(gschedules);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Exception: {ex.Message}");
-        //        return StatusCode(500, "伺服器發生錯誤，請稍後再試");
-        //    }
-        //}
-        #endregion
 
     }
 }
