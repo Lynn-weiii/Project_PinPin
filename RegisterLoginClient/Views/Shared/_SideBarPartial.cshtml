@@ -359,7 +359,6 @@
             </div>
         </div>
     </div>
-
 </div>
 <script>
 
@@ -398,7 +397,7 @@
         const vueApp = {
             data() {
                 return {
-                    isLoggedIn: false,
+                    isLoggedIn: false, 
                     userdata: [],
                     wishlists: [],
                     newWishlistName: '',
@@ -440,6 +439,10 @@
                     this.isLoggedIn = false;
                     console.log("尚未登入");
                 }
+                // setTimeout(() => {
+                //     this.isLoading = false;
+                //     document.getElementById('preloader').style.display = 'none';
+                // }, 3000); // 假設數據載入需要3秒
 
                 const uri = `${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`;
                 axios.get(uri).then(response => {
