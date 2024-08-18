@@ -162,5 +162,39 @@ namespace PinPinServer.Controllers
             }
         }
         #endregion
+
+        #region 讀取在指定行程中登入使用者的權限
+        // GET: api/ScheduleAuthorities/GetUserAuthority/{scheduleId}
+        [HttpGet("GetUserAuthority/{scheduleId}")]
+        public async Task<ActionResult<ScheduleAuthorityDTO>> GetUserAuthority(int scheduleId)
+        {
+            int? userID = _getUserId.PinGetUserId(User).Value;
+            if (userID == null || userID == 0) return BadRequest("Invalid user ID");
+
+            //檢查有無此行程表
+            bool hasSchedule = await _context.Schedules.AnyAsync(sc => sc.Id == scheduleId);
+            if (!hasSchedule) return NotFound("Not found schedule");
+
+            try
+            {
+                List<ScheduleAuthority> AuthorityList = await _context.ScheduleAuthorities
+                                                       .Where(sa => sa.UserId == userID && sa.ScheduleId == scheduleId)
+                                                       .AsNoTracking()
+                                                       .ToListAsync();
+                ScheduleAuthorityDTO dto = new ScheduleAuthorityDTO
+                {
+                    ScheduleId = scheduleId,
+                    UserId = userID.Value,
+                    AuthorityCategoryIds = AuthorityList.Select(al => al.AuthorityCategoryId).ToList(),
+                };
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        #endregion
     }
 }

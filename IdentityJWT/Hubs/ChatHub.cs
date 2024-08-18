@@ -33,10 +33,13 @@ namespace PinPinServer.Hubs
                 Console.WriteLine($"Error sending test message: {ex.Message}");
             }
         }
-        public async Task SendTestMessageToGroup(int groupId)
-        {
-            await Clients.Group($"Group_{groupId}").SendAsync("ReceiveTestMessage", "This is a test message.");
-        }
+
+        //測試用api
+        //public async Task SendTestMessageToGroup(int groupId)
+        //{
+        //    await Clients.Group($"Group_{groupId}").SendAsync("ReceiveTestMessage", "This is a test message.");
+        //}
+
         public async Task LeaveGroup(int groupId)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Group_{groupId}");

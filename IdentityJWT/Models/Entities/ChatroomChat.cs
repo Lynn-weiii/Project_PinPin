@@ -19,6 +19,12 @@ public partial class ChatroomChat
 
     public bool? IsFocus { get; set; }
 
+    public bool? IsEdited { get; set; }
+
+    public DateTime? LastEditedAt { get; set; }
+
+    public bool? IsDeleted { get; set; }
+
     public virtual Schedule Schedule { get; set; }
 
     public virtual User User { get; set; }

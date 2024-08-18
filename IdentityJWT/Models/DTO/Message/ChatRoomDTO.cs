@@ -1,4 +1,4 @@
-﻿namespace PinPinServer.Models.DTO
+﻿namespace PinPinServer.Models.DTO.Message
 {
     public class ChatRoomDTO
     {
@@ -15,5 +15,11 @@
         public bool? IsFocus { get; set; } = false;
 
         public int ScheduleId { get; set; }
+
+        public bool? IsEdited { get; set; } = false;
+
+        public bool? IsDeleted { get; set; }
+
+        public DateTime? LastEditedAt { get; set; } 
     }
 }

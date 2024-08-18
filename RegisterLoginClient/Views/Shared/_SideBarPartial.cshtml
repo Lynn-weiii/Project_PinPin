@@ -32,6 +32,17 @@
         #iconSelect .round {
             border-radius: 5px;
         }
+
+    .edit-btn, .deleted-btn {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .message-wrapper:hover .edit-btn,
+    .message-wrapper:hover .deleted-btn {
+        opacity: 1;
+    }
+
 </style>
 <!-- 聊天室側邊欄 offcanvas start -->
 <div id="appSidebar">
@@ -115,43 +126,71 @@
                         </div>
                     </div>
                     <!-- Chat Room -->
-                    <div id="chatroom" v-if="isChooseChatroom" class="d-flex flex-column flex-grow-1 overflow-hidden">
-                        <div class="chatroom-container flex-grow-1 d-flex flex-column h-100">
-                            <!-- Chat Messages -->
-                            <div ref="chatroomMessages" class="chatroom-messages p-3 border rounded overflow-auto flex-grow-1">
-                                <div v-for="message in messages" :key="message.id" :class="['d-flex', message.userName == userdata.name ? 'justify-content-end' : 'justify-content-start']">
-                                    <div :class="['d-flex', message.userName == userdata.name ? 'flex-row-reverse align-items-start' : 'align-items-start']">
-                                        <!-- User Avatar -->
-                                        <div class="d-flex flex-column align-items-center" :class="message.userName == userdata.name ? 'ms-2' : 'me-2'">
-                                            <div class="rounded-circle"
-                                                 style="width: 40px; height: 40px; flex-shrink: 0; overflow: hidden; border: 2px solid #ccc; background-color: transparent;">
-                                                <img :src="getUserPhoto(message.userId)" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
-                                            </div>
+                    <div ref="chatroomMessages" class="chatroom-messages p-3 border rounded overflow-auto flex-grow-1">
+                        <div v-for="(message, index) in messages" :key="message.id">
+                            <!-- Date Separator -->
+                            <div v-if="isNewDay(index)" class="text-center my-3">
+                                <hr />
+                                <span class="badge rounded-pill bg-secondary">{{ formatDate(message.createdAt) }}</span>
+                            </div>
+                            <div v-if="message.isDeleted" class="text-center my-3">
+                                <span class="badge rounded-pill bg-warning text-dark">
+                                    <i class="fa-solid fa-trash"></i> 此訊息已被刪除
+                                </span>
+                            </div>
+                            <div v-else :class="['d-flex', message.userName == userdata.name ? 'justify-content-end' : 'justify-content-start']">
+                                <div :class="['d-flex', message.userName == userdata.name ? 'flex-row-reverse align-items-start' : 'align-items-start']">
+                                    <!-- User Avatar -->
+                                    <div class="d-flex flex-column align-items-center" :class="message.userName == userdata.name ? 'ms-2' : 'me-2'">
+                                        <div class="rounded-circle"
+                                             style="width: 40px; height: 40px; flex-shrink: 0; overflow: hidden; border: 2px solid #ccc; background-color: transparent;">
+                                            <img :src="getUserPhoto(message.userId)" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>
-                                        <!-- Message Content -->
-                                        <div>
-                                            <div :class="['p-2', 'mb-1', 'rounded-3', message.userName === userdata.name ? 'bg-dark text-white' : 'bg-light']"
-                                                 style="word-wrap: break-word;">
+                                    </div>
+                                    <!-- Message Content and Edit Button -->
+                                    <div class="d-flex flex-column message-wrapper">
+                                        <div class="d-flex align-items-center">
+                                            <!-- Edit Button -->
+                                            <button v-if="message.userName === userdata.name && message.id !== editMessageId" v-on:click="enableEditing(message)" class="btn btn-sm btn-link text-muted me-2 edit-btn">
+                                                <i class="fa-regular fa-pen-to-square"></i>
+                                            </button>
+                                            <!-- Deleted Button -->
+                                            <button v-if="message.userName === userdata.name" v-on:click="deleteMessage(message)" class="btn btn-sm btn-link text-danger me-2 deleted-btn">
+                                                <i class="fa-regular fa-trash-alt"></i>
+                                            </button>
+                                            <!-- Message Bubble -->
+                                            <div v-if="message.id !== editMessageId" :class="['p-2', 'mb-1', 'rounded-3', message.userName === userdata.name ? 'bg-dark text-white' : 'bg-light']" style="word-wrap: break-word;">
                                                 {{ message.message }}
                                             </div>
-                                            <!-- Message Time -->
-                                            <div :class="['text-muted', message.userName === userdata.name ? 'text-end' : 'text-start']" style="font-size: 0.8rem;">
-                                                {{ formatTime(message.createdAt) }}
+                                            <div v-else>
+                                                <input v-model="editMessage" class="form-control mb-1" />
+                                                <button v-on:click="saveMessage()" class="btn btn-sm btn-success me-2">Save</button>
+                                                <button v-on:click="cancelEditing()" class="btn btn-sm btn-danger">Cancel</button>
                                             </div>
+                                            <!-- Deleted Button -->
+                                            <button v-if="message.userName !== userdata.name && hasAccess" v-on:click="deleteMessage(message)" class="btn btn-sm btn-link text-danger me-2 deleted-btn">
+                                                <i class="fa-regular fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                        <!-- Message Time -->
+                                        <div :class="['text-muted', message.userName === userdata.name ? 'text-end' : 'text-start']" style="font-size: 0.8rem;">
+                                            <span v-if="message.isEdited && message.userName === userdata.name" class="text-black-50">(已編輯)</span>
+                                            {{ formatTime(message.createdAt) }}
+                                            <span v-if="message.isEdited && message.userName !== userdata.name" class="text-black-50">(已編輯)</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Input Area -->
-                            <div class="chatroom-input bg-light p-3">
-                                <div class="input-group">
-                                    <input type="text"
-                                           v-model="newMessage"
-                                           class="form-control"
-                                           placeholder="在此輸入聊天訊息" />
-                                    <button class="btn btn-primary" v-on:click="sendMessage(selectedChatroom,newMessage)">Send</button>
-                                </div>
-                            </div>
+                        </div>
+                    </div>
+                    <!-- Input Area -->
+                    <div class="chatroom-input bg-light p-3">
+                        <div class="input-group">
+                            <input type="text"
+                                   v-model="newMessage"
+                                   class="form-control"
+                                   placeholder="在此輸入聊天訊息" />
+                            <button class="btn btn-primary" v-on:click="sendMessage(selectedChatroom,newMessage)">Send</button>
                         </div>
                     </div>
                 </div>
@@ -432,6 +471,10 @@
                     toastTitle: '',
                     toastMessage: '',
                     toastTime: '',
+                    hasAccess: false,
+                    //以下為聊天室編輯用
+                    editMessageId: 0,
+                    editMessage: "",
                 };
             },
             async mounted() {
@@ -510,6 +553,20 @@
                             this.messages.push(message);
                         } else {
                             this.showToast(`${message.userName}(${this.schdules[message.scheduleId]})`, message.message, message.createdAt);
+                        }
+                    });
+
+                    this.connection.on("ReceiveUpdatedMessage", (updatedMessage) => {
+                        const index = this.messages.findIndex(m => m.id === updatedMessage.id);
+                        if (index !== -1) {
+                            this.messages[index] = updatedMessage;
+                        }
+                    });
+
+                    this.connection.on("ReceiveDeleteMessage", (deletedMessage) => {
+                        const index = this.messages.findIndex(m => m.id === deletedMessage.id);
+                        if (index !== -1) {
+                            this.messages[index] = deletedMessage;
                         }
                     });
 
@@ -756,7 +813,22 @@
                     this.isChooseChatroom = true;
                     await this.axiosGroupMemberData(scheduleId);
                     await this.axiosChatRoom(scheduleId);
+                    await this.axioshasAccess(scheduleId);
                 },
+                async axioshasAccess(scheduleId) {
+                    try {
+                        const response =await axios.get(`${baseAddress}/api/ScheduleAuthorities/GetUserAuthority/${scheduleId}`,{
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        })
+                        const data = response.data;
+                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 8);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                },
+
                 async axiosGroupMemberData(scheduleId) {
                     try {
                         const response = await axios.get(
@@ -794,6 +866,12 @@
                         console.log(error);
                     }
                 },
+                isNewDay(index) {
+                    if (index === 0) return true;
+                    const currentMessageDate = new Date(this.messages[index].createdAt).setHours(0, 0, 0, 0);
+                    const previousMessageDate = new Date(this.messages[index - 1].createdAt).setHours(0, 0, 0, 0);
+                    return currentMessageDate !== previousMessageDate;
+                },
                 getUserPhoto(userId) {
                     const user = this.memberData.find(member => member.userId === userId);
                     if (user) {
@@ -817,6 +895,7 @@
                     }
                 },
                 async sendMessage(scheduleId, message) {
+                    if (this.newMessage == "") return;
                     try {
                         const response = await axios.post(
                             `${baseAddress}/api/chatroom/SendMessage`,
@@ -837,6 +916,12 @@
                         console.log(error);
                     }
                 },
+                formatDate(dateTimeString) {
+                    const date = new Date(dateTimeString);
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+                    return `${month}/${day}`;
+                },
                 formatTime(dateTimeString) {
                     const date = new Date(dateTimeString);
                     const hours = date.getHours().toString().padStart(2, '0');
@@ -849,10 +934,6 @@
                         chatroomMessages.scrollTop = chatroomMessages.scrollHeight;
                     })
                 },
-                updateSelectedWishlist() {
-                    //根據選定的清單，將其設置於<input>元素供用戶修改
-                    this.selectedWishlist = this.wishlists.find(w => w.id === this.selectedWishlistId) || null;
-                },
                 showToast(title, message, time) {
                     this.toastTitle = title;
                     this.toastMessage = message;
@@ -860,6 +941,69 @@
                     const toastEl = this.$refs.toast;
                     const toast = new bootstrap.Toast(toastEl);
                     toast.show();
+                },
+                //編輯訊息用
+                enableEditing(message) {
+                    this.editMessageId = message.id;
+                    this.editMessage = message.message;
+                },
+                cancelEditing() {
+                    this.editMessageId = 0;
+                    this.editMessage = "";
+                },
+                async saveMessage() {
+                    try {
+                        if (this.editMessage == "") {
+                            Swal.fire("請輸入要修改的訊息");
+                            return
+                        };
+                        const response = await axios.put(`${baseAddress}/api/chatroom`, {
+                            id: parseInt(this.editMessageId),
+                            message: this.editMessage
+                        }, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        })
+
+                        this.editMessageId = 0;
+                        this.editMessage = "";
+                    } catch (error) {
+                        console.error("Failed to update message:", error);
+                    }
+                },
+
+                async deleteMessage(message) {
+                    swal.fire({
+                        title: `${message.userName}:${message.message}?`,
+                        text: "你確定要刪除這則訊息嗎",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#198754",
+                        cancelButtonColor: "#C38154",
+                        confirmButtonText: "刪除它",
+                        cancelButtonText:"取消",
+                        reverseButtons: true,
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                const response = await axios.delete(`${baseAddress}/api/chatroom/${message.id}`, {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`,
+                                    },
+                                });
+                            } catch (error) {
+                                console.error("Failed to update message:", error);
+                                Swal.fire("訊息刪除失敗");
+                            }
+                        }
+                    })
+                },
+
+                updateSelectedWishlist() {
+                    //根據選定的清單，將其設置於<input>元素供用戶修改
+                    this.selectedWishlist = this.wishlists.find(w => w.id === this.selectedWishlistId) || null;
                 },
                 //修改願望清單
                 async saveWishlist() {

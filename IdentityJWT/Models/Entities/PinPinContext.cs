@@ -80,6 +80,13 @@ public partial class PinPinContext : DbContext
                 .HasColumnName("message");
             entity.Property(e => e.ScheduleId).HasColumnName("schedule_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.IsEdited)
+                .HasDefaultValue(false)
+                .HasColumnName("is_edited");
+            entity.Property(e => e.LastEditedAt).HasColumnName("last_edited_at");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)    
+                .HasColumnName("is_deleted");
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.ChatroomChats)
                 .HasForeignKey(d => d.ScheduleId)
