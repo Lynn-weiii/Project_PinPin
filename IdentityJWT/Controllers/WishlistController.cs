@@ -4,6 +4,7 @@ using PinPinServer.Models;
 using PinPinServer.Models.DTO;
 using PinPinServer.Services;
 using PinPinServer.Utilities;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -226,20 +227,50 @@ namespace PinPinServer.Controllers
         [HttpDelete("DeleteWishlist/{id}")]
         public async Task<IActionResult> DeleteWishlist(int id)
         {
-            var wishlist = await _context.Wishlists.FindAsync(id);
-            if (wishlist == null)
+            try
             {
-                return NotFound();
+                var wishlist = await _context.Wishlists.FindAsync(id);
+                if (wishlist == null)
+                {
+                    return NotFound();
+                }
+
+                // 刪除相關的 WishlistDetails
+                var relatedWishlistDetails = _context.WishlistDetails
+                    .Where(detail => detail.WishlistId == id);
+                _context.WishlistDetails.RemoveRange(relatedWishlistDetails);
+
+                // 刪除相關的 LocationCategories
+                var relatedLocationCategories = _context.LocationCategories
+                    .Where(category => category.WishlistId == id);
+                _context.LocationCategories.RemoveRange(relatedLocationCategories);
+
+                // 刪除 Wishlist
+                _context.Wishlists.Remove(wishlist);
+                await _context.SaveChangesAsync();
+
+                return Content("願望清單刪除成功!");
             }
-            // 刪除相關的wishlistDetail
-            var relatedLocationCategory = _context.LocationCategories
-                .Where(category => category.WishlistId == id);
-            _context.LocationCategories.RemoveRange(relatedLocationCategory);
+            catch (Exception ex)
+            {
+                // 記錄錯誤日志，並返回適當的錯誤消息
+                // 例如：_logger.LogError(ex, "刪除願望清單時出錯");
+                return StatusCode(500, "刪除願望清單時發生錯誤，請稍後再試。");
+            }
+            //var wishlist = await _context.Wishlists.FindAsync(id);
+            //if (wishlist == null)
+            //{
+            //    return NotFound();
+            //}
+            //// 刪除相關的wishlistDetail
+            //var relatedLocationCategory = _context.LocationCategories
+            //    .Where(category => category.WishlistId == id);
+            //_context.LocationCategories.RemoveRange(relatedLocationCategory);
 
-            _context.Wishlists.Remove(wishlist);
-            await _context.SaveChangesAsync();
+            //_context.Wishlists.Remove(wishlist);
+            //await _context.SaveChangesAsync();
 
-            return Content("願望清單刪除成功!");
+            //return Content("願望清單刪除成功!");
         }
 
 
