@@ -19,8 +19,8 @@
                 <div class="mb-3">
                     <label for="birthday" class="form-label">生日:</label>
                     <div class="d-flex align-items-center">
-                        <label id="private" style="display:none; margin-right:10px;">不公開</label>
-                        <button type="button" class="btn btn-primary" id="btnModifyBirthday" style="display:none;">修改</button>
+                        <label id="private" style="display:none margin-right:10px;">不公開</label>
+                        <button type="button" class="btn btn-outline-primary" id="btnModifyBirthday" style="display:none;">修改</button>
                     </div>
                     <input type="date" class="form-control" id="birthday" name="birthday">
                     <span id="birthdayDisplay"></span>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="photo" class="form-label">大頭貼照:
-                        <button class="btn btn-primary" id="btnModifyPhoto">修改</button>
+                        <button class="btn btn-outline-primary" id="btnModifyPhoto">修改</button>
                     </label>
                     <img id="userPhoto" alt="User Photo" width="150">
                     <input type="file" class="form-control" style="display: none" id="photo" name="photo" accept="image/*">
@@ -104,7 +104,6 @@
                         document.getElementById('btnModifyBirthday').style.display = 'block';
                         document.getElementById('birthday').style.display = 'none';
                     } else {
-                        document.getElementById('birthdayDisplay').textContent = data.birthday ? data.birthday.split('T')[0] : '';
                         document.getElementById('birthday').readOnly = true; //生日不可修改
                     }
 
