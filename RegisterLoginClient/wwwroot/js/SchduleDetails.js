@@ -87,9 +87,9 @@ async function LoadScheduleInfo(scheduleId) {
             picture,
             scheduleId,
         };
-        GetWeatherInfo(lat, lng);
+        GetWeatherInfo(lat, lng)
         updateUIWithScheduleInfo(data);
-
+        
         const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
             method: 'GET',
             headers: {
@@ -428,6 +428,8 @@ function createInfoWindowContent(place, name, scheduleId) {
         ? place.photos[0].getUrl({ maxWidth: 290, maxHeight: 290 })
         : ''; // 这里加上默认值（比如空字符串）
 
+    const starsHtml = getStarRating(place.rating); // 获取 starsHtml
+
     let content = `
         <div class="info-window" style="max-width: 640px; max-height: 460px; display: flex; padding: 15px; font-family: Arial, sans-serif; box-sizing: border-box;" id="info-window">
             <!-- 照片部分 -->
@@ -438,7 +440,7 @@ function createInfoWindowContent(place, name, scheduleId) {
             <div class="location-details" style="flex: 0 0 50%; max-width: 45%; padding-left: 10px; box-sizing: border-box; overflow-y: auto;">
                 <h2 style="margin-top: 0; font-size: 20px; color: #333; overflow-wrap: break-word;">${place.name}</h2>
                 <div style="margin: 5px 0; font-size: 16px; color: #FF9900;">
-                    Google 評價:(${place.rating || '沒有評分'}) ${starRatingHtml} ${place.user_ratings_total ? `(${place.user_ratings_total} 則評價)` : ''}
+                    Google 評價:(${place.rating || '沒有評分'}) ${starsHtml} ${place.user_ratings_total ? `(${place.user_ratings_total} 則評價)` : ''}
                 </div>
                 <p style="margin: 5px 0; font-size: 14px; color: #666; overflow-wrap: break-word;">${place.vicinity || place.formatted_address}</p>
 
@@ -459,8 +461,7 @@ function createInfoWindowContent(place, name, scheduleId) {
         content += `<li>無營業時間資訊</li>`;
     }
 
-    content += `
-                    </ul>
+    content += `</ul>
                 </div>
                 <div class="btn-container mb-1" style="margin-top: 10px;">
                     <button class="btn btn-primary" id="add-place-btn" data-id="${scheduleId}" onclick="addscheduledate('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}', '${place.name}')">+</button>
@@ -475,7 +476,7 @@ function createInfoWindowContent(place, name, scheduleId) {
     return content;
 }
 
-    function getStarRating(rating) {
+function getStarRating(rating) {
     const fullStars = rating ? Math.floor(rating) : 0;
     const halfStar = rating && rating % 1 >= 0.5 ? 1 : 0;
     const emptyStars = 5 - fullStars - halfStar;
@@ -494,6 +495,7 @@ function createInfoWindowContent(place, name, scheduleId) {
 
     return starsHtml;
 }
+
 //#endregion
 
 //#region 新增景點到日程
@@ -1298,36 +1300,32 @@ async function refreshlist() {
 }
 //#endregion
 
-//#region 天氣資訊 2024/8/19暫停使用待確認
-//async function GetWeatherInfo(lat, lng) {
-//    try {
-//        console.log(`GetWeatherInfo`, lat, lng);
-//        var body = {
-//            "lat":lat,
-//            "lon":lng,
-//            "units":"metric"
-//        }
-//        var response = await fetch(`${baseAddress}/api/Weather/GetWeatherInfo`, {
-//            method: 'GET',
-//            headers: {
-//                'Authorization': `Bearer ${token}`,
-//                'Content-Type': 'application/json'
-//            },
-//            body: JSON.stringify(body)
-//        });
+//#region 天氣資訊
+async function GetWeatherInfo(lat, lng) {
+    try {
+        const url=`${baseAddress}/api/Weather?lat=${lat}&lon=${lng}&units=metric`;
+        console.log(`GetWeatherInfo`, lat, lng);
+        
+        var response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
 
-//        if (response.ok) {
-//            var weatherInfo = await response.json();
-//            console.log(`GetWeatherInfo`, weatherInfo);
-//            return weatherInfo; 
-//        } else {
-//            console.error(`GetWeatherInfo failed with status ${response.status}`);
-//        }
-//    } catch (error) {
-//        console.log(`GetWeatherInfo error ${error}`);
-//    }
-//    return null;
-//}
+        if (response.ok) {
+            var weatherInfo = await response.json();
+            console.log(`GetWeatherInfo`, weatherInfo);
+            return weatherInfo; 
+        } else {
+            console.error(`GetWeatherInfo failed with status ${response.status}`);
+        }
+    } catch (error) {
+        console.log(`GetWeatherInfo error ${error}`);
+    }
+    return null;
+}
 
 //#endregion
 

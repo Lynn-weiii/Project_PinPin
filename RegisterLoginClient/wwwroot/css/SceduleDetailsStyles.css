@@ -433,27 +433,4 @@
     padding: 0 !important; /* Remove padding to avoid shifting the text */
 }
 
-/*#region 天氣框*/
-#weathersession {
-    display: flex;
-    justify-content: space-around;
-    opacity: 0.5; /* 设置50%的透明度 */
-    padding: 10px;
-    margin-top: 10px;
-    background-color: rgba(255, 255, 255, 0.3); /* 半透明白色背景 */
-    border-radius: 10px;
-}
-
-.weather-info {
-    text-align: center;
-    padding: 5px;
-}
-
-#weatherdate, #weathertemp, #weatherrain {
-    font-size: 12px;
-    border: 1px solid black;
-    padding: 5px;
-    border-radius: 5px;
-}
-/*#endregion*/
 

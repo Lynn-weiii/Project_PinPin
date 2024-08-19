@@ -22,16 +22,7 @@
             <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden; position: relative;">
                 <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschedule">修改行程名稱/日期</button>
                 <h5 id="theme-name"></h5>
-                <div id="travelduring"></div>
-
-                <!-- 添加天气预报信息的部分 -->
-                <div id="weathersession" style="display:flex; justify-content:space-around; opacity: 0.5;">
-                    <div class="weather-info">
-                        <div id="weatherdate" style="font-size:12px;"></div>
-                        <div id="weathertemp" style="font-size:12px;"></div>
-                        <div id="weatherrain" style="font-size:12px;"></div>
-                    </div>
-                </div>
+                <div id="travelduring"></div>                
             </div>
             <!-- #region 行程列表 -->            
             <div class="wrapper" id="scheduledetailprivewsection" style="width: 500px;background:transparent;">
@@ -141,59 +132,45 @@
 <div class="modal fade" id="AddPointWhichDayList" tabindex="-1" aria-labelledby="AddPointWhichDayList_modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+            <div class="modal-header">
                 <h5 class="modal-title">要將行程加入哪一天行程?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="whichday_list" style="display:flex; justify-content:center; align-items:center;">
                     <div class="row w-100">
+                        <!-- 日期下拉選單 -->
                         <div class="col-12 mb-3">
+                            <label for="date-list" class="form-label">選擇日期:</label>
                             <select id="date-list" class="form-select" autocomplete="off">
                                 <option value="0">----- 請選擇日期 -----</option>
+                                <!-- 動態生成選項 -->
                             </select>
                         </div>
+                        <!-- 出發時間 -->
                         <div class="col-12 mb-3">
-                            <label for="transportation-list" class="form-label mb-2  font-size:12px">交通工具</label>
-                            <select id="transportation-list" class="form-select" autocomplete="off">
-                                <option value="1">汽車</option>
-                                <option value="2">機車</option>
-                                <option value="3">大眾運輸</option>
-                                <option value="4">腳踏車</option>
-                                <option value="5">步行</option>
-                            </select>
+                            <label for="start-time" class="form-label">出發時間:</label>
+                            <input type="time" id="start-time" class="form-control" step="900" required>
                         </div>
+                        <!-- 預計停留時間 -->
                         <div class="col-12 mb-3">
-                            <form class="mx-auto grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="start-time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">抵達時間:</label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <input type="time" id="start-time" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" min="00:00" max="23:59" value="08:00" required />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="end-time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">離開時間:</label>
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <input type="time" id="end-time" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" min="00:00" max="23:59" value="09:00" required />
-                                    </div>
-                                </div>
-                            </form>
+                            <label for="duration" class="form-label">預計停留時間 (小時和分鐘):</label>
+                            <div class="d-flex">
+                                <input type="number" id="duration-hours" class="form-control me-2" placeholder="小時" min="0" step="1" required>
+                                <input type="number" id="duration-minutes" class="form-control" placeholder="分鐘" min="0" step="1" required>
+                            </div>
+                        </div>
+                        <!-- 計算後的離開時間 -->
+                        <div class="col-12 mb-3">
+                            <label for="end-time" class="form-label">離開時間:</label>
+                            <input type="time" id="end-time" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-end">
-                <button class="btn btn-primary btn-sm" id="addPointWhichDayList" >加入行程</button>
-                <button class="btn btn-secondary btn-sm ms-2" id="addPointWhichDayList_cancel"  data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary btn-sm" id="addPointWhichDayList">加入行程</button>
+                <button class="btn btn-secondary btn-sm ms-2" id="addPointWhichDayList_cancel" data-bs-dismiss="modal">取消</button>
             </div>
         </div>
     </div>
@@ -224,8 +201,5 @@
             //     initAirDatepicker();
             // });
             //#endregion
-
-
-        });
     </script>
 }
