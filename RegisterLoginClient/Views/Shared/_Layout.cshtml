@@ -25,6 +25,12 @@
             flex-direction: column;
         }
 
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
         .content {
             flex: 1;
             display: flex;
@@ -34,7 +40,12 @@
         footer {
             padding: 1rem 0;
             margin-top: auto;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
         }
+
     </style>
 </head>
 
@@ -99,7 +110,7 @@
         <div id="modal-container"></div>
     </div>
 
-    <footer class="navbar bg-black">
+    <footer class="navbar bg-black" id="nva-footer">
         <div class="container-fluid d-flex justify-content-center">
             <span class="text-muted"><a class="text-light">© 2024 by PinPinTeam.</a></span>
         </div>
@@ -126,7 +137,6 @@
 
                 const getToken = () => {
                     token = localStorage.getItem('token');
-                    console.log(token);
                     isLogin.value = token === null ? false : true;
                 }
 

@@ -14,6 +14,7 @@ export function initExpenseModal() {
       const userName = ref("");
       const modalStack = ref([]);
       const codeIcons = ref([]);
+      const expenseCurrencyIcon = ref("");
       //編輯分帳表用
       const mainForm = ref(null);
       const editExpenseId = ref(0);
@@ -250,8 +251,19 @@ export function initExpenseModal() {
             }
           );
           expense.value = response.data;
+          console.log(expense.value);
+          getExpenseCurrencyIcon(expense.value.currency);
         } catch (error) {
           console.log(error);
+        }
+      };
+
+      const getExpenseCurrencyIcon = (codeId) => {
+        if (codeId) {
+          const icon = codeIcons.value.find(
+            (code) => code.code === codeId
+          ).icon;
+          expenseCurrencyIcon.value = icon;
         }
       };
 
@@ -831,6 +843,7 @@ export function initExpenseModal() {
         getAllScheduleExpenses,
         createExpense,
         scheduleBalance,
+        expenseCurrencyIcon,
         //編輯分帳表
         getEditExpenseData,
         editName,
