@@ -193,7 +193,7 @@ namespace PinPinServer.Controllers
             //檢查有無權限
             bool isSelf = userID.Value == chatroomChat.UserId;
             bool hasAccess = await _context.ScheduleAuthorities
-                .AnyAsync(sa => sa.UserId == userID && sa.ScheduleId == chatroomChat.ScheduleId && sa.AuthorityCategoryId == 4);
+                .AnyAsync(sa => sa.UserId == userID && sa.ScheduleId == chatroomChat.ScheduleId && sa.AuthorityCategoryId == 7);
             if(!(isSelf || hasAccess)) return Forbid("You can't delete someone else's message.");
             try
             {
