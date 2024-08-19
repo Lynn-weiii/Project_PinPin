@@ -76,12 +76,8 @@ namespace PinPinServer.Controllers
                 user.Phone = userDto.Phone;
                 user.Birthday = userDto.Birthday;
                 user.Gender = userDto.Gender;
-                //user.Photo = userDto.Photo;
+                user.Photo = userDto.Photo;
             }
-
-
-            // 更新用戶資料
-
 
             // 保存變更
             await _context.SaveChangesAsync();

@@ -13,18 +13,6 @@
 2. Body and some general stuff
 *********************************/
 
-* {
-    margin: 0;
-    padding: 0;
-    -webkit-font-smoothing: antialiased;
-    -moz-font-smoothing: antialiased;
-    -o-font-smoothing: antialiased;
-    -webkit-text-shadow: rgba(0,0,0,.01) 0 0 1px;
-    -moz-text-shadow: rgba(0,0,0,.01) 0 0 1px;
-    -o-text-shadow: rgba(0,0,0,.01) 0 0 1px;
-    text-shadow: rgba(0,0,0,.01) 0 0 1px;
-}
-
 #course-container h1, #group_course-container h1 {
     font-size: 48px;
 }

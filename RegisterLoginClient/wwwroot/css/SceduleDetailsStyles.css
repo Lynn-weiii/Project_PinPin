@@ -1,4 +1,8 @@
-﻿
+﻿:root {
+    --darkgreen: #435a4f;
+    --white: #f6f4e8;
+}
+
 .air-datepicker {
     z-index: 9999 !important;
     background-color: #f8f9fa;
@@ -113,10 +117,27 @@
 
 #theme-header .btn:hover, #theme-header .btn:focus, #theme-header .btn:active {
 
-    color: white; /* 文字颜色为白色 */
+    color: var(--white); /* 文字颜色为白色 */
     transform: scale(1.15); /* 略微放大 */
-
     box-shadow: none; /* 移除可能的阴影效果 */
+}
+
+#travelduring {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(244, 246, 232, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: var(--darkgreen);
+    z-index: 2;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+#travelTimeLabel, #SchName {
+    font-size: 14px !important;
+    color: var(--darkgreen) !important;
 }
 /*#endregion*/
 
@@ -156,232 +177,260 @@
 }
 /*#endregion*/
 
-/*#region google map informadal*/
-.info-window {
-    width: 280px;
-    padding: 5px;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-    overflow: hidden; /* 确保没有滚动条 */
-}
-
-.info-window-photo {
-    width: 100%;
-    height: 200px;
-    object-fit: contain; /* 等比例缩放并适应容器 */
-    object-position: center; /* 中心对齐 */
-    border-radius: 20px;
-    overflow:hidden;
-}
-
-.info-window .details {
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-.rating-container {
-    display: flex;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.rating-container .rating {
-    display: flex;
-    align-items: center;
-}
-
-.rating-container .average-rating {
-    font-size: 14px;
-    color: brown;
-    margin-right: 5px;
-}
-
-.rating-container .reviews {
-    margin-left: 5px;
-    font-size: 14px;
-    color: gray;
-}
-
+/*#region 星星評價*/
 .star-rating {
     display: flex;
 }
 
-.star-rating .full,
-.star-rating .half,
-.star-rating .empty {
-    width: 16px;
-    height: 16px;
-    display: inline-block;
-    background-size: contain;
-    background-repeat: no-repeat;
-    margin-right: 2px;
-}
+    .star-rating .full,
+    .star-rating .half,
+    .star-rating .empty {
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        background-size: contain;
+        background-repeat: no-repeat;
+        margin-right: 2px;
+    }
 
-.star-rating .full {
-    background-image: url('/images/star-full.svg');
-}
+    .star-rating .full {
+        background-image: url('/images/star-full.svg');
+    }
 
-.star-rating .half {
-    background-image: url('/images/star-half.svg');
-}
+    .star-rating .half {
+        background-image: url('/images/star-half.svg');
+    }
 
-.star-rating .empty {
-    background-image: url('/images/star-empty.svg');
-}
-
-.info-window .address {
-    font-size: 12px;
-    color: gray;
-    margin-top: 5px;
-}
-
-.info-window .btn-container {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.info-window .btn-primary {
-    background-color: #000;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-}
-
-.info-window .btn-primary#wishlist-btn {
-    background-color: gold;
-    color: #fff;
-}
-
-.info-window .btn-container span {
-    font-size: 14px;
-    color: gray;
-    margin-right: 20px;
-}
+    .star-rating .empty {
+        background-image: url('/images/star-empty.svg');
+    }
 /*#endregion*/
 
-/*#region 行程列表*/
-:root {
-    --darkgreen: #435a4f;
-    --white: #f6f4e8;
+/*#region 左邊預覽列表*/
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@100;300;400;700&display=swap');
+.delete_btn{
+    z-index:1;
 }
 
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+#scheduledetailprivewsection .wrapper {
+    margin: auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, .1);
+    width: 500px;
+    height: 400px; /* 设置固定高度 */
+    overflow-y: auto; /* 垂直方向自动显示滚动条 */
 }
 
-body,
-.tabs-to-dropdown .dropdown-toggle,
-.tabs-to-dropdown .dropdown-item {
-    font-size: 1.3rem;
+#scheduledetailprivewsection .buttonWrapper {
+    grid-template-columns: 1fr 1fr 1fr;
+    display: inline-flex;
+    overflow-x: scroll;
+    width: 500px;
 }
 
-.tabs-to-dropdown .nav-wrapper {
-    padding: 0;
-    box-shadow: none;
+#scheduledetailprivewsection button {
+    letter-spacing: 3px;
+    border: none;
+    padding: 10px;
+    background-color: #bccbe9;
+    color: #232c3d;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.5s;
 }
 
-    .tabs-to-dropdown .nav-wrapper a {
-        color: var(--darkgreen);
-    }
-
-.tabs-to-dropdown .nav-pills {
-    border-bottom: 1px solid #ddd;
-    overflow-x: auto;
-    white-space: nowrap;
-    flex-wrap: nowrap;
+#scheduledetailprivewsection button:hover {
+    background-color: #d5e3ff;
 }
 
-    .tabs-to-dropdown .nav-pills .nav-link {
-        color: var(--darkgreen);
-        background-color: var(--white);
-        border: none;
-        border-radius: 0;
-        margin-right: 0;
-        padding: 5px 10px;
-        font-size: 1rem;
-        height: 40px;
-        line-height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .tabs-to-dropdown .nav-pills .nav-link.active {
-            background-color: var(--darkgreen);
-            color: var(--white);
-        }
-
-.tabs-to-dropdown .tab-content .container-fluid {
-    max-width: 1250px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+#scheduledetailprivewsection button.active {
+    background-color: white;
 }
 
-.schedule-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    background: #f6f4e8;
-    border-radius: 5px;
-    padding: 1rem;
+#scheduledetailprivewsection .active {
+    background-color: white;
 }
 
-    .schedule-item img {
-        width: 80px;
-        height: 80px;
-        border-radius: 5px;
-        margin-right: 1rem;
-    }
-
-    .schedule-item .time {
-        color: #ff0000;
-        font-weight: bold;
-    }
-
-    .schedule-item .location {
-        font-size: 1.2rem;
-        font-weight: bold;
-    }
-
-    .schedule-item .duration {
-        color: #666;
-    }
-
-.tab-content {
+#scheduledetailprivewsection p {
+    text-align: left;
     padding: 10px;
 }
 
-.nav-scroller {
-    position: relative;
-    z-index: 2;
-    height: 3.5rem;
-    overflow-y: hidden;
+#scheduledetailprivewsection .content {
+    display: none;
+    padding: 10px 20px;
+    height:600px;
 }
 
-    .nav-scroller .nav {
-        display: flex;
-        flex-wrap: nowrap;
-        padding-bottom: 1rem;
-        margin-top: -1px;
-        overflow-x: auto;
-        text-align: center;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
+#scheduledetailprivewsection .content.active {
+    display: block;
+}
+/* 整個滾動條 */
+#scheduledetailprivewsection ::-webkit-scrollbar {
+    width: 5px;
+    /* 設置滾動條的寬度 */
+    height: 5px;
+    /* 設置滾動條的高度 */
+}
+
+/* 滾動條的背景 */
+#scheduledetailprivewsection ::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    /* 設置滾動條背景色 */
+    border-radius: 5px;
+    /* 圓角 */
+}
+
+/* 滾動條的滑塊 */
+#scheduledetailprivewsection ::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* 設置滑塊顏色 */
+    border-radius: 5px;
+    /* 圓角 */
+}
+
+/* 滾動條滑塊在懸停時的顏色 */
+#scheduledetailprivewsection ::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+    /* 懸停時的顏色 */
+}
+
+
+/* 滾動條按鈕在懸停時的顏色 */
+#scheduledetailprivewsection ::-webkit-scrollbar-button:hover {
+    background-color: #aaa;
+    /* 懸停時的顏色 */
+}
+
+#scheduledetailprivewsection .content-item {
+    display: flex;
+    align-items: start;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    position: relative;
+}
+
+#scheduledetailprivewsection .content-item-header {
+    position: relative;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+#scheduledetailprivewsection .content-item-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: #ff4d4d;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+#scheduledetailprivewsection .content-item-image {
+    width: 120px;
+    height: 130px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+#scheduledetailprivewsection .content-item-body {
+    flex-grow: 1;
+}
+
+#scheduledetailprivewsection .content-item-time {
+    color: #ff4d4d;
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+    #scheduledetailprivewsection .content-item-time .icon {
+        margin-right: 5px;
     }
 
-    .nav-scroller .nav-link {
-        padding-top: .75rem;
-        padding-bottom: .75rem;
-        font-size: .875rem;
+#scheduledetailprivewsection .content-item-location {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+#scheduledetailprivewsection .content-item-detail {
+    font-size: 14px;
+    color: #888;
+}
+
+#scheduledetailprivewsection .content-item-menu {
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    user-select: none;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.no-content-message {
+    background-color: #f5f7fa; /* 背景颜色 */
+    border-radius: 10px; /* 圆角 */
+    padding: 20px; /* 内边距 */
+    text-align: center; /* 文本居中 */
+    color: #888; /* 文本颜色 */
+    font-size: 16px; /* 字体大小 */
+    font-weight: 500; /* 字体粗细 */
+    margin: 20px 0; /* 上下外边距 */
+}
+
+.dropdown-menu {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    background-color: white;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 120px;
+}
+
+    .dropdown-menu a {
+        display: block;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: black;
+        cursor: pointer;
     }
-/*#endregion*/
+
+        .dropdown-menu a:hover {
+            background-color: #f0f0f0; /* 悬停时的背景色 */
+        }
+
+.show-menu {
+    display: block;
+}
+
+.delete-btn {
+    font-size: 12px !important;
+    margin: 10px !important;
+    background-color: var(--white) !important;
+    color: darkred !important;
+    width: 70px !important;
+    height: 30px !important;
+    border-radius: 30px !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important; /* Remove padding to avoid shifting the text */
+}
+
+

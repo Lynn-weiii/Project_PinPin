@@ -26,9 +26,11 @@
     <Compile Remove="Views\Schdules\Index.cshtml.cs" />
     <Content Remove="bundleconfig.json" />
     <Content Remove="Views\Home\Schedule.cshtml" />
+    <Content Remove="wwwroot\css\mdtimepicker.min.css" />
     <Content Remove="wwwroot\images\entrylogolightnoshadow.png" />
     <Content Remove="wwwroot\images\entrylogomiddle.png" />
     <Content Remove="wwwroot\js\ExpenseMain.js" />
+    <Content Remove="wwwroot\js\mdtimepicker.min.js" />
     <Content Remove="wwwroot\js\SchduleDetails.js" />
   </ItemGroup>
 
@@ -54,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>

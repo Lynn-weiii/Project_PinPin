@@ -245,39 +245,7 @@
 
     <script>
         $(document).ready(async function () {
-            //#region 加載 Google Maps API
-            (function (g) {
-                var h, a, k, p = "The Google Maps JavaScript API",
-                    c = "google",
-                    l = "importLibrary",
-                    q = "__ib__",
-                    m = document,
-                    b = window;
-                b = b[c] || (b[c] = {});
-                var d = b.maps || (b.maps = {}),
-                    r = new Set(),
-                    e = new URLSearchParams(),
-                    u = () => h || (h = new Promise(async (f, n) => {
-                        a = m.createElement("script");
-                        e.set("libraries", [...r].join(","));
-                        for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                        e.set("callback", c + ".maps." + q);
-                        e.set("language", "zh-TW");
-                        e.set("region", "TW");
-                        a.src = `https://maps.${c}apis.com/maps/api/js?${e}`;
-                        d[q] = f;
-                        a.onerror = () => h = n(Error(p + " could not load."));
-                        a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                        m.head.append(a);
-                    }));
-                d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
-            })({
-                key: "AIzaSyAsqUaAhyp0Co3tjTN7n-dHGvU-oui3KgU",
-                v: "weekly",
-                libraries: "places,geometry,drawing,visualization"
-            });
-            //#endregion
-
+            getToken();
             //#region 載入跟user相關的行程主題
             try {
                 var [allSchedulesResponse] = await Promise.all([
@@ -296,45 +264,45 @@
                     return;
                 }
                 else if (allSchedulesResponse.ok) {
-                    // 解析 JSON 数据
                     const responseData = await allSchedulesResponse.json();
-                    console.log('Response Data:', responseData); // 输出响应数据
-
                     const data = responseData.mainSchedules || [];
                     const data2 = responseData.groupSchedules || [];
 
-                    console.log('Main Schedules:', data.length); // 输出主要行程数据
-                    console.log('Group Schedules:', data2.length); // 输出群组行程数据
-
-                    
-                    if (Array.isArray(data)) {
-                        if (data.length > 0) {
-                            $('#course-container').show();
-                            renderCourses(data);
-                        } else {
-                            $('#course-container').hide();
-                            $('#emptyschedule').show();
+                    // 替换 data 中的 picture
+                    const updatedData = Array.isArray(data) ? await Promise.all(data.map(async (item) => {
+                        if (item.placeId) {
+                            const photoUrl = await fetchPlacePhotoUrl(item.placeId);
+                            item.picture = photoUrl || item.picture; // 如果没有新图片，保留原始图片
                         }
-                    } else if (typeof data === 'string' && data.includes('趕快規劃新行程吧')) {
+                        return item;
+                    })) : [];
+
+                    // 替换 data2 中的 picture
+                    const updatedData2 = Array.isArray(data2) ? await Promise.all(data2.map(async (item) => {
+                        if (item.placeId) {
+                            const photoUrl = await fetchPlacePhotoUrl(item.placeId);
+                            item.picture = photoUrl || item.picture; // 如果没有新图片，保留原始图片
+                        }
+                        return item;
+                    })) : [];
+
+                    if (updatedData.length > 0) {
+                        $('#course-container').show();
+                        renderCourses(updatedData);
+                    } else {
                         $('#course-container').hide();
                         $('#emptyschedule').show();
                     }
 
-
-                    if (Array.isArray(data2)) {
-                        if (data2.length > 0) {
-                            $('#group_course-container').show();
-                            groupCourses(data2);
-                        } else {
-                            $('#group_course-container').hide();
-                            $('#emptygroup').show();
-                        }
-                    } else if (typeof data2 === 'string' && data2.includes('目前沒有參加的旅遊群組')) {
+                    if (updatedData2.length > 0) {
+                        $('#group_course-container').show();
+                        groupCourses(updatedData2);
+                    } else {
                         $('#group_course-container').hide();
                         $('#emptygroup').show();
                     }
                 }
-                else if (response.status === 204) {
+                else if (allSchedulesResponse.status === 204) {
                     $('#course-container').hide();
                     $('#emptyschedule').show();
                     $('#group_course-container').hide();
@@ -351,6 +319,35 @@
                     console.log('Calling initPopularCoursesSlider');
                     initPopularCoursesSlider();
                 }, 300);
+            }
+
+            //#endregion
+
+            //#region 取景點照片
+            async function fetchPlacePhotoUrl(placeId) {
+                const { PlacesService } = await google.maps.importLibrary("places");
+                const map = new google.maps.Map(document.createElement('div'));
+                const placesService = new PlacesService(map);
+
+                return new Promise((resolve, reject) => {
+                    const request = {
+                        placeId: placeId,
+                        fields: ['photos']
+                    };
+
+                    placesService.getDetails(request, (place, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            if (place.photos && place.photos.length > 0) {
+                                const picture = place.photos[0].getUrl({ maxWidth: 400, maxHeight: 400 });
+                                resolve(picture); // 返回照片 URL
+                            } else {
+                                resolve(null); // 没有照片时返回 null
+                            }
+                        } else {
+                            reject('Error fetching place details: ' + status);
+                        }
+                    });
+                });
             }
             //#endregion
 
@@ -371,7 +368,7 @@
                 } else {
                     alert('Missing required data.');
                 }
-                alert('go schedule detail');
+               
             });
             //#endregion
 
@@ -391,7 +388,6 @@
                     var endTime = $('#el2').val();
                     var lat = $('#Lat').val();
                     var lng = $('#Lng').val();
-                    var picture_url = $('#picture_url').val();
                     var place_id = $('#place_id').val();
                     var body = {
                         "Name": name,
@@ -400,7 +396,6 @@
                         "Lat": lat,
                         "Lng": lng,
                         "PlaceId": place_id,
-                        "PictureUrl": picture_url
                     };
 
                     var response = await fetch(`${baseAddress}/api/Schedules`, {
@@ -553,22 +548,14 @@
                             }
                         });
 
-                        // 处理 id 为 2 的复选框的未勾选情况
                         if (checkedCheckboxes.filter('[data-authority-id="2"]').length === 0) {
                             AuthorityCategoryIds.push(1);
                         }
-
-                        // 输出结果
-                        console.log({
-                            UserId: UserId,
-                            ScheduleId: ScheduleId,
-                            AuthorityCategoryIds: AuthorityCategoryIds
-                        });
                         var userData = {
                             'ScheduleId': ScheduleId,
                             'AuthorityCategoryIds': AuthorityCategoryIds.length ? AuthorityCategoryIds : [],
                             'UserId': UserId,
-                            'Id': null // 你可能需要為每個用戶生成一個唯一的 ID
+                            'Id': null
                         };
                         usersData.push(userData);
                     });
@@ -677,8 +664,6 @@
                     }
 
                     var groupMembers = await response.json();
-
-                    // 根据 isHost 排序，将 isHost 为 true 的成员放在第一位
                     groupMembers.sort((a, b) => b.isHost - a.isHost);
 
                     var modalBody = document.querySelector('#groupmembers_modal .modal-body');
@@ -948,11 +933,6 @@
                             document.getElementById('Lng').value = lng;
                             document.getElementById('place_id').value = placeId;
                             document.getElementById('picture_url').value = photoUrl;
-
-                            console.log('Place ID:', placeId);
-                            console.log('Latitude:', lat);
-                            console.log('Longitude:', lng);
-                            console.log('Photo URL:', photoUrl);
                         });
 
                         // 添加 debounce 处理

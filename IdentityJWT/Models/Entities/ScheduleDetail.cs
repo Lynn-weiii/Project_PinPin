@@ -17,9 +17,9 @@ public partial class ScheduleDetail
 
     public string Location { get; set; }
 
-    public DateTime StartTime { get; set; }
+    public TimeOnly StartTime { get; set; }
 
-    public DateTime EndTime { get; set; }
+    public TimeOnly EndTime { get; set; }
 
     public string Remark { get; set; }
 
@@ -28,6 +28,12 @@ public partial class ScheduleDetail
     public DateTime? ModifiedTime { get; set; }
 
     public byte[] Rowversion { get; set; }
+
+    public decimal? Lat { get; set; }
+
+    public decimal? Lng { get; set; }
+
+    public int? Sort { get; set; }
 
     public virtual SchedulePreview ScheduleDay { get; set; }
 
