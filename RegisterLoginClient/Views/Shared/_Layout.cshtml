@@ -135,6 +135,12 @@
         function goToLoginPage() {
             window.location.href = '@Url.Action("Login", "Home")';
         }
+        function  getToken () {
+            token = localStorage.getItem('token');
+            if (!token) {
+                goToLoginPage();
+            }
+        }
 
         const { createApp, onMounted, ref } = Vue;
         createApp({
@@ -143,7 +149,6 @@
                 const user = ref({ name: '', photoBase64: '' });
                 const getToken = () => {
                     token = localStorage.getItem('token');
-                    console.log(token);
                     isLogin.value = token === null ? false : true;
                 }
 
