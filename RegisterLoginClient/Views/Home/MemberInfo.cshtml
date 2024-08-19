@@ -89,6 +89,9 @@
                     document.getElementById('phone').value = data.phone;
                     document.getElementById('birthday').value = data.birthday ? data.birthday.split('T')[0] : '';
                     document.getElementById('gender').value = data.gender;
+                    document.getElementById('photo').value = data.photo;
+
+                    console.log("response data:", data);
 
                     if (data.phone === null) {
                         document.getElementById('private').textContent = "未提供";
@@ -105,6 +108,7 @@
                         document.getElementById('birthday').readOnly = true; //生日不可修改
                     }
 
+                    //若用戶有大頭貼照則顯示，否則顯示替代圖片
                     if (data.photoBase64) {
                         document.getElementById('userPhoto').src = 'data:image/png;base64,' + data.photoBase64;
                     } else {
@@ -119,28 +123,48 @@
             }
         }
         
+        //提交修改的資料
         $(document).ready(function () {
             // 從隱藏輸入框中獲取 email
             //const email = $("#userEmail").val();
             const token = localStorage.getItem('token');
 
+            //處理圖檔，轉為base64
+            let base64Photo = null;
+
+            // 當使用者選擇圖片時
+            $("#photo").on("change", function (event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+
+                reader.onloadend = function () {
+                    const base64String = reader.result;
+                    // 移除 "data:image/png;base64," 或其他格式前綴
+                    base64Photo = base64String.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+                    $("#userPhoto").attr("src", base64String); // 預覽圖片
+                };
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+            });
+
             $("#btnUpdate").on("click", async function () {
-
-
                 const name = $("#name").val();
                 const phone = $("#phone").val();
                 var birthday = $("#birthday").val();
                 const gender = $("#gender").val();
                 const email = $("#email").val();
-
+               
                 var body = {
                     "Name": name,
                     "Phone": phone,
                     "Birthday": birthday,
                     "Gender": gender,
-                    "Email": email
+                    "Email": email,
+                    "Photo": base64Photo
                 }
-                //alert("btnGetAll");
+
                 var result = await fetch(`${baseAddress}/api/MemberInfo/${email}`, {
                     method: "PUT",
                     body: JSON.stringify(body),
@@ -150,7 +174,6 @@
                     }
                 });
                 var data = await result.text();
-                //alert(data);
                 Swal.fire({
                     title: "修改成功",
                     icon: "success"
@@ -159,8 +182,6 @@
 
             getUserData();
         });
-
-        //待修改
     </script>
 
 }
