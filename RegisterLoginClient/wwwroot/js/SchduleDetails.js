@@ -1204,81 +1204,102 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
 
 //#region 更新行程列表
 async function refreshlist() {
-    var scheduleId = sessionStorage.getItem("scheduleId");
-    console.log(`refreshlist get scheduleid:${scheduleId}`);
+    try {
+        var scheduleId = sessionStorage.getItem("scheduleId");
+        console.log(`refreshlist get scheduleid:${scheduleId}`);
 
-    const response3 = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        }
-    });
-
-    if (!response3.ok) {
-        throw new Error(`Failed to fetch schedule info: ${response3.statusText}`);
-    }
-
-    const results3 = await response3.json();
-    const scheduleDateIdInfo = results3.sceduleDateIdInfo;
-    const scheduleDetail = results3.scheduleDetail;
-    if (!scheduleDetail) {
-        throw new Error('scheduleDetail is undefined or invalid');
-    }
-
-    const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        }
-    });
-    let data2 = [];
-    if (!response2.ok) {
-        throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
-    }
-
-    const textResponse = await response2.text();
-    if (textResponse) {
-        const jsonResponse = JSON.parse(textResponse);
-        const data2 = [];
-        if (jsonResponse && jsonResponse.scheduleDetails) {
-            const { scheduleDetails } = jsonResponse;
-
-            for (let scheduleDayId of Object.keys(scheduleDetails)) {
-                const scheduleItems = scheduleDetails[scheduleDayId];
-                for (let item of scheduleItems) {
-                    const placeId = item.location;
-                    const pictureUrl = await fetchPlacePhotoUrl(placeId);
-
-                    const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
-
-                    data2.push({
-                        sort: item.sort,  // 使用冒号而非等号
-                        id: item.id,
-                        scheduleDayId: item.scheduleDayId,
-                        userId: item.userId,
-                        locationName: item.locationName,
-                        placeId: placeId,
-                        startTime: item.startTime,
-                        endTime: item.endTime,
-                        lat: item.lat,
-                        lng: item.lng,
-                        pictureUrl: pictureUrl,
-                        transportation: transportation || null
-                    });
-                }
+        const response3 = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
             }
+        });
 
-            // 对 data2 进行排序
-            data2.sort((a, b) => a.sort - b.sort);
-        } else {
-            console.log('No schedule details found or scheduleDetails is missing.');
+        if (!response3.ok) {
+            throw new Error(`Failed to fetch schedule info: ${response3.statusText}`);
         }
-    } else {
-        console.log('Empty response, no data to process.');
+
+        const results3 = await response3.json();
+        const scheduleDateIdInfo = results3.sceduleDateIdInfo;
+        const scheduleDetail = results3.scheduleDetail;
+        if (!scheduleDetail) {
+            throw new Error('scheduleDetail is undefined or invalid');
+        }
+
+        const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        if (!response2.ok) {
+            throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
+        }
+
+        const textResponse = await response2.text();
+        let data2 = [];
+        if (textResponse) {
+            const jsonResponse = JSON.parse(textResponse);
+            if (jsonResponse && jsonResponse.scheduleDetails) {
+                const { scheduleDetails } = jsonResponse;
+
+                for (let scheduleDayId of Object.keys(scheduleDetails)) {
+                    const scheduleItems = scheduleDetails[scheduleDayId];
+                    for (let item of scheduleItems) {
+                        const placeId = item.location;
+                        let pictureUrl = '';
+
+                        try {
+                            pictureUrl = await fetchPlacePhotoUrl(placeId);
+                        } catch (error) {
+                            console.error(`Failed to fetch picture URL for place ID ${placeId}: ${error}`);
+                        }
+
+                        const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
+
+                        data2.push({
+                            sort: item.sort,
+                            id: item.id,
+                            scheduleDayId: item.scheduleDayId,
+                            userId: item.userId,
+                            locationName: item.locationName,
+                            placeId: placeId,
+                            startTime: item.startTime,
+                            endTime: item.endTime,
+                            lat: item.lat,
+                            lng: item.lng,
+                            pictureUrl: pictureUrl,
+                            transportation: transportation || null
+                        });
+                    }
+                }
+
+                // 对 data2 进行排序
+                data2.sort((a, b) => a.sort - b.sort);
+            } else {
+                console.log('No schedule details found or scheduleDetails is missing.');
+            }
+        } else {
+            console.log('Empty response, no data to process.');
+        }
+
+        generateDateList(scheduleDateIdInfo);
+        generateTabLabel(scheduleDateIdInfo);
+        generateTabContents(data2, scheduleDateIdInfo);
+
+    } catch (error) {
+        console.error(`Error in refreshlist: ${error}`);
+        Swal.fire({
+            title: "Oops!",
+            text: "Failed to refresh the list. Please try again.",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1500
+        });
     }
-    generateDateList(scheduleDateIdInfo);
-    generateTabLabel(scheduleDateIdInfo);
-    generateTabContents(data2, scheduleDateIdInfo);
+
+
 
     document.getElementById('tab-contents').addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-btn')) {
