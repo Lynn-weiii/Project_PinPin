@@ -72,9 +72,18 @@ public partial class PinPinContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.IsEdited)
+                .HasDefaultValue(false)
+                .HasColumnName("is_edited");
             entity.Property(e => e.IsFocus)
                 .HasDefaultValue(false)
                 .HasColumnName("is_focus");
+            entity.Property(e => e.LastEditedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("last_edited_at");
             entity.Property(e => e.Message)
                 .IsRequired()
                 .HasColumnName("message");
