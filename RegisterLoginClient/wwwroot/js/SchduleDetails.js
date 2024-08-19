@@ -87,7 +87,7 @@ async function LoadScheduleInfo(scheduleId) {
             picture,
             scheduleId,
         };
-        GetWeatherInfo(lat, lng)
+        //GetWeatherInfo(lat, lng)
         updateUIWithScheduleInfo(data);
         
         const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
