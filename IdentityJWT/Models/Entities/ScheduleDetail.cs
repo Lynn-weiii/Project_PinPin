@@ -29,6 +29,12 @@ public partial class ScheduleDetail
 
     public byte[] Rowversion { get; set; }
 
+    public decimal? Lat { get; set; }
+
+    public decimal? Lng { get; set; }
+
+    public int? Sort { get; set; }
+
     public virtual SchedulePreview ScheduleDay { get; set; }
 
     public virtual ICollection<Transportation> Transportations { get; set; } = new List<Transportation>();

@@ -13,7 +13,7 @@ public partial class Transportation
 
     public int TransportationCategoryId { get; set; }
 
-    public DateTime Time { get; set; }
+    public DateTime? Time { get; set; }
 
     public int? CurrencyId { get; set; }
 
