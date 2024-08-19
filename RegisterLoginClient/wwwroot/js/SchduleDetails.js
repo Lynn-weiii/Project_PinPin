@@ -87,7 +87,6 @@ async function LoadScheduleInfo(scheduleId) {
             picture,
             scheduleId,
         };
-        //GetWeatherInfo(lat, lng)
         updateUIWithScheduleInfo(data);
         
         const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
@@ -100,12 +99,10 @@ async function LoadScheduleInfo(scheduleId) {
         if (!response2.ok) {
             throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
         }
-
+        const data2= [];
         const textResponse = await response2.text(); 
-        const data2 = [];
-
         if (textResponse) {
-            const jsonResponse = JSON.parse(textResponse); 
+            const jsonResponse = JSON.parse(textResponse);
 
             if (jsonResponse && jsonResponse.scheduleDetails) {
                 const { scheduleDetails } = jsonResponse;
@@ -115,10 +112,11 @@ async function LoadScheduleInfo(scheduleId) {
                     for (let item of scheduleItems) {
                         const placeId = item.location;
                         const pictureUrl = await fetchPlacePhotoUrl(placeId);
-                        
+
                         const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
 
                         data2.push({
+                            sort: item.sort,  // 使用冒号而非等号
                             id: item.id,
                             scheduleDayId: item.scheduleDayId,
                             userId: item.userId,
@@ -133,6 +131,9 @@ async function LoadScheduleInfo(scheduleId) {
                         });
                     }
                 }
+
+                // 对 data2 进行排序
+                data2.sort((a, b) => a.sort - b.sort);
             } else {
                 console.log('No schedule details found or scheduleDetails is missing.');
             }
@@ -431,27 +432,27 @@ function createInfoWindowContent(place, name, scheduleId) {
     const starsHtml = getStarRating(place.rating); // 获取 starsHtml
 
     let content = `
-        <div class="info-window" style="max-width: 640px; max-height: 460px; display: flex; padding: 15px; font-family: Arial, sans-serif; box-sizing: border-box;" id="info-window">
-            <!-- 照片部分 -->
-            <div class="location-image" style="flex: 0 0 50%; max-width: 55%; padding: 5px; box-sizing: border-box;">
-                <img src="${imageUrl}" alt="${place.name}" class="info-window-photo" style="border-radius: 15px; width: 100%; height: 100%; object-fit: cover;">
+    <div class="info-window" style="max-width: 640px; max-height: 460px; display: flex; padding: 15px; font-family: Arial, sans-serif; box-sizing: border-box;" id="info-window">
+        <!-- 照片部分 -->
+        <div class="location-image" style="flex: 0 0 50%; max-width: 55%; padding: 5px; box-sizing: border-box;">
+            <img src="${imageUrl}" alt="${place.name}" class="info-window-photo" style="border-radius: 15px; width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <!-- 详细信息部分 -->
+        <div class="location-details mb-3" style="flex: 0 0 50%; max-width: 45%; padding-left: 10px; box-sizing: border-box; overflow-y: auto;">
+            <h2 style="margin-top: 0; font-size: 20px; color: #333; overflow-wrap: break-word;">${place.name}</h2>
+            <div style="margin: 5px 0; font-size: 16px; color: #FF9900;">
+                Google 評價:(${place.rating || '沒有評分'}) ${starsHtml} ${place.user_ratings_total ? `(${place.user_ratings_total} 則評價)` : ''}
             </div>
-            <!-- 详细信息部分 -->
-            <div class="location-details" style="flex: 0 0 50%; max-width: 45%; padding-left: 10px; box-sizing: border-box; overflow-y: auto;">
-                <h2 style="margin-top: 0; font-size: 20px; color: #333; overflow-wrap: break-word;">${place.name}</h2>
-                <div style="margin: 5px 0; font-size: 16px; color: #FF9900;">
-                    Google 評價:(${place.rating || '沒有評分'}) ${starsHtml} ${place.user_ratings_total ? `(${place.user_ratings_total} 則評價)` : ''}
-                </div>
-                <p style="margin: 5px 0; font-size: 14px; color: #666; overflow-wrap: break-word;">${place.vicinity || place.formatted_address}</p>
+            <p style="margin: 5px 0; font-size: 14px; color: #666; overflow-wrap: break-word;">${place.vicinity || place.formatted_address}</p>
 
-                <div class="contact" style="margin: 10px 0; font-size: 14px; overflow-wrap: break-word;">
-                    <i class="fas fa-phone-alt" style="margin-right: 5px; color: #666;"></i>
-                    <span>${place.formatted_phone_number || 'N/A'}</span>
-                </div>
+            <div class="contact" style="margin: 10px 0; font-size: 14px; overflow-wrap: break-word;">
+                <i class="fas fa-phone-alt" style="margin-right: 5px; color: #666;"></i>
+                <span>${place.formatted_phone_number || 'N/A'}</span>
+            </div>
 
-                <div class="mt-2 mb-2">
-                    <p style="font-size: 14px; color: #333;"><strong>營業時間:</strong></p>
-                    <ul style="list-style-type: none; padding-left: 0; font-size: 14px; color: #666; max-height: 100px; overflow-y: auto;">`;
+            <div class="mt-2 mb-2">
+                <p style="font-size: 14px; color: #333;"><strong>營業時間:</strong></p>
+                <ul style="list-style-type: none; padding-left: 0; font-size: 14px; color: #666; max-height: 100px; overflow-y: auto;">`;
 
     if (place.current_opening_hours && place.current_opening_hours.weekday_text) {
         for (let i = 0; i < place.current_opening_hours.weekday_text.length; i++) {
@@ -462,16 +463,15 @@ function createInfoWindowContent(place, name, scheduleId) {
     }
 
     content += `</ul>
-                </div>
-                <div class="btn-container mb-1" style="margin-top: 10px;">
-                    <button class="btn btn-primary" id="add-place-btn" data-id="${scheduleId}" onclick="addscheduledate('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}', '${place.name}')">+</button>
-                    <strong style="margin-left: 10px;">${name}</strong>
-                    <button class="btn btn-primary mx-3" id="wishlist-btn" onclick="ShowWishList('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}','${place.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList">
-                        <i class="fas fa-star"></i>
-                    </button>
-                </div>
             </div>
-        </div>`;
+            <div class="btn-container mb-1" style="font-size:14px;margin-top: 5px;display:flex;position:absolute;bottom: 10px;right: 10px;">
+                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" onclick="addscheduledate('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}', '${place.name}')">+<strong style="margin-left: 10px;">加入行程</strong></button>
+                <button class="btn btn-primary mx-3 btn-sm" id="wishlist-btn" onclick="ShowWishList('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}','${place.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList">
+                    <i class="fas fa-star"></i><strong style="margin-left: 10px;">加入願望清單</strong>
+                </button>
+            </div>
+        </div>
+    </div>`;
 
     return content;
 }
@@ -499,15 +499,15 @@ function getStarRating(rating) {
 //#endregion
 
 //#region 新增景點到日程
-async function addscheduledate(lat, lng, placeId, name) {
-    console.log(`addscheduledate called with: ${lat}, ${lng}, ${placeId}, ${name}`)
-    
+function addscheduledate(lat, lng, placeId, name) {
     $('#AddPointWhichDayList').modal('show');
-    $('#addPointWhichDayList').on('click', async function () {
+
+    // 先移除之前可能已存在的点击事件监听器
+    $('#addPointWhichDayList').off('click').on('click', async function () {
         var daylistSelected = $('#date-list option:selected');
         var daylistSelectedId = daylistSelected.attr('data-schdule_day_id');
-        console.log(`dailyID: ${daylistSelectedId}`)
-        var TransportationCategoryId = $('#transportation-list option:selected').val(); // 修改为 val() 以获取选中的值
+        console.log(`dailyID: ${daylistSelectedId}`);
+        var TransportationCategoryId = $('#transportation-list option:selected').val();
         var stratTime = $('#start-time').val();
         var endTime = $('#end-time').val();
         stratTime += ":00";
@@ -611,7 +611,6 @@ async function addscheduledate(lat, lng, placeId, name) {
                 showConfirmButton: false,
                 timer: 1500
             });
-            
         } finally {
             $('#AddPointWhichDayList').modal('hide');
             $('#search_input_field').val('');
@@ -720,6 +719,7 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                     const contentItem = document.createElement('div');
                     contentItem.classList.add('content-item');
                     contentItem.setAttribute('data-placeId', `${place.placeId}`);
+                    contentItem.setAttribute('data-sort', `${place.sort}`);
                     contentItem.setAttribute('data-lat', `${place.lat}`);
                     contentItem.setAttribute('data-lng', `${place.lng}`);
                     contentItem.innerHTML = `
@@ -740,7 +740,7 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                             </div>
                             <div class="button-group">
                                 <button class="delete-btn"  data-scheduleDayId="${place.scheduleDayId}" data-id="${place.id}" >
-                                    刪除<i class="fa-solid fa-minus" style="color: #ec092b;"></i>
+                                    刪除景點
                                 </button>
                             </div>
                         </div>
@@ -831,7 +831,6 @@ async function getRouteInfo(origin, destination) {
 
     throw new Error('查無路線。');
 }
-
 function getTransportationMode(categoryId) {
     switch (categoryId) {
         case 1:
@@ -1205,86 +1204,102 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
 
 //#region 更新行程列表
 async function refreshlist() {
-    var scheduleId = sessionStorage.getItem("scheduleId");
-    console.log(`refreshlist get scheduleid:${scheduleId}`);
+    try {
+        var scheduleId = sessionStorage.getItem("scheduleId");
+        console.log(`refreshlist get scheduleid:${scheduleId}`);
 
-    const response3 = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
+        const response3 = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        if (!response3.ok) {
+            throw new Error(`Failed to fetch schedule info: ${response3.statusText}`);
         }
-    });
 
-    if (!response3.ok) {
-        throw new Error(`Failed to fetch schedule info: ${response3.statusText}`);
-    }
-
-    const results3 = await response3.json();
-    const scheduleDateIdInfo = results3.sceduleDateIdInfo;
-    const scheduleDetail = results3.scheduleDetail;
-    if (!scheduleDetail) {
-        throw new Error('scheduleDetail is undefined or invalid');
-    }
-
-    const response4 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
+        const results3 = await response3.json();
+        const scheduleDateIdInfo = results3.sceduleDateIdInfo;
+        const scheduleDetail = results3.scheduleDetail;
+        if (!scheduleDetail) {
+            throw new Error('scheduleDetail is undefined or invalid');
         }
-    });
 
-    if (!response4.ok) {
-        throw new Error(`Failed to fetch schedule details: ${response4.statusText}`);
-    }
+        const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
 
-    const textResponse = await response4.text();
-    const data2 = [];
+        if (!response2.ok) {
+            throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
+        }
 
-    if (textResponse) {
-        const jsonResponse = JSON.parse(textResponse);
+        const textResponse = await response2.text();
+        let data2 = [];
+        if (textResponse) {
+            const jsonResponse = JSON.parse(textResponse);
+            if (jsonResponse && jsonResponse.scheduleDetails) {
+                const { scheduleDetails } = jsonResponse;
 
-        if (jsonResponse && jsonResponse.scheduleDetails) {
-            const { scheduleDetails } = jsonResponse;
+                for (let scheduleDayId of Object.keys(scheduleDetails)) {
+                    const scheduleItems = scheduleDetails[scheduleDayId];
+                    for (let item of scheduleItems) {
+                        const placeId = item.location;
+                        let pictureUrl = '';
 
-            for (let scheduleDayId of Object.keys(scheduleDetails)) {
-                const scheduleItems = scheduleDetails[scheduleDayId];
-                for (let item of scheduleItems) {
-                    const placeId = item.location;
-                    const pictureUrl = await fetchPlacePhotoUrl(placeId);
+                        try {
+                            pictureUrl = await fetchPlacePhotoUrl(placeId);
+                        } catch (error) {
+                            console.error(`Failed to fetch picture URL for place ID ${placeId}: ${error}`);
+                        }
 
-                    const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
+                        const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
 
-                    data2.push({
-                        id: item.id,
-                        scheduleDayId: item.scheduleDayId,
-                        userId: item.userId,
-                        locationName: item.locationName,
-                        placeId: placeId,
-                        startTime: item.startTime,
-                        endTime: item.endTime,
-                        lat: item.lat,
-                        lng: item.lng,
-                        pictureUrl: pictureUrl,
-                        transportation: transportation || null
-                    });
+                        data2.push({
+                            sort: item.sort,
+                            id: item.id,
+                            scheduleDayId: item.scheduleDayId,
+                            userId: item.userId,
+                            locationName: item.locationName,
+                            placeId: placeId,
+                            startTime: item.startTime,
+                            endTime: item.endTime,
+                            lat: item.lat,
+                            lng: item.lng,
+                            pictureUrl: pictureUrl,
+                            transportation: transportation || null
+                        });
+                    }
                 }
+
+                // 对 data2 进行排序
+                data2.sort((a, b) => a.sort - b.sort);
+            } else {
+                console.log('No schedule details found or scheduleDetails is missing.');
             }
         } else {
-            console.log('No schedule details found or scheduleDetails is missing.');
+            console.log('Empty response, no data to process.');
         }
-    } else {
-        console.log('Empty response, no data to process.');
+
+        generateDateList(scheduleDateIdInfo);
+        generateTabLabel(scheduleDateIdInfo);
+        generateTabContents(data2, scheduleDateIdInfo);
+
+    } catch (error) {
+        console.error(`Error in refreshlist: ${error}`);
+        Swal.fire({
+            title: "Oops!",
+            text: "Failed to refresh the list. Please try again.",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1500
+        });
     }
 
-    // 清空现有内容
-    document.getElementById('tab-contents').innerHTML = '';
-    document.getElementById('date-list').innerHTML = '';
 
-    console.log('After clearing:', document.getElementById('tab-contents').innerHTML);
-
-    // 重新生成内容
-    generateDateList(scheduleDateIdInfo);
-    generateTabContents(data2, scheduleDateIdInfo);
 
     document.getElementById('tab-contents').addEventListener('click', function (event) {
         if (event.target.classList.contains('delete-btn')) {
@@ -1295,37 +1310,56 @@ async function refreshlist() {
             DeleteSchedule(Id, scheduleDayId, scheduleId);
         }
     });
-
     console.log('data2:', data2);
 }
 //#endregion
 
-//#region 天氣資訊
-async function GetWeatherInfo(lat, lng) {
-    try {
-        const url=`${baseAddress}/api/Weather?lat=${lat}&lon=${lng}&units=metric`;
-        console.log(`GetWeatherInfo`, lat, lng);
-        
-        var response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-        });
+//#region 天氣資訊 可以呼叫但是div要自己刻，如果用官方的不能用後台呼叫的資料渲染
+//async function GetWeatherInfo(lat, lng) {
+//    try {
+//        const url=`${baseAddress}/api/Weather?lat=${lat}&lon=${lng}&units=metric`;
+//        var response = await fetch(url, {
+//            method: 'GET',
+//            headers: {
+//                'Authorization': `Bearer ${token}`,
+//                'Content-Type': 'application/json'
+//            },
+//        });
 
-        if (response.ok) {
-            var weatherInfo = await response.json();
-            console.log(`GetWeatherInfo`, weatherInfo);
-            return weatherInfo; 
-        } else {
-            console.error(`GetWeatherInfo failed with status ${response.status}`);
-        }
-    } catch (error) {
-        console.log(`GetWeatherInfo error ${error}`);
-    }
-    return null;
-}
+//        if (response.ok) {
+//            const weatherData = await response.json();
+//            const container = document.getElementById('weather-container');
+//            container.innerHTML = '';
+//            weatherData.forEach(dayData => {
+//                dayData.Day.forEach(weather => {
+//                    const timeOfDay = weather.IsMorning ? '早上' : '下午/晚上';
+//                    const date = new Date(weather.DateTime).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' });
+
+//                    const weatherDiv = document.createElement('div');
+//                    weatherDiv.style.display = 'flex';
+//                    weatherDiv.style.flexDirection = 'column';
+//                    weatherDiv.style.padding = '10px';
+//                    weatherDiv.style.borderRadius = '10px';
+//                    weatherDiv.style.backgroundColor = '#ffffff';
+//                    weatherDiv.style.boxShadow = '0px 2px 4px rgba(0, 0, 0, 0.1)';
+//                    weatherDiv.style.marginBottom = '10px';
+
+//                    weatherDiv.innerHTML = `
+//                    <div style="font-weight: bold; font-size: 16px;">${date} ${timeOfDay}</div>
+//                    <div style="font-size: 14px;">溫度: ${weather.Temp.toFixed(1)}°C</div>
+//                    <div style="font-size: 14px;">降雨機率: ${(weather.ChanceOfRain * 100).toFixed(1)}%</div>
+//                `;
+//                    container.appendChild(weatherDiv);
+//                });
+//            });
+//        } else {
+//            console.error(`GetWeatherInfo failed with status ${response.status}`);
+//        }
+//    } catch (error) {
+//        console.log(`GetWeatherInfo error ${error}`);
+//    }
+//    return null;
+//}
 
 //#endregion
 
@@ -1407,3 +1441,35 @@ async function GetWeatherInfo(lat, lng) {
 //    });
 //}
 //#endregion
+
+//#region timepicker
+
+
+function calculateEndTime() {
+    const startTime = document.getElementById('start-time').value;
+    const durationHours = parseInt(document.getElementById('duration-hours').value) || 0;
+    const durationMinutes = parseInt(document.getElementById('duration-minutes').value) || 0;
+
+    if (startTime) {
+        const [hours, minutes] = startTime.split(':').map(Number);
+        let endHours = hours + durationHours;
+        let endMinutes = minutes + durationMinutes;
+
+        // 处理分钟进位
+        if (endMinutes >= 60) {
+            endHours += Math.floor(endMinutes / 60);
+            endMinutes = endMinutes % 60;
+        }
+
+        // 处理24小时制的情况
+        if (endHours >= 24) {
+            endHours = endHours % 24;
+        }
+
+        // 格式化小时和分钟
+        const formattedEndHours = String(endHours).padStart(2, '0');
+        const formattedEndMinutes = String(endMinutes).padStart(2, '0');
+
+        document.getElementById('end-time').value = `${formattedEndHours}:${formattedEndMinutes}`;
+    }
+}
