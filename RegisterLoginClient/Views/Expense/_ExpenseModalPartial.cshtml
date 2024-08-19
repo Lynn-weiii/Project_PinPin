@@ -64,7 +64,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th><i class="fa-solid fa-users"></i> 團員</th>
-                                        <th class="text-end"><i class="fa-solid fa-dollar-sign"></i> 總金額</th>
+                                        <th class="text-end"><i :class="['fa-solid', selectedCurrencyIcon]"></i> 總金額</th>
                                         <th class="text-end">
                                             <div class="d-flex justify-content-end align-items-center">
                                                 <i class="fa-solid fa-coins"></i> 剩餘金額
@@ -79,8 +79,8 @@
                                 <tbody>
                                     <tr v-for="expens in balanceData" :key="expens.userId" v-on:click="showModalWithData('UserDetailModal',()=>getUserExpense(expens.name, expens.id))">
                                         <td>{{ expens.name }}</td>
-                                        <td class="text-end">{{ expens.balance.toFixed(2) }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
-                                        <td class="text-end">{{ expens.isPaidBalance.toFixed(2) }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
+                                        <td class="text-end"><i :class="['fa-solid', selectedCurrencyIcon]"></i>{{ expens.balance.toFixed(2) }}</td>
+                                        <td class="text-end"><i :class="['fa-solid', selectedCurrencyIcon]"></i>{{ expens.isPaidBalance.toFixed(2) }} </td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
                                         </td>
@@ -95,7 +95,7 @@
                                         <option v-for="(name, id) in currencies" :key="id" :value="name">{{ name }}</option>
                                     </select>
                                 </p>
-                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: {{ totalBalance }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></strong></p>
+                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: <i :class="['fa-solid', selectedCurrencyIcon]"></i>{{ totalBalance }}</strong></p>
                             </div>
                         </div>
                         <div v-else>
@@ -136,7 +136,7 @@
                                         <th><i class="fa-solid fa-receipt"></i> 名稱</th>
                                         <th class="text-end"><i class="fa-solid fa-tags"></i> 種類</th>
                                         <th class="text-center"><i class="fa-solid fa-circle-check"></i> 已付款</th>
-                                        <th class="text-end"><i class="fa-solid fa-dollar-sign"></i> 金額</th>
+                                        <th class="text-end"><i :class="['fa-solid', selectedCurrencyIcon]"></i> 金額</th>
                                         <th class="text-center"><i class="fa-solid fa-eye"></i> 查看</th>
                                     </tr>
                                 </thead>
@@ -147,7 +147,7 @@
                                         <td class="text-center">
                                             <i :class="expens.isPaid ? 'fa-regular fa-square-check text-success' : 'fa-regular fa-square text-danger'"></i>
                                         </td>
-                                        <td class="text-end">{{expens.amount.toFixed(2)}} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
+                                        <td class="text-end"><i :class="['fa-solid', selectedCurrencyIcon]"></i>{{expens.amount.toFixed(2)}}</td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
                                         </td>
@@ -162,7 +162,7 @@
                                         <option v-for="(name, id) in currencies" :key="id" :value="name">{{ name }}</option>
                                     </select>
                                 </p>
-                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: {{ totalUserBalance }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></strong></p>
+                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> <i :class="['fa-solid', selectedCurrencyIcon]"></i>總應收金額: {{ totalUserBalance }}</strong></p>
                             </div>
                         </div>
                         <div v-else>
@@ -211,7 +211,7 @@
                                 <div class="fs-5">
                                     <div class="d-flex justify-content-between fs-2">
                                         <p class="mb-0"><strong><i class="fa-solid fa-money-bill"></i> 總金額</strong>:</p>
-                                        <p class="mb-0">{{ expense.amount }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></p>
+                                        <p class="mb-0"><i :class="['fa-solid', expenseCurrencyIcon]"></i>{{ expense.amount }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -226,7 +226,7 @@
                                             <tr>
                                                 <th scope="col"><i class="fa-solid fa-user"></i> 名字</th>
                                                 <th scope="col" class="text-center"><i class="fa-solid fa-circle-check"></i> 付款狀態</th>
-                                                <th scope="col" class="text-end"><i class="fa-solid fa-dollar-sign"></i> 金額</th>
+                                                <th scope="col" class="text-end"><i :class="['fa-solid', expenseCurrencyIcon]"></i>金額</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -238,7 +238,7 @@
                                                 <td v-else class="text-center">
                                                     <i class="fa-solid fa-hand-holding-dollar"></i>
                                                 </td>
-                                                <td class="text-end">{{ expenseParticipant.amount }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
+                                                <td class="text-end"><i :class="['fa-solid', selectedCurrencyIcon]"></i>{{ expenseParticipant.amount }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -282,7 +282,7 @@
                                     <input type="text" class="form-control" id="editName" v-model="editName" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="amount" class="form-label fw-bold"><i :class="['fa-solid', selectedEditCurrencyIcon, 'me-2']"></i>金額</label>
+                                    <label for="amount" class="form-label fw-bold"><i :class="['fa-solid', selectedEditCurrencyIcon]"></i>金額</label>
                                     <input type="number" class="form-control" id="editAmount" v-model="editAmount" required>
                                 </div>
                             </div>
@@ -435,8 +435,8 @@
                                     <tr v-for="expens in changeRateExpense" :key="expens.id" v-on:click="showModalWithData('ExpenseModal',()=>getExpense(expens.id))">
                                         <td>{{expens.name}}</td>
                                         <td class="text-end">{{expens.category}}</td>
-                                        <td class="text-end">{{expens.payer}}</td>
-                                        <td class="text-end">{{expens.amount.toFixed(2)}} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></td>
+                                        <td class="text-center">{{expens.payer}}</td>
+                                        <td class="text-end"><i :class="['fa-solid', selectedCurrencyIcon,]"></i> {{expens.amount.toFixed(2)}} </td>
                                         <td class="text-center">
                                             <i class="fa-solid fa-arrow-right" style="cursor: pointer;"></i>
                                         </td>
@@ -451,7 +451,7 @@
                                         <option v-for="(name, id) in currencies" :key="id" :value="name">{{ name }}</option>
                                     </select>
                                 </p>
-                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額: {{ totalExpensAmount }} <i :class="['fa-solid', selectedCurrencyIcon, 'me-2']"></i></strong></p>
+                                <p class="text-end mb-0"><strong><i class="fa-solid fa-balance-scale"></i> 總應收金額:<i :class="['fa-solid', selectedCurrencyIcon]"></i>{{ totalExpensAmount }} </strong></p>
                             </div>
                         </div>
                         <div v-else>
