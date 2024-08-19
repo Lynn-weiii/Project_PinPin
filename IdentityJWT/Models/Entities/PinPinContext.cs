@@ -258,12 +258,16 @@ public partial class PinPinContext : DbContext
             entity.ToTable("schedule_details");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.EndTime)
-                .HasColumnType("datetime")
-                .HasColumnName("end_time");
+            entity.Property(e => e.EndTime).HasColumnName("end_time");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValue(false)
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.Lat)
+                .HasColumnType("decimal(18, 6)")
+                .HasColumnName("lat");
+            entity.Property(e => e.Lng)
+                .HasColumnType("decimal(18, 6)")
+                .HasColumnName("lng");
             entity.Property(e => e.Location)
                 .IsRequired()
                 .HasMaxLength(255)
@@ -283,9 +287,8 @@ public partial class PinPinContext : DbContext
                 .IsConcurrencyToken()
                 .HasColumnName("rowversion");
             entity.Property(e => e.ScheduleDayId).HasColumnName("schedule_day_id");
-            entity.Property(e => e.StartTime)
-                .HasColumnType("datetime")
-                .HasColumnName("start_time");
+            entity.Property(e => e.Sort).HasColumnName("sort");
+            entity.Property(e => e.StartTime).HasColumnName("start_time");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.ScheduleDay).WithMany(p => p.ScheduleDetails)

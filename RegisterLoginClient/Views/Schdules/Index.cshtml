@@ -245,7 +245,7 @@
 
     <script>
         $(document).ready(async function () {
-
+            getToken();
             //#region 載入跟user相關的行程主題
             try {
                 var [allSchedulesResponse] = await Promise.all([

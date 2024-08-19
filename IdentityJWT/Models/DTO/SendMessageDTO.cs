@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PinPinServer.Controllers
+namespace PinPinServer.Models.DTO
 {
     public class SendMessageDTO
     {

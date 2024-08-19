@@ -13,15 +13,15 @@ public partial class Transportation
 
     public int TransportationCategoryId { get; set; }
 
-    public DateTime Time { get; set; }
+    public DateTime? Time { get; set; }
 
     public int? CurrencyId { get; set; }
 
     public decimal? Cost { get; set; }
 
-    public string Remark { get; set; }
+    public string? Remark { get; set; }
 
-    public string TicketImageUrl { get; set; }
+    public string? TicketImageUrl { get; set; }
 
     public virtual CostCurrencyCategory Currency { get; set; }
 

@@ -1,8 +1,8 @@
-﻿namespace PinPinServer.Controllers
+﻿namespace PinPinServer.Models.DTO
 {
     public class ScheduleDateDTO
     {
-        public int? Schedule_Day_Id { get; set;}
+        public int? Schedule_Day_Id { get; set; }
 
         public DateOnly? Date { get; set; }
 

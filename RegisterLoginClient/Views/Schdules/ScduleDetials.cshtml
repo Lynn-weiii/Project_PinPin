@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
     <link href="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.css" type="text/css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
-
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet" />
 }
 
 
@@ -19,24 +19,27 @@
     <div class="row row-cols-md-2 g-0">
         @*# region行程表*@
         <div class="col-12 col-md-5" id="plannertable" style="border:2px solid #f6f4e8;">
-            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden;">                
-                    <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschedule">修改行程名稱/日期</button>
+            <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden; position: relative;">
+                <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschedule">修改行程名稱/日期</button>
                 <h5 id="theme-name"></h5>
-                <div id="travelduring">
-                </div>
-            </div>
-            <!-- #region 行程列表 -->
-            <div id="show-schedule-row">
-                <!-- 修正此处 -->
-                <div class="tab-wrap">
-                    <div class="tab-navigation scrollbar">
-                        <div class="tabs-container" id="tabs-container">
-                            <!-- Add more tabslabel -->
-                        </div>
+                <div id="travelduring"></div>
+
+                <!-- 添加天气预报信息的部分 -->
+                <div id="weathersession" style="display:flex; justify-content:space-around; opacity: 0.5;">
+                    <div class="weather-info">
+                        <div id="weatherdate" style="font-size:12px;"></div>
+                        <div id="weathertemp" style="font-size:12px;"></div>
+                        <div id="weatherrain" style="font-size:12px;"></div>
                     </div>
                 </div>
-                <div class="tab-contents" id="tab-contents">                    
-                    <!-- Add more tab-contents as needed -->
+            </div>
+            <!-- #region 行程列表 -->            
+            <div class="wrapper" id="scheduledetailprivewsection" style="width: 500px;background:transparent;">
+                <div class="buttonWrapper" id="tabs-label">
+                    <!--tablabels-->
+                </div>
+                <div class="contentWrapper" id="tab-contents" style="overflow-y: auto;background:transparent;">
+                    <!--tabcontents-->
                 </div>
             </div>
             <!-- #endregion -->
@@ -45,7 +48,7 @@
         @*#region 地圖*@        
         <div class="col-12 col-md-8">
             <div id="search_input" class="position-absolute top-5 end-0 p-2">
-                <input id="search_input_field" type="text" class="form-control mb-1" placeholder="目的地" required>
+                <input id="search_input_field" type="text" class="form-control mb-1" style="border:1px solid gray;border-radius: 10px; width: 300px;transform:translateY(50%)!important;transform: translateX(-10%);" placeholder="目的地" required>
             </div>
             <div id="map"></div>
         </div>
@@ -99,26 +102,29 @@
 </div>
 @*#endgion*@    
 
-@*願望清單選單*@
+@*#region 願望清單選單*@
 <div class="modal fade" id="PopWishList" tabindex="-1" aria-labelledby="PopWishList_modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-between align-items-center">
-                <h5 class="modal-title">將地點加入願望清單</h5>
+                <h5 class="modal-title" style="justify-content:center;align-items:center;transform:translateX(10%);">將地點加入願望清單</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="wishlist_list">
-                    <div class="row">
-                        <select id="wishlist_content" class="form-select mb-3" autocomplete="off">
-                            <option value="0">----- 請選擇願望清單 -----</option>                        
+                    <div class="row" style="display:flex; justify-content:center; align-items:center;">
+                        <select id="wishlist_content" class="form-select mb-3" style="max-width: calc(100% - 20px); margin: 0 auto;" autocomplete="off">
+                            <option value="0">----- 請選擇願望清單 -----</option>
                         </select>
-                        <select id="location_categories_content" class="form-select mb-3" autocomplete="off">
+                        <select id="location_categories_content" class="form-select mb-3" style="max-width: calc(100% - 20px); margin: 0 auto;" autocomplete="off">
                             <option value="0">----- 請選擇標籤 -----</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
+                    <div class="d-flex justify-content-start mt-3 col">
+                        <button class="btn btn-sm btn-primary" id="creatnewwishlist">新增願望清單</button>
+                    </div>
                     <div class="d-flex justify-content-end mt-3 col">
                         <button class="btn btn-primary btn-sm" id="addwishlist">加入願望清單</button>
                         <button class="btn btn-secondary btn-sm ms-2" id="addwoshlist_cancel" data-bs-dismiss="modal">取消</button>
@@ -129,17 +135,84 @@
         </div>
     </div>
 </div>
+@*#endgion*@
+
+@*#region 將行程加入的選單*@
+<div class="modal fade" id="AddPointWhichDayList" tabindex="-1" aria-labelledby="AddPointWhichDayList_modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+                <h5 class="modal-title">要將行程加入哪一天行程?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="whichday_list" style="display:flex; justify-content:center; align-items:center;">
+                    <div class="row w-100">
+                        <div class="col-12 mb-3">
+                            <select id="date-list" class="form-select" autocomplete="off">
+                                <option value="0">----- 請選擇日期 -----</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="transportation-list" class="form-label mb-2  font-size:12px">交通工具</label>
+                            <select id="transportation-list" class="form-select" autocomplete="off">
+                                <option value="1">汽車</option>
+                                <option value="2">機車</option>
+                                <option value="3">大眾運輸</option>
+                                <option value="4">腳踏車</option>
+                                <option value="5">步行</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <form class="mx-auto grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="start-time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">抵達時間:</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <input type="time" id="start-time" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" min="00:00" max="23:59" value="08:00" required />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="end-time" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">離開時間:</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <input type="time" id="end-time" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" min="00:00" max="23:59" value="09:00" required />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button class="btn btn-primary btn-sm" id="addPointWhichDayList" >加入行程</button>
+                <button class="btn btn-secondary btn-sm ms-2" id="addPointWhichDayList_cancel"  data-bs-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*#endgion*@
+
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js" type="text/javascript" asp-append-version="true"></script>
     <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/air-datepicker.js" type="text/javascript" asp-append-version="true"></script>
     <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/en.js" type="text/javascript" asp-append-version="true"></script>
     <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
     <script src="~/js/schduledetails.js"></script>
     <script>
         $(document).ready(function () {
-            LoadScheduleInfo(@scheduleId);
-            ListenScheduleListEvent();
-
+            sessionStorage.setItem("scheduleId", @scheduleId);
+            tabsscoller();
+            LoadScheduleInfo(@scheduleId)
+            getToken();
             //#region 把地點加入願望清單
             $('#PopWishList').on('shown.bs.modal', function () {
                 AddPointToWishList();
@@ -147,13 +220,12 @@
             //#endregion
 
             //#region 修改行程主題
-            $('#modifiedschedule').on('shown.bs.modal', function () {
-                initAirDatepicker();
-                UploadScheduleTopic(@scheduleId);
-            });
+            // $('#modifiedschedule').on('shown.bs.modal', function () {
+            //     initAirDatepicker();
+            // });
             //#endregion
+
+
         });
     </script>
 }
-
-
