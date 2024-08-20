@@ -46,16 +46,15 @@
             z-index: 1000;
         }
 
+
+        .user-photo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 </head>
-<style>
-    .user-photo {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-</style>
 
 <body>
     <header>
@@ -86,7 +85,6 @@
                         </li>
                         <li class="nav-item dropdown" v-if="isLogin">
                             <button class="btn btn-secondary dropdown-toggle" id="memberDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                @* {{user.name}} <i class="fas fa-user text-white"></i> *@
                                 <template v-if="user.photoBase64">
                                     <img :src="'data:image/jpeg;base64,' + user.photoBase64" alt="User Photo" class="user-photo">
                                 </template>
