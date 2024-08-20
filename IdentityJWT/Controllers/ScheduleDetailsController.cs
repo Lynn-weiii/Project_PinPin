@@ -274,9 +274,22 @@ namespace PinPinServer.Controllers
                 };
                 _context.Transportations.Add(transportation);
                 await _context.SaveChangesAsync();
+                ScheduleDetailDTO scheduleDetailDTOResult = new ScheduleDetailDTO
+                {
+                    Id = scheduleDetailId,
+                    ScheduleDayId = scheduleDetail.ScheduleDayId,
+                    LocationName = scheduleDetail.LocationName,
+                    Location = scheduleDetail.Location,
+                    Lat = scheduleDetail.Lat,
+                    Lng = scheduleDetail.Lng,
+                    StartTime = scheduleDetail.StartTime,
+                    EndTime = scheduleDetail.EndTime,
+                    Sort = scheduleDetail.Sort,
+                    TransportationCategoryId = transportation.TransportationCategoryId,
+                    TransportationId = transportation.Id
+                };
 
-
-                return Ok(new { scheduleDetail = scheduleDetail, transportation = transportation });
+                return Ok(scheduleDetailDTOResult);
             }
             catch (Exception ex)
             {

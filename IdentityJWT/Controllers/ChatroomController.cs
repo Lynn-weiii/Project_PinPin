@@ -1,5 +1,4 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -44,7 +43,7 @@ namespace PinPinServer.Controllers
                 List<ChatRoomDTO> dtos = await _context.ChatroomChats
                     .Where(cc => cc.ScheduleId == scheduleId)
                     .Include(cc => cc.User)
-                    .OrderBy(cc=>cc.CreatedAt)
+                    .OrderBy(cc => cc.CreatedAt)
                     .Select(cc => new ChatRoomDTO
                     {
                         Id = cc.Id,
@@ -136,7 +135,7 @@ namespace PinPinServer.Controllers
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 
             ChatroomChat? chatroomChat = await _context.ChatroomChats
-                                .Include(cc=>cc.User)
+                                .Include(cc => cc.User)
                                 .FirstOrDefaultAsync(cc => cc.Id == messageDto.Id);
             //檢查有無此訊息
             if (chatroomChat == null) return NotFound("Message not found");
@@ -185,7 +184,7 @@ namespace PinPinServer.Controllers
             int? userID = _getUserId.PinGetUserId(User).Value;
             if (userID == null || userID == 0) return BadRequest("Invalid user ID");
 
-            ChatroomChat? chatroomChat = await _context.ChatroomChats.Include(cc=>cc.User).FirstOrDefaultAsync(cc=>cc.Id==messageId);
+            ChatroomChat? chatroomChat = await _context.ChatroomChats.Include(cc => cc.User).FirstOrDefaultAsync(cc => cc.Id == messageId);
 
             //檢查有無此訊息
             if (chatroomChat == null) return NotFound("Message not found");
@@ -193,13 +192,13 @@ namespace PinPinServer.Controllers
             //檢查有無權限
             bool isSelf = userID.Value == chatroomChat.UserId;
             bool hasAccess = await _context.ScheduleAuthorities
-                .AnyAsync(sa => sa.UserId == userID && sa.ScheduleId == chatroomChat.ScheduleId && sa.AuthorityCategoryId == 7);
-            if(!(isSelf || hasAccess)) return Forbid("You can't delete someone else's message.");
+                .AnyAsync(sa => sa.UserId == userID && sa.ScheduleId == chatroomChat.ScheduleId && sa.AuthorityCategoryId == 7 || sa.AuthorityCategoryId == 8);
+            if (!(isSelf || hasAccess)) return Forbid("You can't delete someone else's message.");
             try
             {
                 chatroomChat.IsDeleted = true;
                 chatroomChat.Message = "";
-                chatroomChat.LastEditedAt=DateTime.Now;
+                chatroomChat.LastEditedAt = DateTime.Now;
 
                 _context.ChatroomChats.Update(chatroomChat);
                 await _context.SaveChangesAsync();

@@ -49,16 +49,21 @@ async function LoadScheduleInfo(scheduleId) {
         const results = await response.json();
         const scheduleDateIdInfo = results.sceduleDateIdInfo;
         const scheduleDetail = results.scheduleDetail;
+        console.log(`scheduleDetail`,scheduleDetail)
         if (!scheduleDetail) {
             throw new Error('scheduleDetail is undefined or invalid');
         }
 
         const detail = Array.isArray(scheduleDetail) ? scheduleDetail[0] : scheduleDetail;
 
+        if (!detail) {
+            throw new Error('No schedule detail found.');
+        }
+
         const {
             name,
-            lat,
-            lng,
+            lat = 0,  // 默认值为 0，防止 `lat` 为 `null` 或 `undefined`
+            lng = 0,  // 默认值为 0，防止 `lng` 为 `null` 或 `undefined`
             placeId,
             caneditdetail,
             canedittitle,
@@ -70,7 +75,7 @@ async function LoadScheduleInfo(scheduleId) {
         const parsedLng = parseFloat(lng);
 
         if (isNaN(parsedLat) || isNaN(parsedLng)) {
-            throw new Error('Invalid coordinates received.');
+            throw new Error('Invalid coordinates received.');  // 如果解析结果是 `NaN`，抛出错误
         }
 
         const picture = await fetchPlacePhotoUrl(placeId);
@@ -223,34 +228,67 @@ switch (response.status) {
 //#endregion
 
 //#region google Map API 
-let map, marker, autocomplete, infowindow, position, service, keyword, searchTimeout, idleListener, globalName, globalScheduleId, polylines, directionsService,directionsRenderer;
-let markers = []; 
-async function initMap(scheduleId, name, position,placeId) {
-    console.log('initMap:', { scheduleId, name, position });
+let map, marker, autocomplete, infowindow, position, service, keyword, searchTimeout, idleListener, globalName, globalScheduleId, polylines, directionsService, directionsRenderer;
+let markers = [];
+
+async function initMap(scheduleId, name, position, placeId) {
+    console.log('initMap:', { scheduleId, name, position, placeId });
+
     globalName = name;
     globalScheduleId = scheduleId;
+
+    // 引入 Google Maps 所需的库
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const { Geocoder } = await google.maps.importLibrary("geocoding");
-    var placeId = placeId;
+
+    // 初始化地图
     map = new Map(document.getElementById("map"), {
         center: position,
         zoom: 16,
         mapId: "d4432686758d8acc",
     });
-    
+
     infowindow = new google.maps.InfoWindow({
         maxWidth: 640,
         maxHeight: 460
     });
+
     geocoder = new Geocoder();
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
         map: map,
     });
+
     service = new google.maps.places.PlacesService(map);
-    var drawingManager = new google.maps.drawing.DrawingManager();
-    drawingManager.setMap(map);
+
+    // 如果有提供 placeId，则使用 PlacesService 获取地标详情（繁体中文）
+    if (placeId) {
+        service.getDetails({ placeId: placeId, language: 'zh-TW' }, function (place, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                if (place) {
+                    name = place.name; // 更新地标的名称为繁体中文
+                    console.log('Place details (zh-TW):', place);
+
+                    const marker = new AdvancedMarkerElement({
+                        position: place.geometry.location,
+                        map: map,
+                        title: place.name,
+                    });
+                    marker.placeInfo = { name, scheduleId };
+                    markers.push(marker);
+
+                    const content = createInfoWindowContent(place, name, scheduleId);
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                }
+            } else {
+                console.error('Failed to get place details:', status);
+            }
+        });
+    }
+
+    // 初始化自动填充功能
     const autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input_field'));
     autocomplete.bindTo('bounds', map);
 
@@ -276,22 +314,22 @@ async function initMap(scheduleId, name, position,placeId) {
             map: map,
             title: place.name,
         });
-        marker.placeInfo = { name, scheduleId };
+        marker.placeInfo = { name: place.name, scheduleId };
         markers.push(marker);
 
-        console.log('Autocomplete place selected:', { place, name, scheduleId });
-        const content = createInfoWindowContent(place, name, scheduleId);
+        console.log('Autocomplete place selected:', { place, name: place.name, scheduleId });
+        const content = createInfoWindowContent(place, place.name, scheduleId);
         infowindow.setContent(content);
         infowindow.open(map, marker);
 
-        
-        document.querySelector('#add-place-btn').removeEventListener('click');        
-        document.querySelector('#add-place-btn').addEventListener('click');
-
-        const keyword = document.getElementById('search_input_field').value;
-        performNearbySearch(place.geometry.location, keyword, name, scheduleId);
+        document.querySelector('#add-place-btn').removeEventListener('click');
+        document.querySelector('#add-place-btn').addEventListener('click', function () {
+            const keyword = document.getElementById('search_input_field').value;
+            performNearbySearch(place.geometry.location, keyword, place.name, scheduleId);
+        });
     });
 
+    // 处理搜索输入框的 "Enter" 事件
     keyword = document.getElementById('search_input_field').addEventListener('keyup', function (event) {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -300,6 +338,7 @@ async function initMap(scheduleId, name, position,placeId) {
         }
     });
 
+    // 在地图空闲时执行搜索
     idleListener = map.addListener('idle', function () {
         const keyword = document.getElementById('search_input_field').value;
         if (keyword) {
@@ -307,9 +346,10 @@ async function initMap(scheduleId, name, position,placeId) {
         }
     });
 
+    // 处理地图点击事件
     map.addListener('click', function (event) {
         console.log('Map clicked:', { lat: event.latLng.lat(), lng: event.latLng.lng(), name, scheduleId });
-        infowindow.close(); 
+        infowindow.close();
         const content = createInfoWindowContent({ name: '', geometry: { location: event.latLng } }, name, scheduleId);
         infowindow.setContent(content);
         infowindow.setPosition(event.latLng);
@@ -529,8 +569,18 @@ function addscheduledate(lat, lng, placeId, name) {
                 },
                 body: JSON.stringify(body)
             });
-
-            console.log(`response`, response);
+            var dataresult = await response.json();
+            var dataresults = {
+                "ScheduleDayId": dataresult.scheduleDayId,
+                "LocationName": dataresult.locatioName,
+                "placeId": dataresult.location,
+                "StartTime": dataresult.stratTime,
+                "EndTime": dataresult.endTime,
+                "lat": dataresult.lat,
+                "lng": dataresult.lng,
+                "TransportationCategoryId": dataresult.TransportationCategoryId
+            };
+            console.log(`response`, dataresults);
             if (response.ok) {
                 Swal.fire({
                     title: "成功",
@@ -539,7 +589,7 @@ function addscheduledate(lat, lng, placeId, name) {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    refreshlist();
+                    refreshlist(dataresults);
                 });
             } else if (response.status === 409) {
                 let data = await response.json();
@@ -571,7 +621,7 @@ function addscheduledate(lat, lng, placeId, name) {
                                 timer: 1500
                             }).then(() => {
                                 console.log(`go refresh add schedule id :${scheduleId}`);
-                                refreshlist();
+                                refreshlist(dataresults);
                             });
                         } else {
                             Swal.fire({
@@ -804,9 +854,9 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
 async function getRouteInfo(origin, destination, categoryId) {
     const primaryTravelMode = getTravelMode(categoryId);  // 根据 categoryId 获取首选的 travelMode
     const fallbackTravelModes = [
-        google.maps.TravelMode.DRIVING,
         google.maps.TravelMode.TRANSIT,
-        google.maps.TravelMode.WALKING,
+        google.maps.TravelMode.DRIVING,
+        google.maps.TravelMode.WALKING,        
         google.maps.TravelMode.BICYCLING
     ].filter(mode => mode !== primaryTravelMode);  // 过滤掉首选模式
 
@@ -1233,101 +1283,11 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
 //#endregion
 
 //#region 更新行程列表
-async function refreshlist() {
-    try {
+async function refreshlist(dataresults) {
+        console.log(`dataresults`, dataresults);
         var scheduleId = sessionStorage.getItem("scheduleId");
         console.log(`refreshlist get scheduleid:${scheduleId}`);
-
-        const response3 = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
-        });
-
-        if (!response3.ok) {
-            throw new Error(`Failed to fetch schedule info: ${response3.statusText}`);
-        }
-
-        const results3 = await response3.json();
-        const scheduleDateIdInfo = results3.sceduleDateIdInfo;
-        const scheduleDetail = results3.scheduleDetail;
-        if (!scheduleDetail) {
-            throw new Error('scheduleDetail is undefined or invalid');
-        }
-
-        const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
-        });
-
-        if (!response2.ok) {
-            throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
-        }
-
-        const textResponse = await response2.text();
-        let data2 = [];
-        if (textResponse) {
-            const jsonResponse = JSON.parse(textResponse);
-            if (jsonResponse && jsonResponse.scheduleDetails) {
-                const { scheduleDetails } = jsonResponse;
-
-                for (let scheduleDayId of Object.keys(scheduleDetails)) {
-                    const scheduleItems = scheduleDetails[scheduleDayId];
-                    for (let item of scheduleItems) {
-                        const placeId = item.location;
-                        let pictureUrl = '';
-
-                        try {
-                            pictureUrl = await fetchPlacePhotoUrl(placeId);
-                        } catch (error) {
-                            console.error(`Failed to fetch picture URL for place ID ${placeId}: ${error}`);
-                        }
-
-                        const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
-
-                        data2.push({
-                            sort: item.sort,
-                            id: item.id,
-                            scheduleDayId: item.scheduleDayId,
-                            userId: item.userId,
-                            locationName: item.locationName,
-                            placeId: placeId,
-                            startTime: item.startTime,
-                            endTime: item.endTime,
-                            lat: item.lat,
-                            lng: item.lng,
-                            pictureUrl: pictureUrl,
-                            transportation: transportation || null
-                        });
-                    }
-                }
-
-                // 对 data2 进行排序
-                data2.sort((a, b) => a.sort - b.sort);
-            } else {
-                console.log('No schedule details found or scheduleDetails is missing.');
-            }
-        } else {
-            console.log('Empty response, no data to process.');
-        }
-
-        generateDateList(scheduleDateIdInfo);
-        generateTabLabel(scheduleDateIdInfo);
-        generateTabContents(data2, scheduleDateIdInfo);
-
-    } catch (error) {
-        console.error(`Error in refreshlist: ${error}`);
-        Swal.fire({
-            title: "Oops!",
-            text: "Failed to refresh the list. Please try again.",
-            icon: "error",
-            showConfirmButton: false,
-            timer: 1500
-        });
-    }
+        console.log('refreshlist');
 }
 
 //#endregion

@@ -842,7 +842,7 @@
                             },
                         })
                         const data = response.data;
-                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 7 || ac==8);
+                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 7 || ac==8 );
                     } catch (error) {
                         console.log(error);
                     }
