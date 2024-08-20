@@ -135,10 +135,16 @@
                     });
 
                     const result = await response.text();
-                    alert(result);
+                    //alert(result);
                     if (response.ok) {
+                        Swal.fire({
+                            title: "註冊成功!",
+                            icon: "success"
+                        }).then(() => {
+                            window.location.href = '@Url.Action("Index", "Home")';
+                        });
                         //用Razo渲染正確的Url
-                        window.location.href = '@Url.Action("Index", "Home")';
+                        //window.location.href = '@Url.Action("Index", "Home")';
                     }
 
                 } catch (error) {
