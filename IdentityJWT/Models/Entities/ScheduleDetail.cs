@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PinPinServer.Models;
 
@@ -37,7 +38,10 @@ public partial class ScheduleDetail
 
     public virtual SchedulePreview ScheduleDay { get; set; }
 
+    public virtual User User { get; set; }
+
+    [JsonIgnore]
     public virtual ICollection<Transportation> Transportations { get; set; } = new List<Transportation>();
 
-    public virtual User User { get; set; }
+
 }

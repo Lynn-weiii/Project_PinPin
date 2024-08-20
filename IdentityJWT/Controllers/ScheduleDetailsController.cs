@@ -155,83 +155,67 @@ namespace PinPinServer.Controllers
         [HttpPost]
         public async Task<ActionResult> PostScheduleDetail([FromBody] ScheduleDetailDTO scheduleDetailDTO)
         {
-            int? jwtUserId = _getUserId.PinGetUserId(User).Value;
-            if (jwtUserId == null)
-            {
-                return Unauthorized(new { message = "請先登入會員" });
-            }
-
-            if (_context.ScheduleDetails.Any(s =>
-                s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId &&
-                s.LocationName == scheduleDetailDTO.LocationName &&
-                s.Location == scheduleDetailDTO.Location &&
-                s.Lat == scheduleDetailDTO.Lat &&
-                s.Lng == scheduleDetailDTO.Lng &&
-                s.IsDeleted != true))
-            {
-                Console.WriteLine("Location already exists");
-                return Conflict(new { message = "該景點已在同一天的行程中，是否要要再新增一樣的行程？" });
-            }
-
-
-            var maxSortValue = _context.ScheduleDetails
-                .Where(s => s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId && s.IsDeleted != true)
-                .Max(s => (int?)s.Sort) ?? 0;
-
-            ScheduleDetail scheduleDetail = new ScheduleDetail
-            {
-                Id = 0,
-                UserId = jwtUserId.Value,
-                ScheduleDayId = scheduleDetailDTO.ScheduleDayId,
-                LocationName = scheduleDetailDTO.LocationName,
-                Location = scheduleDetailDTO.Location,
-                Lat = scheduleDetailDTO.Lat,
-                Lng = scheduleDetailDTO.Lng,
-                StartTime = scheduleDetailDTO.StartTime,
-                EndTime = scheduleDetailDTO.EndTime,
-                Remark = null,
-                IsDeleted = false,
-                ModifiedTime = DateTime.Now,
-                Sort = maxSortValue + 1,
-            };
-
             try
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync())
+                int? jwtUserId = _getUserId.PinGetUserId(User).Value;
+                if (jwtUserId == null)
                 {
-                    _context.ScheduleDetails.Add(scheduleDetail);
-                    await _context.SaveChangesAsync();
-
-                    int scheduleDetailsId = scheduleDetail.Id;
-
-                    // 檢查 TransportationCategoryId 是否有效
-                    var transportationCategoryExists = await _context.TransportationCategories
-                        .AnyAsync(tc => tc.Id == scheduleDetailDTO.TransportationCategoryId);
-
-                    if (!transportationCategoryExists)
-                    {
-                        return BadRequest(new { message = "無效的 TransportationCategoryId" });
-                    }
-
-                    Transportation transportation = new Transportation
-                    {
-                        Id = 0,
-                        ScheduleDetailsId = scheduleDetailsId,
-                        TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId
-                    };
-
-                    _context.Transportations.Add(transportation);
-                    await _context.SaveChangesAsync();
-
-                    await transaction.CommitAsync();
+                    return Unauthorized(new { message = "請先登入會員" });
                 }
 
-                return Ok(new { message = "新增成功" });
+                if (_context.ScheduleDetails.Any(s =>
+                    s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId &&
+                    s.LocationName == scheduleDetailDTO.LocationName &&
+                    s.Location == scheduleDetailDTO.Location &&
+                    s.Lat == scheduleDetailDTO.Lat &&
+                    s.Lng == scheduleDetailDTO.Lng &&
+                    s.IsDeleted != true))
+                {
+                    Console.WriteLine("Location already exists");
+                    return Conflict(new { message = "該景點已在同一天的行程中，是否要要再新增一樣的行程？" });
+                }
+
+
+                var maxSortValue = _context.ScheduleDetails
+                    .Where(s => s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId && s.IsDeleted != true)
+                    .Max(s => (int?)s.Sort) ?? 0;
+
+                ScheduleDetail scheduleDetail = new ScheduleDetail
+                {
+                    Id = 0,
+                    UserId = jwtUserId.Value,
+                    ScheduleDayId = scheduleDetailDTO.ScheduleDayId,
+                    LocationName = scheduleDetailDTO.LocationName,
+                    Location = scheduleDetailDTO.Location,
+                    Lat = scheduleDetailDTO.Lat,
+                    Lng = scheduleDetailDTO.Lng,
+                    StartTime = scheduleDetailDTO.StartTime,
+                    EndTime = scheduleDetailDTO.EndTime,
+                    Remark = null,
+                    IsDeleted = false,
+                    ModifiedTime = DateTime.Now,
+                    Sort = maxSortValue + 1,
+                };
+                _context.ScheduleDetails.Add(scheduleDetail);
+                await _context.SaveChangesAsync();
+                int scheduleDetailId = scheduleDetail.Id;
+
+                Transportation transportation = new Transportation
+                {
+                    Id = 0,
+                    ScheduleDetailsId = scheduleDetailId,
+                    TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId
+                };
+                _context.Transportations.Add(transportation);
+                await _context.SaveChangesAsync();
+
+
+                return Ok(new { scheduleDetail = scheduleDetail, transportation = transportation });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("PostScheduleDetail failed", e);
-                return StatusCode(500, new { message = "新增失敗", error = e.Message });
+                Console.WriteLine("新增行程發生錯誤", ex);
+                return StatusCode(500, new { message = "新增行程發生錯誤", error = ex.Message });
             }
         }
         #endregion
@@ -241,81 +225,58 @@ namespace PinPinServer.Controllers
         [HttpPost("override-schedule-detail")]
         public async Task<ActionResult> OverrideScheduleDetail([FromBody] ScheduleDetailDTO scheduleDetailDTO)
         {
-            int? jwtUserId = _getUserId.PinGetUserId(User).Value;
-            if (jwtUserId == null)
-            {
-                return Unauthorized(new { message = "請先登入會員" });
-            }
-
-            var existingScheduleDetail = await _context.ScheduleDetails
-                .FirstOrDefaultAsync(s =>
-                    s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId &&
-                    s.LocationName == scheduleDetailDTO.LocationName &&
-                    s.Location == scheduleDetailDTO.Location &&
-                    s.Lat == scheduleDetailDTO.Lat &&
-                    s.Lng == scheduleDetailDTO.Lng &&
-                    s.IsDeleted != true);
-
             try
             {
-                if (existingScheduleDetail != null)
+                int? jwtUserId = _getUserId.PinGetUserId(User).Value;
+
+                var maxSortValue = _context.ScheduleDetails
+                    .Where(s => s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId && s.IsDeleted != true)
+                    .Max(s => (int?)s.Sort) ?? 0;
+
+                ScheduleDetail scheduleDetail = new ScheduleDetail
                 {
-                    var maxSortValue = _context.ScheduleDetails
-                .Where(s => s.ScheduleDayId == scheduleDetailDTO.ScheduleDayId && s.IsDeleted != true)
-                .Max(s => (int?)s.Sort) ?? 0;
+                    Id = 0,
+                    UserId = jwtUserId.Value,
+                    ScheduleDayId = scheduleDetailDTO.ScheduleDayId,
+                    LocationName = scheduleDetailDTO.LocationName,
+                    Location = scheduleDetailDTO.Location,
+                    Lat = scheduleDetailDTO.Lat,
+                    Lng = scheduleDetailDTO.Lng,
+                    StartTime = scheduleDetailDTO.StartTime,
+                    EndTime = scheduleDetailDTO.EndTime,
+                    Remark = null,
+                    IsDeleted = false,
+                    ModifiedTime = DateTime.Now,
+                    Sort = maxSortValue + 1,
+                };
+                _context.ScheduleDetails.Add(scheduleDetail);
+                await _context.SaveChangesAsync();
+                int scheduleDetailId = scheduleDetail.Id;
 
-                    ScheduleDetail scheduleDetail = new ScheduleDetail
-                    {
-                        Id = 0,
-                        UserId = jwtUserId.Value,
-                        ScheduleDayId = scheduleDetailDTO.ScheduleDayId,
-                        LocationName = scheduleDetailDTO.LocationName,
-                        Location = scheduleDetailDTO.Location,
-                        Lat = scheduleDetailDTO.Lat,
-                        Lng = scheduleDetailDTO.Lng,
-                        StartTime = scheduleDetailDTO.StartTime,
-                        EndTime = scheduleDetailDTO.EndTime,
-                        Remark = null,
-                        IsDeleted = false,
-                        ModifiedTime = DateTime.Now,
-                        Sort = maxSortValue + 1,
-                    };
-                    _context.ScheduleDetails.Add(scheduleDetail);
-                    await _context.SaveChangesAsync();
-
-                    var existingTransportation = await _context.Transportations
-                        .FirstOrDefaultAsync(t => t.ScheduleDetailsId == existingScheduleDetail.Id);
-
-                    if (existingTransportation != null)
-                    {
-                        existingTransportation.TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId;
-                    }
-                    else
-                    {
-
-                        Transportation newTransportation = new Transportation
-                        {
-                            ScheduleDetailsId = existingScheduleDetail.Id,
-                            TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId
-                        };
-                        _context.Transportations.Add(newTransportation);
-                    }
-
-                    await _context.SaveChangesAsync();
-                    return Ok(new { message = "新增行程成功" });
-                }
-                else
+                Transportation transportation = new Transportation
                 {
-                    return BadRequest(new { message = "新增行程失敗，請再試一次" });
-                }
+                    Id = 0,
+                    ScheduleDetailsId = scheduleDetailId,
+                    TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId
+                };
+                _context.Transportations.Add(transportation);
+                await _context.SaveChangesAsync();
+
+
+                return Ok(new { scheduleDetail = scheduleDetail, transportation = transportation });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "操作失敗", error = ex.Message });
+                Console.WriteLine("新增行程發生錯誤", ex);
+                return StatusCode(500, new { message = "新增行程發生錯誤", error = ex.Message });
             }
+
         }
         #endregion
 
+
+        #region 更改id順序
+        #endregion
 
         // DELETE: api/ScheduleDetails/5
         [HttpDelete("{id}")]
