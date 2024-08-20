@@ -39,5 +39,7 @@
 
         public string? TicketImageUrl { get; set; }
 
+        public int TransportationId { get; set; }
+
     }
 }
