@@ -19,9 +19,9 @@ public partial class Transportation
 
     public decimal? Cost { get; set; }
 
-    public string? Remark { get; set; }
+    public string Remark { get; set; }
 
-    public string? TicketImageUrl { get; set; }
+    public string TicketImageUrl { get; set; }
 
     public virtual CostCurrencyCategory Currency { get; set; }
 

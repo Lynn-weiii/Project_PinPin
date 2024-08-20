@@ -2,6 +2,8 @@
 {
     public class ScheduleDetailDTO
     {
+
+
         public int? Sort { get; set; }
 
         public int? Id { get; set; }
