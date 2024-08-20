@@ -144,20 +144,7 @@ async function LoadScheduleInfo(scheduleId) {
         generateTabLabel(scheduleDateIdInfo);
         generateTabContents(data2, scheduleDateIdInfo); 
         
-            document.getElementById('tab-contents').addEventListener('click', function (event) {
-                if (event.target.classList.contains('delete-btn')) {
-                    const Id = event.target.getAttribute('data-id');
-                    const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
-                    const scheduleId = event.target.getAttribute('data-Id');
-                    
-                    DeleteSchedule(Id, scheduleDayId, scheduleId);
-                }
-                if (event.target.classList.contains('edit-point-btn')) {
-                    const Id = event.target.getAttribute('data-id');
-                    const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
-                    const scheduleId = event.target.getAttribute('data-Id');
-                }
-            });
+            
         console.log('data2:', data2);
     } catch (error) {
         console.error('Error fetching schedule info:', error);
@@ -552,8 +539,7 @@ function addscheduledate(lat, lng, placeId, name) {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    //var result = response.json();
-                    console.log(`response`, response);
+                    refreshlist();
                 });
             } else if (response.status === 409) {
                 let data = await response.json();
@@ -585,7 +571,7 @@ function addscheduledate(lat, lng, placeId, name) {
                                 timer: 1500
                             }).then(() => {
                                 console.log(`go refresh add schedule id :${scheduleId}`);
-                                refreshlist(scheduleId);
+                                refreshlist();
                             });
                         } else {
                             Swal.fire({
@@ -1205,7 +1191,8 @@ function initAirDatepicker() {
 //#region 刪除行程
 async function DeleteSchedule(id, scheduleDayId, scheduleId) {
     try {
-
+        scheduleId = sessionStorage.getItem("scheduleId");
+        console.log(`DeleteSchedule get scheduleid:${scheduleId}`);
         var response = await fetch(`${baseAddress}/api/ScheduleDetails/${id}/${scheduleDayId}`, {
             method: 'PUT',
             headers: {
@@ -1341,20 +1328,8 @@ async function refreshlist() {
             timer: 1500
         });
     }
-
-
-
-    document.getElementById('tab-contents').addEventListener('click', function (event) {
-        if (event.target.classList.contains('delete-btn')) {
-            const Id = event.target.getAttribute('data-id');
-            const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
-            const scheduleId = event.target.getAttribute('data-scheduleId');
-
-            DeleteSchedule(Id, scheduleDayId, scheduleId);
-        }
-    });
-    console.log('data2:', data2);
 }
+
 //#endregion
 
 //#region 天氣資訊 可以呼叫但是div要自己刻，如果用官方的不能用後台呼叫的資料渲染
@@ -1517,6 +1492,28 @@ function calculateEndTime() {
     }
 }
 //#endregion
+
+$(document).off('click', '#tab-contents .delete-btn');
+$(document).off('click', '#tab-contents .edit-point-btn');
+
+document.getElementById('tab-contents').addEventListener('click', function (event) {
+    if (event.target.classList.contains('delete-btn')) {
+        const Id = event.target.getAttribute('data-id');
+        const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
+        const scheduleId = event.target.getAttribute('data-Id');
+
+        DeleteSchedule(Id, scheduleDayId, scheduleId);
+    }
+    if (event.target.classList.contains('edit-point-btn')) {
+        const Id = event.target.getAttribute('data-id');
+        const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
+        const scheduleId = event.target.getAttribute('data-Id');
+
+        // 添加你对编辑按钮点击后的处理逻辑
+    }
+});
+
+
 
 //#region 調整行程順序
 //let draggedItem = null;

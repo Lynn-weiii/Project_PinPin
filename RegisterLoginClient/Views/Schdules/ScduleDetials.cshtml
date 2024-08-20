@@ -203,6 +203,7 @@
     <script src="~/js/schduledetails.js"></script>
     <script>
         $(document).ready(function () {
+            scheduleID = sessionStorage.setItem("scheduleId", @scheduleId);
             document.getElementById('start-time').addEventListener('input', calculateEndTime);
             document.getElementById('duration-hours').addEventListener('input', calculateEndTime);
             document.getElementById('duration-minutes').addEventListener('input', calculateEndTime);
