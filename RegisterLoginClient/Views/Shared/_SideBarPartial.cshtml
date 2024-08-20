@@ -159,6 +159,7 @@
                                              style="width: 40px; height: 40px; flex-shrink: 0; overflow: hidden; border: 2px solid #ccc; background-color: transparent;">
                                             <img :src="getUserPhoto(message.userId)" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>
+                                        <span style="font-size: 0.8rem;">{{message.userName}}</span>
                                     </div>
                                     <!-- Message Content and Edit Button -->
                                     <div class="d-flex flex-column message-wrapper">
@@ -841,7 +842,7 @@
                             },
                         })
                         const data = response.data;
-                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 7);
+                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 7 || ac==8);
                     } catch (error) {
                         console.log(error);
                     }
