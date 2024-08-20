@@ -71,14 +71,25 @@
                                     </div>
                                     <!--行程卡片-->
                                     <div class="row" v-if="wishlist.selectedCategoryId === locationCategory.id">
-                                        <div class="col-md-6" v-for="detail in getFilteredDetails(wishlist)" :key="detail.id">
-                                            <div class="card mb-3" style="width: 100%;">
-                                                <img :src="detail.photoUrl" class="card-img-top" alt="...">
+                                        <!-- 判斷行程卡片是否有內容 -->
+                                        <template v-if="getFilteredDetails(wishlist).length > 0">
+                                            <div class="col-md-6" v-for="detail in getFilteredDetails(wishlist)" :key="detail.id">
+                                                <div class="card mb-3" style="width: 100%;">
+                                                    <img :src="detail.photoUrl" class="card-img-top" alt="...">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ detail.name }}</h5>
+                                                        <p class="card-text">{{ detail.address }}</p>
+                                                        <button class="btn btn-outline-primary" v-on:click="addscheduledate()"><i class="fa-solid fa-calendar-days"></i></button>
+                                                        <button class="btn btn-outline-primary" v-on:click="deleteSelectedDetail(detail.id)"><i class="fa-solid fa-trash"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <!-- 如果沒有行程內容，顯示[尚無行程] -->
+                                        <div class="col-md-12" v-else>
+                                            <div class="card mb-3 text-center" style="width: 100%; border-color: #ccc;">
                                                 <div class="card-body">
-                                                    <h5 class="card-title">{{ detail.name }}</h5>
-                                                    <p class="card-text">{{ detail.address }}</p>
-                                                    <button class="btn btn-outline-primary"><i class="fa-solid fa-calendar-days"></i></button>
-                                                    <button class="btn btn-outline-primary"><i class="fa-solid fa-trash"></i></button>
+                                                    <h5 class="card-title">目前沒有行程，趕快搜尋喜歡的地點吧！</h5>
                                                 </div>
                                             </div>
                                         </div>

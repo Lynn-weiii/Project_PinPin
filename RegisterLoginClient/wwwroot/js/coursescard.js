@@ -99,7 +99,6 @@ function createGroupCourseCard(gcourse) {
 
 
 function renderCourses(data) {
-    console.log(`renderCourses get data: ${data}`);
     var container = document.getElementById('course-container');
     container.innerHTML = '';
 
@@ -120,7 +119,6 @@ function renderCourses(data) {
 
 
 function groupCourses(data2) {
-    console.log(`groupCourses get data: ${data2}`);
     var gcontainer = document.getElementById('group_course-container');
     gcontainer.innerHTML = '';
     data2.forEach(gcourse => {

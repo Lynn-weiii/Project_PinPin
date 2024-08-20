@@ -722,6 +722,11 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                     contentItem.setAttribute('data-sort', `${place.sort}`);
                     contentItem.setAttribute('data-lat', `${place.lat}`);
                     contentItem.setAttribute('data-lng', `${place.lng}`);
+                    contentItem.setAttribute('draggable', 'true'); // 启用拖动
+                    contentItem.addEventListener('dragstart', handleDragStart); // 添加 dragstart 事件监听器
+                    contentItem.addEventListener('dragover', handleDragOver); // 添加 dragover 事件监听器
+                    contentItem.addEventListener('drop', handleDrop); // 添加 drop 事件监听器
+
                     contentItem.innerHTML = `
                         <div class="content-item-header">
                             <span class="content-item-number">${itemIndex}</span>
@@ -1444,7 +1449,7 @@ async function refreshlist() {
 
 //#region timepicker
 
-
+//計算結束時間
 function calculateEndTime() {
     const startTime = document.getElementById('start-time').value;
     const durationHours = parseInt(document.getElementById('duration-hours').value) || 0;
@@ -1473,3 +1478,71 @@ function calculateEndTime() {
         document.getElementById('end-time').value = `${formattedEndHours}:${formattedEndMinutes}`;
     }
 }
+
+//#region drag and drop
+let draggedItem = null;
+
+function handleDragStart(event) {
+    draggedItem = event.currentTarget;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', draggedItem.outerHTML);
+    event.dataTransfer.setData('text/plain', draggedItem.dataset.sort); // 存储排序顺序
+}
+
+function handleDragOver(event) {
+    event.preventDefault(); // 必须阻止默认行为才能允许放置
+    event.dataTransfer.dropEffect = 'move';
+}
+
+async function handleDrop(event) {
+    event.preventDefault();
+
+    const targetItem = event.currentTarget;
+    const targetParent = targetItem.parentNode;
+
+    if (draggedItem !== targetItem) {
+        // 移除被拖动的项目并在目标项目前重新插入
+        targetParent.removeChild(draggedItem);
+        targetParent.insertBefore(draggedItem, targetItem);
+
+        // 根据新位置更新排序顺序
+        await updateSortOrder(targetParent);
+    }
+
+    draggedItem = null; // 重置 draggedItem
+}
+
+async function updateSortOrder(parentElement) {
+    const contentItems = Array.from(parentElement.getElementsByClassName('content-item'));
+
+    contentItems.forEach((item, index) => {
+        item.dataset.sort = index + 1; // 使用新顺序更新排序属性
+    });
+
+    // 可选：将更新后的排序顺序发送到服务器
+    const updatedOrder = contentItems.map(item => ({
+        id: item.dataset.placeId,
+        sort: item.dataset.sort
+    }));
+
+    try {
+        const response = await fetch(`${baseAddress}/api/ScheduleDetails/UpdateSortOrder`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedOrder)
+        });
+
+        if (response.ok) {
+            console.log('排序顺序更新成功');
+        } else {
+            console.error(`更新排序顺序失败: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('更新排序顺序时出错:', error);
+    }
+}
+
+//#endregion

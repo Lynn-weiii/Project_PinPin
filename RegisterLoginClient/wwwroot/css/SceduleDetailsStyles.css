@@ -18,7 +18,7 @@
 }
 
 #search_input {
-    z-index: 999;
+    z-index: 1;
     width: 300px; /* 可以根据需要调整宽度 */
     margin: 10px; 
 }
@@ -44,14 +44,13 @@
         flex: 0 0 70%; /* 占据 70% */
         max-width: 70%;
         box-sizing: border-box; /* 包含边距和边框 */
-        z-index: 1;
+       
     }
 }
 
 @media (max-width: 998px) {
     #map {
         display: none; /* 隐藏地图 */
-        z-index: 1;
     }
 
     #plannertable {
