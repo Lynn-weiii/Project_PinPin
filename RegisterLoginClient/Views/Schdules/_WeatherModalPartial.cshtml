@@ -1,0 +1,80 @@
+﻿<div id="weather-container">
+    <div class="modal fade" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="weatherModalLabel">當地天氣資訊</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 顯示旅行名稱和目的地 -->
+                    <div id="tripInfo" class="row mb-3">
+                        <div class="text-start fs-2">
+                            <p><strong>行程名稱:</strong> <span>{{ scheduleName }}</span></p>
+                        </div>
+                        <div class="text-start fs-3">
+                            <p><strong>城市:</strong> <span>{{cityName}}</span></p>
+                        </div>
+                        <div class="text-start fs-5">
+                            <p><strong>城市:</strong> <span>{{countryName}}</span></p>
+                        </div>
+                    </div>
+
+                    <!-- 增加標題和按鈕區域 -->
+                    <div class="d-flex justify-content-between align-items-end mb-1" style="height: 50px;">
+                        <p v-if="isTableVisible" class="fs-4 fw-bold mb-0">未來五天天氣預報:</p>
+                        <button v-on:click="toggleView" class="btn btn-secondary ms-auto">
+                            {{ isTableVisible ? "顯示圖表" : "顯示表格" }}
+                        </button>
+                    </div>
+                    <div v-if="isTableVisible">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">日期</th>
+                                    <th scope="col">時間</th>
+                                    <th scope="col">風速 (km/h)</th>
+                                    <th scope="col">濕度 (%)</th>
+                                    <th scope="col">溫度 (°C)</th>
+                                    <th scope="col">降雨機率 (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(data, index) in weatherData" :key="index">
+                                    <td>{{ new Date(data.DateTime).getMonth() + 1 }}/{{ new Date(data.DateTime).getDate() }}</td>
+                                    <td>{{ data.IsMorning ? "AM" : "PM" }}</td>
+                                    <td>{{ data.WindSpeed.toFixed(1) }} km/h</td>
+                                    <td>{{ data.Humidity }}%</td>
+                                    <td>{{ data.Temp.toFixed(1) }} °C</td>
+                                    <td>{{ (data.ChanceOfRain * 100).toFixed(2) }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 顯示當前天氣 -->
+                    @*                     <div class="weather-info row mb-4">
+                    <div class="col text-start">
+                    <i class="fa-solid fa-cloud-sun fa-2x"></i> <!-- 動態插入天氣圖標 -->
+                    <span class="weather-temp">{{ currentTemp }}°C</span>
+                    </div>
+                    <div class="col text-end">
+                    <p><strong>濕度:</strong> <span>{{ humidity }}%</span></p>
+                    <p><strong>風速:</strong> <span>{{ windSpeed }} km/h</span></p>
+                    </div>
+                    </div> *@
+
+                    <!-- 圖表區域 -->
+                    <div v-else class="chart-container" style="width: 100%;height: 100%;">
+                        <canvas id="weatherChart"></canvas>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* <script>window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = []; window.myWidgetParam.push({ id: 21, cityid: '2643743', appid: '154dec71ec69e2086c862c0d0ca9d053', units: 'metric', containerid: 'openweathermap-widget-21', }); (function () { var script = document.createElement('script'); script.async = true; script.charset = "utf-8"; script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js"; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s); })();</script> *@

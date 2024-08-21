@@ -25,7 +25,6 @@ namespace PinPinServer.Controllers
         /// 傳入經度與緯度即可獲取資料型態為JSON的回應，單位格式為imperial和metric
         /// </summary>
         /// <returns>回應格式為JSON，架構為一個Day的列表裡頭包含兩個天氣資訊，分別為上下午，資訊為WeatherDataDTO格式</returns>
-        //GET:api/GetWeatherInfo
         [HttpGet]
         public async Task<ActionResult> GetWeatherInfo(decimal lat, decimal lon, string units)
         {

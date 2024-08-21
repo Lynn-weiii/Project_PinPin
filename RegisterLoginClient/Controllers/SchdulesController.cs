@@ -15,5 +15,11 @@ namespace PinPinClient.Controllers
             ViewBag.scheduleId = scheduleId;
             return View(scheduleId);
         }
+
+        //GET:Schdules/WeatherModal
+        public IActionResult WeatherModal()
+        {
+            return PartialView("_WeatherModalPartial");
+        }
     }
 }
