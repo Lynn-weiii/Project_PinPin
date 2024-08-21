@@ -66,12 +66,7 @@
             //取出token
             const token = localStorage.getItem('token');
             if (!token) {
-                Swal.fire({
-                    title: "無此權限，請先登入會員!",
-                    icon: "error"
-                })
-                //alert('無此權限，請先登入會員');
-                return;
+                window.location.href = '@Url.Action("Index", "Home")';
             }
 
             try {
@@ -115,7 +110,7 @@
                     }
 
                 } else {
-                    alert('Failed to fetch user data');
+                    //alert('Failed to fetch user data');
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
