@@ -159,9 +159,9 @@
                         <!-- 日期下拉選單 -->
                         <div class="col-12 mb-3">
                             <label for="date-list" class="form-label">選擇日期:</label>
-                            <select id="date-list" class="form-select" autocomplete="off" required>
-                                <option value="0">----- 請選擇日期 -----</option>
+                            <select id="date-list" class="form-select" autocomplete="off" required>                               
                                 <!-- 動態生成選項 -->
+                                <option value="0">----- 請選擇日期 -----</option>
                             </select>
                         </div>
                         <div class="col-12 mb-3">
@@ -180,7 +180,6 @@
                         <div class="col-12 mb-3">
                             <label for="start-time" class="form-label">出發時間:</label>
                             <input type="time" id="start-time" class="form-control" autocomplete="off" min="00:00" max="23:59" required>
-
                         </div>
                         <!-- 預計停留時間 -->
                         <div class="col-12 mb-3">
@@ -219,6 +218,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         $(document).ready(function () {
+            $('#date-list').trigger('change');
             scheduleID = sessionStorage.setItem("scheduleId", @scheduleId);
             document.getElementById('start-time').addEventListener('input', calculateEndTime);
             document.getElementById('duration-hours').addEventListener('input', calculateEndTime);

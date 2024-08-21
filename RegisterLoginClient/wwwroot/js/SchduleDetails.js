@@ -62,8 +62,8 @@ async function LoadScheduleInfo(scheduleId) {
 
         const {
             name,
-            lat = 0,  // 默认值为 0，防止 `lat` 为 `null` 或 `undefined`
-            lng = 0,  // 默认值为 0，防止 `lng` 为 `null` 或 `undefined`
+            lat = 0,  
+            lng = 0,
             placeId,
             caneditdetail,
             canedittitle,
@@ -449,6 +449,7 @@ async function geocodeLatLng(latlng) {
 
 //#region 景點詳細資訊 createInfoWindowContent(place, name, scheduleId)
 function createInfoWindowContent(place, name, scheduleId) {
+    
     const imageUrl = place.photos && place.photos.length > 0
         ? place.photos[0].getUrl({ maxWidth: 290, maxHeight: 290 })
         : '';
@@ -499,7 +500,7 @@ function createInfoWindowContent(place, name, scheduleId) {
     content += `</ul>
             </div>
             <div class="btn-container mb-1" style="font-size:14px;margin-top: 5px;display:flex;position:absolute;bottom: 10px;right: 10px;">
-                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" data-lat="${p.lat}" data-lng="${p.lng}" data-placeId="${p.placeId}" data-name="${p.name}" data-bs-toggle="modal" data-bs-target="#AddPointWhichDayList" />
+                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" data-scheduleDayId="${p.scheduleDayId}" data-lat="${p.lat}" data-lng="${p.lng}" data-placeId="${p.placeId}" data-name="${p.name}" data-bs-toggle="modal" data-bs-target="#AddPointWhichDayList" />
                     +<strong style="margin-left: 10px;">加入行程</strong>
                 </button>
                 <button class="btn btn-primary mx-3 btn-sm" id="wishlist-btn" onclick="ShowWishList('${p.lat}', '${p.lng}', '${p.placeId}', '${p.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList">
@@ -533,7 +534,79 @@ function getStarRating(rating) {
 }
 //#endregion
 
-/*#region 新增景點到日程*/
+//#region 新增景點到日程
+$('#AddPointWhichDayList').on('shown.bs.modal', async function () {
+    var daylistSelected = $('#date-list option:selected');
+    var scheduleDayId = daylistSelected.attr('data-schdule_day_id');
+    console.log(`Initial day selected: ${daylistSelected.text()}, Id: ${scheduleDayId}`);
+    console.log('AddPointWhichDayList shown.bs.modal');
+    scheduleId = sessionStorage.getItem('scheduleId');
+    await updateStartTime(scheduleId, scheduleDayId);
+});
+
+$('#date-list').on('change', async function () {
+    scheduleId = sessionStorage.getItem('scheduleId');
+    daylistSelected = $('#date-list option:selected');
+    scheduleDayId = daylistSelected.attr('data-schdule_day_id');
+    console.log(`Change detected! ${scheduleId} daylistSelectedId: ${scheduleDayId}`);
+    await updateStartTime(scheduleId, scheduleDayId);
+});
+
+        
+async function updateStartTime(scheduleId, scheduleDayId) {
+    try {
+        
+        const response = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                //'Content-Type': 'application/json'
+            }
+        });
+
+        let startTime = "08:00";
+
+        if (response.ok) {
+            const result = await response.text();
+            console.log('result:', result);
+            const jsonResponse = JSON.parse(result);
+            console.log('jsonResponse:', jsonResponse);
+
+            let maxRecord = null;
+            Object.keys(jsonResponse.scheduleDetails).forEach(dayId => {
+                const items = jsonResponse.scheduleDetails[dayId];
+
+                items.forEach(item => {
+                    if (item.scheduleDayId == scheduleDayId &&
+                        (!maxRecord || item.sort > maxRecord.sort)) {
+                        maxRecord = item;
+                        startTime = maxRecord.endTime.substring(0, 5);
+                        return;
+                    }
+                });
+
+            });
+
+            $('#start-time').val(startTime);
+
+            const dictionary = {
+                'ScheduleDaysId': maxRecord.scheduleDayId,
+                'Sort': maxRecord.sort || null,
+                'ScheduleEndTime': maxRecord.endTime,
+            };
+            console.log('Dictionary:', dictionary);
+        } else {
+            console.error('Failed to fetch schedule details:', response.statusText);
+        }
+
+        
+
+    } catch (error) {
+        console.error('Error fetching schedule details:', error);
+    }
+}
+
+
 $('#addPointWhichDayList').off('click').on('click', function () {
     var lat = $('#add-place-btn').attr('data-lat');
     var lng = $('#add-place-btn').attr('data-lng');
@@ -541,7 +614,12 @@ $('#addPointWhichDayList').off('click').on('click', function () {
     var name = $('#add-place-btn').attr('data-name');
     addscheduledate(lat, lng, placeId, name);
 });
+
+
 async function addscheduledate(lat, lng, placeId, name) {
+
+    var schduleDayId = $('.tab-button.active').data('data-schdule_day_id');
+    console.log(`addsch`, schduleDayId)
     $('#AddPointWhichDayList').modal('show');
     var daylistSelected = $('#date-list option:selected');
     var daylistSelectedId = daylistSelected.attr('data-schdule_day_id');
@@ -693,11 +771,13 @@ function generateDateList(scheduleDateIdInfo) {
             const formattedDate = `${dateObj.getFullYear()}/${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
 
             const dateItem = document.createElement('option');
+            let i = 1;
+            dateItem.setAttribute('value', i );
             dateItem.setAttribute('class', 'date-item');
             dateItem.setAttribute('data-scheduleId', `${scheduleId}`);
             dateItem.setAttribute('data-schdule_day_id', key);
             dateItem.textContent = formattedDate;
-
+            i++;
             dateList.appendChild(dateItem);
         });
     } else {
@@ -823,7 +903,7 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                             const routeDiv = document.createElement('div');
                             routeDiv.classList.add('route-info');
                             routeDiv.innerHTML = `
-                                <div class="route-description mt-2 mb-2">
+                                <div class="route-description mt-2 mb-2 d-none">
                                     <span class="route-icon">${getTravelModeIcon(routeInfo.travelMode)}</span>
                                     <span>${routeInfo.durationText}</span> (${routeInfo.distanceText})
                                 </div>
@@ -853,8 +933,7 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                 isFirst = false;
             }
         }
-
-        // Initialize the map markers only after all data is processed
+        
         if (MarksData.length > 0) {
             initMarkers(MarksData);
         }
@@ -1111,6 +1190,8 @@ async function AddPointToWishList() {
                         showConfirmButton: false,
                         timer: 1500
                     });
+                    $('#duration-hours').val('');
+                    $('#duration-minutes').val('');
                 } else {
                     return response.json().then(data => {
                         Swal.fire({
@@ -1270,7 +1351,7 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
 
                 if (contentItem) {
                     const tabContent = contentItem.parentElement;
-                    contentItem.remove(); // 删除选中的内容项
+                    contentItem.remove(); 
                     const remainingItems = tabContent.querySelectorAll('.content-item').length;
 
                     if (remainingItems === 0) {
@@ -1278,8 +1359,8 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
                         noContentMessage.setAttribute('id', `tab${scheduleDayId}`);
                         noContentMessage.classList.add('no-content-message');
                         noContentMessage.textContent = '目前沒有安排的景點唷~';
-                        console.log('Appending noContentMessage:', noContentMessage); // 确认 noContentMessage 已正确创建
-                        console.log('TabContent before appending:', tabContent); // 检查 tabContent 是否有效
+                        console.log('Appending noContentMessage:', noContentMessage); 
+                        console.log('TabContent before appending:', tabContent); 
                         setTimeout(() => {
                             tabContent.appendChild(noContentMessage);
                         }, 200);
@@ -1395,8 +1476,6 @@ function insertTabContentItem(scheduleDayId, dataresults) {
 
         marker.placeInfo = placeInfo;
         markers.push(marker);
-
-        // 点击标记时，显示信息窗口
         google.maps.event.addListener(marker, 'click', function () {
             infowindow.setContent(createInfoWindowContent({ geometry: { location: marker.position }, ...placeInfo }, title, placeInfo.scheduleId));
             infowindow.open(map, marker);
