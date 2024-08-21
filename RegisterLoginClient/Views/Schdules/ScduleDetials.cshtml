@@ -13,24 +13,29 @@
     <link href="~/css/serchinput.css" type="text/css" rel="stylesheet" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" integrity="sha512-/Ae8qSd9X8ajHk6Zty0m8yfnKJPlelk42HTJjOHDWs1Tjr41RfsSkceZ/8yyJGLkxALGMIYd5L2oGemy/x1PLg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 }
+
+
 
 
     <div class="container-fluid" style="margin:1px;padding:0;overflow:hidden;">
     <div class="row row-cols-md-2 g-0">
         @*# region行程表*@
+
         <div class="col-12 col-md-5" id="plannertable" style="border:2px solid #f6f4e8;">
             <div class="theme-header" id="theme-header" style="background-image: url('');width:auto;align-content:start;border-radius: 15px;overflow:hidden; position: relative;">
                 <button class="btn btn-sm" id="schtitle_edit_btn" style="z-index:1;display:none;text-align:center;" data-bs-toggle="modal" data-bs-target="#modifiedschedule">修改行程名稱/日期</button>
                 <h5 id="theme-name"></h5>
-                <div id="travelduring"></div>
+                <div id="travelduring">
+                </div>
                 <div id="openweathermap-widget-11"></div>
             </div>
-            <!-- #region 行程列表 -->            
-            <div class="wrapper" id="scheduledetailprivewsection" style="width: 500px;background:transparent;">
+            <!-- #region 行程列表 --> 
+            <div class="wrapper" id="scheduledetailprivewsection" style="width: 100%;background:transparent;">
                 <div class="buttonWrapper" id="tabs-label">
                     <!--tablabels-->
-                </div>
+                </div>               
                 <div class="contentWrapper" id="tab-contents" style="overflow-y: auto;background:transparent;">
                     <!--tabcontents-->
                 </div>
@@ -40,16 +45,23 @@
         @*#endgion*@
         @*#region 地圖*@        
         <div class="col-12 col-md-8">
-            <div id="search_input" class="position-absolute top-5 end-0 p-2">
-                <input id="search_input_field" type="text" class="form-control mb-1" style="border:1px solid gray;border-radius: 10px; width: 300px;transform:translateY(50%)!important;transform: translateX(-10%);" placeholder="目的地" required>
+            <div id="search_input" class="position-absolute top-2 end-0">
+                <input id="search_input_field" type="text" class="form-control mb-1" style="border:1px solid gray;border-radius: 10px; width: 300px;" placeholder="目的地" required>
             </div>
+            @* <div class="row mt-5" style="">
+                <div class="routebtn mt-5 mb-3" style="padding: 5px; border-radius: 5px; position: absolute; top: 10px; right: 10px; z-index: 1; display: flex; justify-content: end;">
+                    <div id="search_input" class="position-absolute top-5 end-0 p-2">
+                        <input id="search_input_field" type="text" class="form-control mb-1" style="border:1px solid gray;border-radius: 10px; width: 300px;transform:translateY(50%)!important;transform: translateX(-10%);" placeholder="目的地" required>
+                    </div>
+                </div>
+            </div> *@
             <div id="map"></div>
         </div>
         @*#endgion*@
     </div>
 </div>
-@*#region 變更主題名稱*@
-<div class="container-fluid modal-body">
+@* @*#region 變更主題名稱*@
+@* <div class="container-fluid modal-body">
     <div class="modal fade" id="modifiedschedule" tabindex="-1" aria-labelledby="modifiedscheduleLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -92,8 +104,8 @@
             </div>
         </div>
     </div>
-</div>
-@*#endgion*@    
+</div> *@
+@*#endgion*@
 
 @*#region 願望清單選單*@
 <div class="modal fade" id="PopWishList" tabindex="-1" aria-labelledby="PopWishList_modal" aria-hidden="true">
@@ -116,9 +128,11 @@
                     </div>
                 </div>
                 <div class="row">
-@*                     <div class="d-flex justify-content-start mt-3 col">
+                    @* 
+                    <div class="d-flex justify-content-start mt-3 col">
                         <button class="btn btn-sm btn-primary" id="creatnewwishlist">新增願望清單</button>
-                    </div> *@
+                    </div> 
+                    *@
                     <div class="d-flex justify-content-end mt-3 col">
                         <button class="btn btn-primary btn-sm" id="addwishlist">加入願望清單</button>
                         <button class="btn btn-secondary btn-sm ms-2" id="addwoshlist_cancel" data-bs-dismiss="modal">取消</button>
@@ -165,11 +179,12 @@
                         <!-- 出發時間 -->
                         <div class="col-12 mb-3">
                             <label for="start-time" class="form-label">出發時間:</label>
-                            <input type="time" id="start-time" class="form-control" autocomplete="off" required>
+                            <input type="time" id="start-time" class="form-control" autocomplete="off" min="00:00" max="23:59" required>
+                            
                         </div>
                         <!-- 預計停留時間 -->
                         <div class="col-12 mb-3">
-                            <label for="duration" class="form-label">預計停留時間 (小時和分鐘):</label>
+                            <label for="duration" class="form-label">預計在下個目的地停留時間 :</label>
                             <div class="d-flex">
                                 <input type="number" id="duration-hours" class="form-control me-2" placeholder="小時" min="0" step="1" required>
                                 <input type="number" id="duration-minutes" class="form-control" placeholder="分鐘" min="0" step="1" required>
@@ -201,6 +216,7 @@
     <script src="~/lib/air-datepicker-3/air-datepicker-3/dist/locale/zh.js" type="text/javascript" asp-append-version="true"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
     <script src="~/js/schduledetails.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         $(document).ready(function () {
             scheduleID = sessionStorage.setItem("scheduleId", @scheduleId);
@@ -216,8 +232,13 @@
                 AddPointToWishList();
             });
             //#endregion
-            //#region WeatherAPI
-            
+            //#region Timepicker format
+            flatpickr("#start-time", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: false     
+            });
             //#endregion
             //#region 修改行程主題
             // $('#modifiedschedule').on('shown.bs.modal', function () {

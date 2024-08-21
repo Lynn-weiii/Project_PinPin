@@ -230,19 +230,17 @@ switch (response.status) {
 //#region google Map API 
 let map, marker, autocomplete, infowindow, position, service, keyword, searchTimeout, idleListener, globalName, globalScheduleId, polylines, directionsService, directionsRenderer;
 let markers = [];
-
+let simplePolyline = [];
 async function initMap(scheduleId, name, position, placeId) {
     console.log('initMap:', { scheduleId, name, position, placeId });
 
     globalName = name;
     globalScheduleId = scheduleId;
 
-    // 引入 Google Maps 所需的库
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const { Geocoder } = await google.maps.importLibrary("geocoding");
-
-    // 初始化地图
+    const { poly } = await google.maps.importLibrary("geometry");
     map = new Map(document.getElementById("map"), {
         center: position,
         zoom: 16,
@@ -262,12 +260,11 @@ async function initMap(scheduleId, name, position, placeId) {
 
     service = new google.maps.places.PlacesService(map);
 
-    // 如果有提供 placeId，则使用 PlacesService 获取地标详情（繁体中文）
     if (placeId) {
         service.getDetails({ placeId: placeId, language: 'zh-TW' }, function (place, status) {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                 if (place) {
-                    name = place.name; // 更新地标的名称为繁体中文
+                    name = place.name;
                     console.log('Place details (zh-TW):', place);
 
                     const marker = new AdvancedMarkerElement({
@@ -288,7 +285,6 @@ async function initMap(scheduleId, name, position, placeId) {
         });
     }
 
-    // 初始化自动填充功能
     const autocomplete = new google.maps.places.Autocomplete(document.getElementById('search_input_field'));
     autocomplete.bindTo('bounds', map);
 
@@ -328,8 +324,7 @@ async function initMap(scheduleId, name, position, placeId) {
             performNearbySearch(place.geometry.location, keyword, place.name, scheduleId);
         });
     });
-
-    // 处理搜索输入框的 "Enter" 事件
+    
     keyword = document.getElementById('search_input_field').addEventListener('keyup', function (event) {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -338,15 +333,12 @@ async function initMap(scheduleId, name, position, placeId) {
         }
     });
 
-    // 在地图空闲时执行搜索
     idleListener = map.addListener('idle', function () {
         const keyword = document.getElementById('search_input_field').value;
         if (keyword) {
             performNearbySearch(map.getCenter(), keyword, name, scheduleId);
         }
     });
-
-    // 处理地图点击事件
     map.addListener('click', function (event) {
         console.log('Map clicked:', { lat: event.latLng.lat(), lng: event.latLng.lng(), name, scheduleId });
         infowindow.close();
@@ -459,9 +451,19 @@ async function geocodeLatLng(latlng) {
 function createInfoWindowContent(place, name, scheduleId) {
     const imageUrl = place.photos && place.photos.length > 0
         ? place.photos[0].getUrl({ maxWidth: 290, maxHeight: 290 })
-        : ''; // 这里加上默认值（比如空字符串）
+        : ''; 
 
-    const starsHtml = getStarRating(place.rating); // 获取 starsHtml
+    const starsHtml = getStarRating(place.rating); 
+
+    var p = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+        placeId: place.place_id || '',
+        name: place.name || ''
+    };
+    
+    p.placeId = p.placeId.replace(/'/g, "\\'");
+    p.name = p.name.replace(/'/g, "\\'");
 
     let content = `
     <div class="info-window" style="max-width: 640px; max-height: 460px; display: flex; padding: 15px; font-family: Arial, sans-serif; box-sizing: border-box;" id="info-window">
@@ -497,8 +499,10 @@ function createInfoWindowContent(place, name, scheduleId) {
     content += `</ul>
             </div>
             <div class="btn-container mb-1" style="font-size:14px;margin-top: 5px;display:flex;position:absolute;bottom: 10px;right: 10px;">
-                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" onclick="addscheduledate('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}', '${place.name}')">+<strong style="margin-left: 10px;">加入行程</strong></button>
-                <button class="btn btn-primary mx-3 btn-sm" id="wishlist-btn" onclick="ShowWishList('${place.geometry.location.lat()}', '${place.geometry.location.lng()}', '${place.place_id}','${place.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList">
+                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" data-lat="${p.lat}" data-lng="${p.lng}" data-placeId="${p.placeId}" data-name="${p.name}" data-bs-toggle="modal" data-bs-target="#AddPointWhichDayList" />
+                    +<strong style="margin-left: 10px;">加入行程</strong>
+                </button>
+                <button class="btn btn-primary mx-3 btn-sm" id="wishlist-btn" onclick="ShowWishList('${p.lat}', '${p.lng}', '${p.placeId}', '${p.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList">
                     <i class="fas fa-star"></i><strong style="margin-left: 10px;">加入願望清單</strong>
                 </button>
             </div>
@@ -527,125 +531,125 @@ function getStarRating(rating) {
 
     return starsHtml;
 }
-
 //#endregion
 
-//#region 新增景點到日程
-function addscheduledate(lat, lng, placeId, name) {
+/*#region 新增景點到日程*/
+$('#addPointWhichDayList').off('click').on('click', function () {
+    var lat = $('#add-place-btn').attr('data-lat');
+    var lng = $('#add-place-btn').attr('data-lng');
+    var placeId = $('#add-place-btn').attr('data-placeId');
+    var name = $('#add-place-btn').attr('data-name');
+    addscheduledate(lat, lng, placeId, name);
+});
+async function addscheduledate(lat, lng, placeId, name) {
     $('#AddPointWhichDayList').modal('show');
+    var daylistSelected = $('#date-list option:selected');
+    var daylistSelectedId = daylistSelected.attr('data-schdule_day_id');
+    console.log(`dailyID: ${daylistSelectedId}`);
+    var TransportationCategoryId = $('#transportation-list option:selected').val();
+    var stratTime = $('#start-time').val();
+    var endTime = $('#end-time').val();
+    stratTime += ":00";
+    endTime += ":00";
+    var day = daylistSelected.text();
+    console.log(`transportationId: ${TransportationCategoryId}`);
+    var scheduleId = sessionStorage.getItem('scheduleId');
+    var body = {
+        "ScheduleDayId": daylistSelectedId,
+        "LocationName": name,
+        "Location": placeId,
+        "StartTime": stratTime,
+        "EndTime": endTime,
+        "lat": lat,
+        "lng": lng,
+        "TransportationCategoryId": TransportationCategoryId
+    };
 
-    // 先移除之前可能已存在的点击事件监听器
-    $('#addPointWhichDayList').off('click').on('click', async function () {
-        var daylistSelected = $('#date-list option:selected');
-        var daylistSelectedId = daylistSelected.attr('data-schdule_day_id');
-        console.log(`dailyID: ${daylistSelectedId}`);
-        var TransportationCategoryId = $('#transportation-list option:selected').val();
-        var stratTime = $('#start-time').val();
-        var endTime = $('#end-time').val();
-        stratTime += ":00";
-        endTime += ":00";
-        var day = daylistSelected.text();
-        console.log(`transportationId: ${TransportationCategoryId}`);
-        var scheduleId = sessionStorage.getItem('scheduleId');
 
-        var body = {
-            "ScheduleDayId": daylistSelectedId,
-            "LocationName": name,
-            "Location": placeId,
-            "StartTime": stratTime,
-            "EndTime": endTime,
-            "lat": lat,
-            "lng": lng,
-            "TransportationCategoryId": TransportationCategoryId
+    console.log(JSON.stringify(body));
+
+    try {
+        let response = await fetch(`${baseAddress}/api/ScheduleDetails`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        var dataresult = await response.json();
+        picture = await fetchPlacePhotoUrl(dataresult.location)
+        console.log(`新增景點接回的結果`, dataresult);
+        var dataresults = {
+            "Id": dataresult.id,
+            "Sort": dataresult.sort,
+            "ScheduleDayId": dataresult.scheduleDayId,
+            "LocationName": dataresult.locationName,
+            "placeId": dataresult.location,
+            "StartTime": dataresult.startTime,
+            "EndTime": dataresult.endTime,
+            "lat": dataresult.lat,
+            "lng": dataresult.lng,
+            "TransportationCategoryId": dataresult.transportationCategoryId,
+            "pictureUrl": picture
         };
-        console.log(JSON.stringify(body));
-
-        try {
-            let response = await fetch(`${baseAddress}/api/ScheduleDetails`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
+        console.log(`add data result: ${dataresults}`)
+        if (response.ok) {
+            Swal.fire({
+                title: "成功",
+                text: `已新增 ${name} 到 ${day} 的行程中！`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                console.log(`go refresh add schedule id :${scheduleId}`);
+                insertTabContentItem(dataresult.scheduleDayId, dataresults);
             });
-            var dataresult = await response.json();
-            var dataresults = {
-                "ScheduleDayId": dataresult.scheduleDayId,
-                "LocationName": dataresult.locatioName,
-                "placeId": dataresult.location,
-                "StartTime": dataresult.stratTime,
-                "EndTime": dataresult.endTime,
-                "lat": dataresult.lat,
-                "lng": dataresult.lng,
-                "TransportationCategoryId": dataresult.TransportationCategoryId
-            };
-            console.log(`response`, dataresults);
-            if (response.ok) {
-                Swal.fire({
-                    title: "成功",
-                    text: `已新增 ${name} 到 ${day} 的行程中！`,
-                    icon: "success",
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    refreshlist(dataresults);
-                });
-            } else if (response.status === 409) {
-                let data = await response.json();
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: data.message,
-                    icon: "warning",
-                    iconColor: '#E4003A',
-                    showCancelButton: true,
-                    confirmButtonColor: "#405D72",
-                    cancelButtonColor: "#F9E0BB",
-                    confirmButtonText: "確認再新增"
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        let response2 = await fetch(`${baseAddress}/api/ScheduleDetails/override-schedule-detail`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(body)
+        } else if (response.status === 409) {
+            let data = await response.json();
+            Swal.fire({
+                title: "Are you sure?",
+                text: data.message,
+                icon: "warning",
+                iconColor: '#E4003A',
+                showCancelButton: true,
+                confirmButtonColor: "#405D72",
+                cancelButtonColor: "#F9E0BB",
+                confirmButtonText: "確認再新增"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    let response2 = await fetch(`${baseAddress}/api/ScheduleDetails/override-schedule-detail`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+                    if (response2.ok) {
+                        Swal.fire({
+                            title: "成功",
+                            text: `已新增 ${name} 到 ${day} 的行程中！`,
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            console.log(`go refresh add schedule id :${scheduleId}`);
+                            insertTabContentItem(dataresult.scheduleDayId, dataresults);
                         });
-                        if (response2.ok) {
-                            Swal.fire({
-                                title: "成功",
-                                text: `已新增 ${name} 到 ${day} 的行程中！`,
-                                icon: "success",
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                console.log(`go refresh add schedule id :${scheduleId}`);
-                                refreshlist(dataresults);
-                            });
-                        } else {
-                            Swal.fire({
-                                title: "Oops!",
-                                text: "新增失敗，請重新嘗試。",
-                                icon: "error",
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        }
+                    } else {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: "新增失敗，請重新嘗試。",
+                            icon: "error",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     }
-                });
-            } else {
-                await handleResponseErrors(response);
-                Swal.fire({
-                    title: "Oops!",
-                    text: "新增失敗，請重新嘗試。",
-                    icon: "error",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            }
-        } catch (error) {
-            console.error('Error adding place to schedule:', error);
+                }
+            });
+        } else {
+            await handleResponseErrors(response);
             Swal.fire({
                 title: "Oops!",
                 text: "新增失敗，請重新嘗試。",
@@ -653,12 +657,21 @@ function addscheduledate(lat, lng, placeId, name) {
                 showConfirmButton: false,
                 timer: 1500
             });
-        } finally {
-            $('#AddPointWhichDayList').modal('hide');
-            $('#search_input_field').val('');
-            clearMarkers();
         }
-    });
+    } catch (error) {
+        console.error('Error adding place to schedule:', error);
+        Swal.fire({
+            title: "Oops!",
+            text: "新增失敗，請重新嘗試。",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1500
+        });
+    } finally {
+        $('#AddPointWhichDayList').modal('hide');
+        $('#search_input_field').val('');
+        clearMarkers();
+    }
 }
 //#endregion
 
@@ -726,7 +739,6 @@ async function generateTabLabel(scheduleDateIdInfo) {
         console.error('scheduleDateIdInfo is not an array or an object, unable to iterate.');
     }
 }
-
 async function generateTabContents(data2, scheduleDateIdInfo) {
     var tabContents = document.getElementById("tab-contents");
     tabContents.innerHTML = '';
@@ -777,9 +789,9 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                     contentItem.setAttribute('data-endtime', place.endTime);
                     contentItem.setAttribute('data-transportationmodeid', place.transportation.transportationCategoryId);
                     contentItem.setAttribute('draggable', 'true');
-                    //contentItem.addEventListener('dragstart', handleDragStart);
-                    //contentItem.addEventListener('dragover', handleDragOver);
-                    //contentItem.addEventListener('drop', handleDrop);
+                    contentItem.addEventListener('dragstart', handleDragStart);
+                    contentItem.addEventListener('dragover', handleDragOver);
+                    contentItem.addEventListener('drop', handleDrop);
 
                     contentItem.innerHTML = `
                         <div class="content-item-header">
@@ -792,16 +804,16 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                                 <span class="time">${place.startTime}</span>
                             </div>
                             <div class="content-item-location">
-                                ${place.locationName}
+                                ${place.locationName} <img src="/images/location.png" class="setlocation" style="width:20px;height:20px" data-lat="${place.lat}" data-lng="${place.lng}">
                             </div>
                             <div class="content-item-detail">
-                                ${place.startTime} 抵達
+                                ${place.endTime} 離開
                             </div>
                             <div class="button-group">
                                 <button class="delete-btn"  data-scheduleDayId="${place.scheduleDayId}" data-id="${place.id}" >
                                     刪除景點
                                 </button>
-                            </div>
+                            </div>                           
                         </div>
                     `;
 
@@ -850,7 +862,6 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
         console.error('scheduleDateIdInfo不是array也不是object。');
     }
 }
-
 async function getRouteInfo(origin, destination, categoryId) {
     const primaryTravelMode = getTravelMode(categoryId);  // 根据 categoryId 获取首选的 travelMode
     const fallbackTravelModes = [
@@ -858,9 +869,7 @@ async function getRouteInfo(origin, destination, categoryId) {
         google.maps.TravelMode.DRIVING,
         google.maps.TravelMode.WALKING,        
         google.maps.TravelMode.BICYCLING
-    ].filter(mode => mode !== primaryTravelMode);  // 过滤掉首选模式
-
-    // 首先尝试用户指定的 travelMode
+    ].filter(mode => mode !== primaryTravelMode);
     try {
         const result = await getRoute(origin, destination, primaryTravelMode);
         return {
@@ -871,8 +880,6 @@ async function getRouteInfo(origin, destination, categoryId) {
     } catch (status) {
         console.warn(`無法取得 ${primaryTravelMode} 的路線，原因：${status}`);
     }
-
-    // 如果首选模式失败，依次尝试其他模式
     for (const mode of fallbackTravelModes) {
         try {
             const result = await getRoute(origin, destination, mode);
@@ -891,7 +898,6 @@ async function getRouteInfo(origin, destination, categoryId) {
 
     throw new Error('查無路線。');
 }
-
 function getRoute(origin, destination, travelMode) {
     const directionsService = new google.maps.DirectionsService();
     const request = {
@@ -1256,11 +1262,39 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
                 icon: "success",
                 title: `行程已刪除`,
                 showConfirmButton: false,
-                timer: 1500
-            }).then(() => {               
-                refreshlist();
+                timer: 1800
+            }).then(() => {
+                // 刪除成功後從頁面上移除相應的 content-item
+                const contentItem = document.querySelector(`.content-item[data-id="${id}"]`);
+                var tabContents = document.getElementById("tab-contents");
+
+                if (contentItem) {
+                    const tabContent = contentItem.parentElement;
+                    contentItem.remove(); // 删除选中的内容项
+                    const remainingItems = tabContent.querySelectorAll('.content-item').length;
+
+                    if (remainingItems === 0) {
+                        const noContentMessage = document.createElement('div');
+                        noContentMessage.setAttribute('id', `tab${scheduleDayId}`);
+                        noContentMessage.classList.add('no-content-message');
+                        noContentMessage.textContent = '目前沒有安排的景點唷~';
+                        console.log('Appending noContentMessage:', noContentMessage); // 确认 noContentMessage 已正确创建
+                        console.log('TabContent before appending:', tabContent); // 检查 tabContent 是否有效
+                        setTimeout(() => {
+                            tabContent.appendChild(noContentMessage);
+                        },200);
+                        
+                        clearMarkers(); // 清除地图标记
+                    } else {
+                        const remainingElements = Array.from(tabContent.querySelectorAll('.content-item'));
+                        updateMapMarkers(remainingElements); // 更新地图标记
+                    }
+
+                    refreshTabContentItemNumbers(scheduleDayId);
+                } else {
+                    console.error('Content item not found.');
+                }
             });
-            
         } else {
             console.error('删除失败');
             swal.fire({
@@ -1283,12 +1317,122 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
 //#endregion
 
 //#region 更新行程列表
-async function refreshlist(dataresults) {
-        console.log(`dataresults`, dataresults);
-        var scheduleId = sessionStorage.getItem("scheduleId");
-        console.log(`refreshlist get scheduleid:${scheduleId}`);
-        console.log('refreshlist');
+function insertTabContentItem(scheduleDayId, dataresults) {
+    const tabContent = document.querySelector(`.content[data-schdule_day_id="${scheduleDayId}"]`);
+    if (!tabContent) {
+        console.error(`No tab content found for scheduleDayId: ${scheduleDayId}`);
+        return;
+    }
+
+    console.log(`strat insertTab`, dataresults)
+    const contentItem = document.createElement('div');
+    
+    contentItem.classList.add('content-item');
+    contentItem.setAttribute('data-id', `${dataresults.Id}`);
+    contentItem.setAttribute('data-ScheduleDayId', `${dataresults.ScheduleDayId}`);
+    contentItem.setAttribute('data-sort', `${dataresults.Sort}`);
+    contentItem.setAttribute('data-lat', `${dataresults.lat}`);
+    contentItem.setAttribute('data-lng', `${dataresults.lng}`);
+    contentItem.setAttribute('data-placeid', dataresults.placeId);
+    contentItem.setAttribute('data-endtime', dataresults.EndTime);
+    contentItem.setAttribute('data-transportationmodeid', dataresults.TransportationCategoryId);
+    contentItem.setAttribute('draggable', 'true');
+    contentItem.addEventListener('dragstart', handleDragStart);
+    contentItem.addEventListener('dragover', handleDragOver);
+    contentItem.addEventListener('drop', handleDrop);
+    contentItem.innerHTML = `
+        <div class="content-item-header">
+            <span class="content-item-number"></span>
+            <img src="${dataresults.pictureUrl || '~/images/NoImg.png'}" alt="${dataresults.LocationName || 'default'}" class="content-item-image">
+        </div>
+        <div class="content-item-body">
+            <div class="content-item-time">
+                <span class="icon">${getTransportationMode(dataresults.TransportationCategoryId) || '❓'}</span>
+                <span class="time">${dataresults.StartTime}</span>
+            </div>
+            <div class="content-item-location">
+                ${dataresults.LocationName} <img src="/images/location.png" class="setlocation" style="width:20px;height:20px" data-lat="${dataresults.lat}" data-lng="${dataresults.lng}">
+            <div class="content-item-detail">
+                ${dataresults.EndTime} 離開
+            </div>
+            <div class="button-group">
+                <button class="delete-btn" data-scheduleDayId="${dataresults.ScheduleDayId}" data-id="${dataresults.Id}">
+                    刪除景點
+                </button>                
+            </div>            
+        </div>
+    `;
+    console.log(`insertTabContentItem`, contentItem)
+    let inserted = false;
+    const contentItems = Array.from(tabContent.querySelectorAll('.content-item'));
+    for (let i = 0; i < contentItems.length; i++) {
+        const currentSort = parseInt(contentItems[i].getAttribute('data-sort'), 10);
+        if (dataresults.Sort < currentSort) {
+            tabContent.insertBefore(contentItem, contentItems[i]);
+            inserted = true;
+            break;
+        }
+    }
+    if (!inserted) {
+        tabContent.appendChild(contentItem);
+    }
+    refreshTabContentItemNumbers(scheduleDayId);
+    
+    addMarkerToMap({
+        lat: dataresults.lat,
+        lng: dataresults.lng,
+        title: dataresults.LocationName,
+        placeInfo: { name: dataresults.LocationName, scheduleId: dataresults.scheduleDayId }
+    });
+
+
+    function addMarkerToMap({ lat, lng, title, placeInfo }) {
+        const marker = new google.maps.Marker({
+            position: { lat, lng },
+            map: map,
+            title: title,
+        });
+
+        marker.placeInfo = placeInfo;
+        markers.push(marker);
+
+        // 点击标记时，显示信息窗口
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.setContent(createInfoWindowContent({ geometry: { location: marker.position }, ...placeInfo }, title, placeInfo.scheduleId));
+            infowindow.open(map, marker);
+        });
+    }
 }
+
+function refreshTabContentItemNumbers(scheduleDayId) {
+    const tabContent = document.querySelector(`.content[data-schdule_day_id="${scheduleDayId}"]`);
+    if (!tabContent) {
+        console.error(`No tab content found for scheduleDayId: ${scheduleDayId}`);
+        return;
+    }
+    
+    const contentItems = Array.from(tabContent.querySelectorAll('.content-item'));
+
+
+    contentItems.sort((a, b) => {
+        const sortA = parseInt(a.getAttribute('data-sort'), 10);
+        const sortB = parseInt(b.getAttribute('data-sort'), 10);
+        return sortA - sortB;
+    });
+    
+    tabContent.innerHTML = '';
+    
+    contentItems.forEach((item, index) => {
+        const numberElement = item.querySelector('.content-item-number');
+        if (numberElement) {
+            numberElement.textContent = index + 1;
+        }
+
+        // 重新添加到 tabContent 中
+        tabContent.appendChild(item);
+    });
+}
+
 
 //#endregion
 
@@ -1420,9 +1564,7 @@ async function refreshlist(dataresults) {
 //}
 //#endregion
 
-//#region timepicker
-
-//計算結束時間
+//#region 計算結束時間
 function calculateEndTime() {
     const startTime = document.getElementById('start-time').value;
     const durationHours = parseInt(document.getElementById('duration-hours').value) || 0;
@@ -1455,98 +1597,105 @@ function calculateEndTime() {
 
 $(document).off('click', '#tab-contents .delete-btn');
 $(document).off('click', '#tab-contents .edit-point-btn');
-
+$(document).off('click', '#tab-contents .setlocation');
 document.getElementById('tab-contents').addEventListener('click', function (event) {
     if (event.target.classList.contains('delete-btn')) {
         const Id = event.target.getAttribute('data-id');
         const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
         const scheduleId = event.target.getAttribute('data-Id');
-
+        console.log(`tab-contents .deletebtn catch Id:${Id},scheduleDayId:${scheduleDayId},scheduleId:${scheduleId}`);
         DeleteSchedule(Id, scheduleDayId, scheduleId);
     }
-    if (event.target.classList.contains('edit-point-btn')) {
-        const Id = event.target.getAttribute('data-id');
-        const scheduleDayId = event.target.getAttribute('data-scheduleDayId');
-        const scheduleId = event.target.getAttribute('data-Id');
+    if (event.target.classList.contains('setlocation')) {
 
-        // 添加你对编辑按钮点击后的处理逻辑
+        const lat = event.target.getAttribute('data-lat');
+        const lng = event.target.getAttribute('data-lng');
+        const parsedLat = parseFloat(lat);
+        const parsedLng = parseFloat(lng);
+        const position = { lat: parsedLat, lng: parsedLng };
+        console.log(`setlocation`, position);
+        map.setCenter(position);
+        map.setZoom(16);
+        if (marker) {
+            marker.setMap(null); 
+        }
+        
+        marker = new google.maps.Marker({
+            position: position,
+            map: map
+        });
     }
 });
 
 
 
 //#region 調整行程順序
-//let draggedItem = null;
+let draggedItem = null;
+function handleDragStart(event) {
+    draggedItem = event.currentTarget;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', draggedItem.outerHTML);
+    event.dataTransfer.setData('text/plain', draggedItem.dataset.sort);
+}
+function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+}
+async function handleDrop(event) {
+    event.preventDefault();
 
-//function handleDragStart(event) {
-//    draggedItem = event.currentTarget;
-//    event.dataTransfer.effectAllowed = 'move';
-//    event.dataTransfer.setData('text/html', draggedItem.outerHTML);
-//    event.dataTransfer.setData('text/plain', draggedItem.dataset.sort);
-//}
+    const targetItem = event.currentTarget;
+    const targetParent = targetItem.parentNode;
 
-//function handleDragOver(event) {
-//    event.preventDefault();
-//    event.dataTransfer.dropEffect = 'move';
-//}
+    if (draggedItem !== targetItem) {
+        targetParent.removeChild(draggedItem);
+        targetParent.insertBefore(draggedItem, targetItem);
+        await updateSortOrder(targetParent);
+    }
 
-//async function handleDrop(event) {
-//    event.preventDefault();
+    draggedItem = null;
+    clearMarkers();
+}
+async function updateSortOrder(parentElement) {
+    const contentItems = Array.from(parentElement.getElementsByClassName('content-item'));
 
-//    const targetItem = event.currentTarget;
-//    const targetParent = targetItem.parentNode;
+    contentItems.forEach((item, index) => {
+        item.dataset.sort = index + 1;
 
-//    if (draggedItem !== targetItem) {
-//        targetParent.removeChild(draggedItem);
-//        targetParent.insertBefore(draggedItem, targetItem);
-//        await updateSortOrder(targetParent);
-//    }
+        // 更新排序编号
+        const numberElement = item.querySelector('.content-item-number');
+        if (numberElement) {
+            numberElement.textContent = index + 1;
+        }
+    });
 
-//    draggedItem = null;
-//    clearMarkers();
+    const updatedOrder = contentItems.map(item => ({
+        id: item.dataset.id,
+        sort: item.dataset.sort,
+        scheduleDayId: item.dataset.scheduledayid
+    }));
 
-//}
+    console.log(updatedOrder);
 
-//async function updateSortOrder(parentElement) {
-//    const contentItems = Array.from(parentElement.getElementsByClassName('content-item'));
+    // 取消注释以下代码以在后端更新排序顺序
+    // try {
+    //     const response = await fetch(${baseAddress}/api/ScheduleDetails/UpdateSortOrder, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': Bearer ${token},
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify(updatedOrder)
+    //     });
 
-//    contentItems.forEach((item, index) => {
-//        item.dataset.sort = index + 1;
-
-//        // 更新排序编号
-//        const numberElement = item.querySelector('.content-item-number');
-//        if (numberElement) {
-//            numberElement.textContent = index + 1;
-//        }
-//    });
-
-//    const updatedOrder = contentItems.map(item => ({
-//        id: item.dataset.id,
-//        sort: item.dataset.sort,
-//        scheduleDayId: item.dataset.scheduledayid
-//    }));
-
-//    console.log(updatedOrder);
-
-//    // 取消注释以下代码以在后端更新排序顺序
-//    // try {
-//    //     const response = await fetch(${baseAddress}/api/ScheduleDetails/UpdateSortOrder, {
-//    //         method: 'POST',
-//    //         headers: {
-//    //             'Authorization': Bearer ${token},
-//    //             'Content-Type': 'application/json'
-//    //         },
-//    //         body: JSON.stringify(updatedOrder)
-//    //     });
-
-//    //     if (response.ok) {
-//    //         console.log('排序顺序更新成功');
-//    //     } else {
-//    //         console.error(更新排序顺序失败: ${response.statusText});
-//    //     }
-//    // } catch (error) {
-//    //     console.error('更新排序顺序时出错:', error);
-//    // }
-//}
+    //     if (response.ok) {
+    //         console.log('排序顺序更新成功');
+    //     } else {
+    //         console.error(更新排序顺序失败: ${response.statusText});
+    //     }
+    // } catch (error) {
+    //     console.error('更新排序顺序时出错:', error);
+    // }
+}
 
 //#endregion
