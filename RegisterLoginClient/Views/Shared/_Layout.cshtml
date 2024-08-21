@@ -8,7 +8,7 @@
     <link href="~/css/owl.carousel.css" type="text/css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/owl.theme.default.css" type="text/css" rel="stylesheet" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" asp-fallback-src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/js/bootstrap.bundle.min.js" asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -81,7 +81,9 @@
                             <a id="register" class="nav-link text-white fs-5 fw-bold" asp-controller="Home" asp-action="Register">註冊會員</a>
                         </li>
                         <li class="nav-item" v-if="!isLogin">
-                            <a id="login" class="nav-link text-white fs-5 fw-bold" asp-controller="Home" asp-action="Login">立即登入</a>
+                            <a id="loginButton" class="nav-link text-white fs-5 fw-bold" role="button" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                立即登入
+                            </a>
                         </li>
                         <li class="nav-item dropdown" v-if="isLogin">
                             <button class="btn btn-secondary dropdown-toggle" id="memberDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -112,10 +114,14 @@
                 </div>
             </div>
         </nav>
+
+        <div id="modal-container">
+            @await Html.PartialAsync("_LoginPartial")
+        </div>
     </header>
-    
+
     @await Html.PartialAsync("_SideBarPartial")
-    
+
     <div class=".container-fluid">
         <main role="main">
             @RenderBody()
@@ -135,14 +141,47 @@
         var token;
         const baseAddress = "https://localhost:7280"
 
+        //登入會員
+        $("#Login").on("click", async function () {
+            const email = $("#loginEmail").val();
+            const password = $("#loginPassword").val();
+
+            const response = await fetch(`${baseAddress}/api/Auth/Login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const token = await response.text();
+                const data = { Token: token };
+                localStorage.setItem('token', data.Token);
+                Swal.fire({
+                    title: "登入成功!",
+                    icon: "success"
+                }).then(c => {
+                    window.location.href = '@Url.Action("Index", "Home")';
+                });
+            } else {
+                Swal.fire({
+                    title: "登入失敗!請確認帳號密碼",
+                    icon: "error"
+                })
+            }
+        });
+
         //layout用變數
         const ExpenseBtnId = "ExpenseBtnId";
         const modalContainerId = 'modal-container';
 
         function goToLoginPage() {
-            window.location.href = '@Url.Action("Login", "Home")';
+            //window.location.href = '@Url.Action("Login", "Home")';
+            var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
         }
-        function  getToken () {
+        function getToken() {
             token = localStorage.getItem('token');
             if (!token) {
                 goToLoginPage();
