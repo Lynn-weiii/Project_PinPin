@@ -27,7 +27,9 @@
         //transportation 
         public int ScheduleDetailsId { get; set; }
 
-        public int TransportationCategoryId { get; set; }
+        public int? TransportationCategoryId { get; set; }
+
+        public int? TransportationId { get; set; }
 
         public DateTime? Time { get; set; }
 
@@ -39,7 +41,7 @@
 
         public string? TicketImageUrl { get; set; }
 
-        public int TransportationId { get; set; }
+
 
     }
 }

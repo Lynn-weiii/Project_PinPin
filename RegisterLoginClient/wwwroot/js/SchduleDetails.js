@@ -34,7 +34,7 @@
 //#region 初始化
 async function LoadScheduleInfo(scheduleId) {
     try {
-        
+        // 获取基本日程信息
         const response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
             method: 'GET',
             headers: {
@@ -49,21 +49,17 @@ async function LoadScheduleInfo(scheduleId) {
         const results = await response.json();
         const scheduleDateIdInfo = results.sceduleDateIdInfo;
         const scheduleDetail = results.scheduleDetail;
-        console.log(`scheduleDetail`,scheduleDetail)
+
         if (!scheduleDetail) {
             throw new Error('scheduleDetail is undefined or invalid');
         }
 
         const detail = Array.isArray(scheduleDetail) ? scheduleDetail[0] : scheduleDetail;
 
-        if (!detail) {
-            throw new Error('No schedule detail found.');
-        }
-
         const {
             name,
-            lat = 0,  // 默认值为 0，防止 `lat` 为 `null` 或 `undefined`
-            lng = 0,  // 默认值为 0，防止 `lng` 为 `null` 或 `undefined`
+            lat = 0,
+            lng = 0,
             placeId,
             caneditdetail,
             canedittitle,
@@ -75,7 +71,7 @@ async function LoadScheduleInfo(scheduleId) {
         const parsedLng = parseFloat(lng);
 
         if (isNaN(parsedLat) || isNaN(parsedLng)) {
-            throw new Error('Invalid coordinates received.');  // 如果解析结果是 `NaN`，抛出错误
+            throw new Error('Invalid coordinates received.');
         }
 
         const picture = await fetchPlacePhotoUrl(placeId);
@@ -93,7 +89,8 @@ async function LoadScheduleInfo(scheduleId) {
             scheduleId,
         };
         updateUIWithScheduleInfo(data);
-        
+
+        // 获取详细的日程信息
         const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
             method: 'GET',
             headers: {
@@ -104,57 +101,66 @@ async function LoadScheduleInfo(scheduleId) {
         if (!response2.ok) {
             throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
         }
-        const data2= [];
-        const textResponse = await response2.text(); 
+        const data2 = [];
+        const textResponse = await response2.text();
+
         if (textResponse) {
             const jsonResponse = JSON.parse(textResponse);
 
             if (jsonResponse && jsonResponse.scheduleDetails) {
                 const { scheduleDetails } = jsonResponse;
 
+                // 遍历 scheduleDetails 对象
                 for (let scheduleDayId of Object.keys(scheduleDetails)) {
                     const scheduleItems = scheduleDetails[scheduleDayId];
                     for (let item of scheduleItems) {
+                        const { id, scheduleDayId, locationName, startTime, endTime, lat, lng } = item;
                         const placeId = item.location;
-                        const pictureUrl = await fetchPlacePhotoUrl(placeId);
 
                         const transportation = item.transportations.length > 0 ? item.transportations[0] : null;
 
-                        data2.push({
-                            sort: item.sort,  // 使用冒号而非等号
+                        const dataItem = {
+                            sort: item.sort,
                             id: item.id,
                             scheduleDayId: item.scheduleDayId,
-                            userId: item.userId,
                             locationName: item.locationName,
                             placeId: placeId,
                             startTime: item.startTime,
                             endTime: item.endTime,
                             lat: item.lat,
                             lng: item.lng,
-                            pictureUrl: pictureUrl,
-                            transportation: transportation || null
-                        });
+                            pictureUrl: await fetchPlacePhotoUrl(placeId),  
+                            transportation: transportation || null,
+                            tramsportationId: transportation ? transportation.id:null, 
+                            transportationCategoryId: transportation ? transportation.transportationCategoryId : null
+                        };
+
+                        // 添加到 data2 数组
+                        data2.push(dataItem);
                     }
                 }
 
                 // 对 data2 进行排序
                 data2.sort((a, b) => a.sort - b.sort);
+
+                console.log(`data2`, data2);
             } else {
                 console.log('No schedule details found or scheduleDetails is missing.');
             }
         } else {
             console.log('Empty response, no data to process.');
-        }        
+        }
         generateDateList(scheduleDateIdInfo);
         generateTabLabel(scheduleDateIdInfo);
-        generateTabContents(data2, scheduleDateIdInfo); 
-        
-            
+        generateTabContents(data2, scheduleDateIdInfo);
+
+
         console.log('data2:', data2);
     } catch (error) {
         console.error('Error fetching schedule info:', error);
     }
 }
+
 function generateDefaultContent(scheduleDateIdInfo) {
     const data2 = []; 
     generateDateList(scheduleDateIdInfo);
@@ -533,7 +539,7 @@ function getStarRating(rating) {
 }
 //#endregion
 
-/*#region 新增景點到日程*/
+//#region 新增景點到日程*/
 $('#addPointWhichDayList').off('click').on('click', function () {
     var lat = $('#add-place-btn').attr('data-lat');
     var lng = $('#add-place-btn').attr('data-lng');
@@ -765,9 +771,6 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                 if (place.scheduleDayId && place.scheduleDayId === parseInt(key)) {
                     hasContent = true;
 
-                    const transportationMode = place.transportation ? getTransportationMode(place.transportation.transportationCategoryId) : '❓';
-                    const travelMode = getTravelMode(place.transportation?.transportationCategoryId);
-
                     if (!firstLatLng) {
                         firstLatLng = { lat: place.lat, lng: place.lng };
                     }
@@ -777,6 +780,9 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                         lng: place.lng,
                         title: place.locationName
                     });
+                    const transportationMode = place.transportation ? getTransportationMode(place.transportation.transportationCategoryId) : '❓';
+                    const travelMode = getTravelMode(place.transportation?.transportationCategoryId);
+
 
                     const contentItem = document.createElement('div');
                     contentItem.classList.add('content-item');
@@ -785,13 +791,15 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                     contentItem.setAttribute('data-sort', `${place.sort}`);
                     contentItem.setAttribute('data-lat', `${place.lat}`);
                     contentItem.setAttribute('data-lng', `${place.lng}`);
-                    contentItem.setAttribute('data-placeid', place.placeId);
-                    contentItem.setAttribute('data-endtime', place.endTime);
-                    contentItem.setAttribute('data-transportationmodeid', place.transportation.transportationCategoryId);
+                    contentItem.setAttribute('data-placeid', `${ place.placeId}`);
+                    contentItem.setAttribute('data-endtime', `${place.endTime}`);
+                    contentItem.setAttribute('data-transportationCategoryId', `${place.transportationCategoryId}`);
+                    contentItem.setAttribute('data-tranportationMode', `${transportationMode}`);
                     contentItem.setAttribute('draggable', 'true');
                     contentItem.addEventListener('dragstart', handleDragStart);
                     contentItem.addEventListener('dragover', handleDragOver);
                     contentItem.addEventListener('drop', handleDrop);
+                    
 
                     contentItem.innerHTML = `
                         <div class="content-item-header">
@@ -1335,7 +1343,7 @@ function insertTabContentItem(scheduleDayId, dataresults) {
     contentItem.setAttribute('data-lng', `${dataresults.lng}`);
     contentItem.setAttribute('data-placeid', dataresults.placeId);
     contentItem.setAttribute('data-endtime', dataresults.EndTime);
-    contentItem.setAttribute('data-transportationmodeid', dataresults.TransportationCategoryId);
+    contentItem.setAttribute('transportationCategoryId', dataresults.transportationCategoryId);
     contentItem.setAttribute('draggable', 'true');
     contentItem.addEventListener('dragstart', handleDragStart);
     contentItem.addEventListener('dragover', handleDragOver);

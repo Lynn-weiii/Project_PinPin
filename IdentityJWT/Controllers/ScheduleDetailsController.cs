@@ -52,7 +52,6 @@ namespace PinPinServer.Controllers
 
             try
             {
-
                 var scheduleDetailsList = await _context.ScheduleDetails
                     .Where(detail => scheduleDetailIds.Contains(detail.ScheduleDayId) && detail.IsDeleted != true)
                     .Select(detail => new ScheduleDetailDTO
@@ -204,7 +203,7 @@ namespace PinPinServer.Controllers
                 {
                     Id = 0,
                     ScheduleDetailsId = scheduleDetailId,
-                    TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId
+                    TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId ?? 0
                 };
                 _context.Transportations.Add(transportation);
                 await _context.SaveChangesAsync();
@@ -270,7 +269,7 @@ namespace PinPinServer.Controllers
                 {
                     Id = 0,
                     ScheduleDetailsId = scheduleDetailId,
-                    TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId
+                    TransportationCategoryId = scheduleDetailDTO.TransportationCategoryId ?? 0
                 };
                 _context.Transportations.Add(transportation);
                 await _context.SaveChangesAsync();
