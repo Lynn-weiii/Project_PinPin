@@ -92,7 +92,7 @@
                                                     <div class="card-body">
                                                         <h5 class="card-title">{{ detail.name }}</h5>
                                                         <p class="card-text">{{ detail.address }}</p>
-                                                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addtoScheduleModal"><i class="fa-solid fa-calendar-days"></i></button>
+                                                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addtoScheduleModal" v-on:click="setSelectedLocation(detail)"><i class="fa-solid fa-calendar-days"></i></button>
                                                         <button class="btn btn-outline-primary" v-on:click="deleteSelectedDetail(detail.id)"><i class="fa-solid fa-trash"></i></button>
                                                     </div>
                                                 </div>
@@ -428,7 +428,7 @@
                         <!-- Schedule Selection -->
                         <div class="mb-3">
                             <label for="schedule">選擇行程:</label>
-                            <select class="form-control schedule-select" v-model="selectedScheduleId">
+                            <select class="form-control schedule-select" v-model="selectedScheduleId" v-on:change="onScheduleChange">
                                 <option v-for="schedule in userschedules" :key="schedule.id" :value="schedule.id">
                                     {{ schedule.name }}
                                 </option>
@@ -436,12 +436,52 @@
                         </div>
                         <!-- Details Form (Second Step) -->
                         <div class="row w-100" v-if="selectedScheduleId">
-                            細節
+                            <!-- 日期下拉選單 -->
+                            <div class="col-12 mb-3">
+                                <label for="date-list" class="form-label">選擇日期:</label>
+                                <select id="date-list" class="form-select" v-model="selectedDate" autocomplete="off" required>
+                                    <option value="0">----- 請選擇日期 -----</option>
+                                    <!-- 動態生成選項 -->
+                                    <option v-for="date in scheduleDates" :key="date" :value="date">
+                                        {{ date }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="date-list" class="form-label">前往方式:</label>
+                                <select id="transportation-list" class="form-select" v-model="selectedTransportationCategoryId" autocomplete="off" required>
+                                    <option value="0">----- 請選擇 -----</option>
+                                    <option value="1">開車</option>
+                                    <option value="3">大眾運輸</option>
+                                    <option value="4">腳踏車</option>
+                                    <option value="5">步行</option>
+                                </select>
+                                <!-- 動態生成選項 -->
+                            </div>
+                            <!-- 出發時間 -->
+                            <div class="col-12 mb-3">
+                                <label for="start-time" class="form-label">出發時間:</label>
+                                <input type="time" id="start-time" class="form-control" autocomplete="off" min="00:00" max="23:59" required>
+                            </div>
+                            <!-- 預計停留時間 -->
+                            <div class="col-12 mb-3">
+                                <label for="duration" class="form-label">預計在下個目的地停留時間 :</label>
+                                <div class="d-flex">
+                                    <input type="number" id="duration-hours" class="form-control me-2" placeholder="小時" min="0" step="1" required>
+                                    <input type="number" id="duration-minutes" class="form-control" placeholder="分鐘" min="0" step="1" required>
+                                </div>
+                            </div>
+                            <!-- 計算後的離開時間 -->
+                            <div class="col-12 mb-3">
+                                <label for="end-time" class="form-label">離開時間:</label>
+                                <input type="time" id="end-time" class="form-control" readonly>
+                            </div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" v-on:click=""><i class="fa-solid fa-trash-can"></i>加入行程</button>
+                <div class="modal-footer d-flex justify-content-end">
+                    <button class="btn btn-primary btn-sm" v-on:click="addToSchedule">加入行程</button>
+                    <button class="btn btn-secondary btn-sm ms-2" data-bs-dismiss="modal">取消</button>
                 </div>
             </div>
         </div>
@@ -480,6 +520,35 @@
     }
     //解密token取得ID END
 
+    function calculateEndTime(startTime, durationHours, durationMinutes) {
+        // 解析開始時間
+        // const [startHours, startMinutes] = startTime.split(':').map(Number);
+        // const startDate = new Date();
+        // startDate.setHours(startHours);
+        // startDate.setMinutes(startMinutes);
+
+        // // 計算結束時間
+        // const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
+
+        // // 返回結束時間的格式為 'HH:MM'
+        // const endHours = endDate.getHours().toString().padStart(2, '0');
+        // const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+        // return `${endHours}:${endMinutes}`;
+        const [startHours, startMinutes] = startTime.split(':').map(Number);
+        const startDate = new Date();
+        startDate.setHours(startHours);
+        startDate.setMinutes(startMinutes);
+
+        // 計算結束時間
+        const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
+
+        // 返回結束時間的格式為 'HH:mm:ss'
+        const endHours = endDate.getHours().toString().padStart(2, '0');
+        const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+        const endSeconds = endDate.getSeconds().toString().padStart(2, '0');
+        return `${endHours}:${endMinutes}:${endSeconds}`;
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
         const vueApp = {
             data() {
@@ -505,9 +574,13 @@
                     selectedLocationCategoryId: null,
                     locationCategories: [],
                     allLocationCategories: [],
-                    //加入行程
-                    selectedScheduleId:null,
-                    userschedules:[],
+                    //以下為[加入行程]相關
+                    selectedLocation: null,
+                    selectedScheduleId: null,
+                    userschedules: [],
+                    scheduleDates: [],
+                    selectedDate: null,
+                    selectedTransportationCategoryId: null,
                     //以下為聊天室相關
                     isChooseChatroom: false,
                     selectedChatroom: "",
@@ -533,28 +606,26 @@
                     this.isLoggedIn = true;
                     await this.fetchWishlists();
                     await this.axiosUserData();
-                    // Fetch schedules
+                    // 取得所有行程，加入行程用
                     const scheduleUri = `${baseAddress}/api/Schedules/AllSchedules`;
                     const token = localStorage.getItem('token');
                     axios.get(scheduleUri, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
-                    })
-                        .then(response => {
-                            if (response.data.mainSchedules && response.data.groupSchedules) {
-                                this.schedules = [...response.data.mainSchedules, ...response.data.groupSchedules];
-                            } else if (response.data.mainSchedules) {
-                                this.schedules = response.data.mainSchedules;
-                            } else if (response.data.groupSchedules) {
-                                this.schedules = response.data.groupSchedules;
-                            }
-                            console.log("行程:", response.data);
-                            console.log(this.schedules);
-                        })
-                        .catch(error => {
-                            console.error('Error loading schedules:', error);
-                        });
+                    }).then(response => {
+                        if (response.data.mainSchedules && response.data.groupSchedules) {
+                            this.userschedules = [...response.data.mainSchedules, ...response.data.groupSchedules];
+                        } else if (response.data.mainSchedules) {
+                            this.userschedules = response.data.mainSchedules;
+                        } else if (response.data.groupSchedules) {
+                            this.userschedules = response.data.groupSchedules;
+                        }
+                        console.log("行程:", response.data);
+                        console.log(this.userschedules);
+                    }).catch(error => {
+                        console.error('Error loading schedules:', error);
+                    });
                 } else {
                     this.isLoggedIn = false;
                     console.log("尚未登入");
@@ -1142,8 +1213,95 @@
                         console.error('Error updating location category:', error);
                     }
                 },
-                //加入行程
+                //以下為[加入行程]相關方法
+                setSelectedLocation(detail) {
+                    this.selectedLocation = detail;
+                    console.log("選中的地點:", this.selectedLocation);
+                },
+                onScheduleChange() {
+                    // 取得選中的行程
+                    const selectedSchedule = this.userschedules.find(schedule => schedule.id === this.selectedScheduleId);
+                    console.log("選中的行程:", selectedSchedule);
 
+                    if (selectedSchedule) {
+                        // 產生日期範圍
+                        this.generateDateRange(selectedSchedule.startTime, selectedSchedule.endTime);
+                    }
+                },
+                // 產生所選中的行程日期範圍
+                generateDateRange(startTime, endTime) {
+                    const start = new Date(startTime);
+                    const end = new Date(endTime);
+                    const dateArray = [];
+                    let currentDate = start;
+
+                    while (currentDate <= end) {
+                        const formattedDate = currentDate.toISOString().split('T')[0];
+                        dateArray.push(formattedDate);
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+
+                    this.scheduleDates = dateArray;
+                    console.log("生成的日期範圍:", this.scheduleDates);
+                },
+                //加入行程
+                async addToSchedule() {
+                    if (!this.selectedScheduleId || !this.selectedDate || !this.selectedLocation) {
+                        Swal.fire('提示', '請選擇行程、日期及地點', 'warning');
+                        return;
+                    }
+                    const startTimeInput = document.getElementById('start-time').value;
+                    const durationHours = parseInt(document.getElementById('duration-hours').value, 10) || 0;
+                    const durationMinutes = parseInt(document.getElementById('duration-minutes').value, 10) || 0;
+
+                    // 計算結束時間
+                    const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
+
+                    // 更新結束時間輸入框的值
+                    document.getElementById('end-time').value = endTime;
+                    const scheduleDetail = {
+                        //"ScheduleDayId": this.selectedDate,
+                        "ScheduleDayId": 41,
+                        "LocationName": this.selectedLocation.name,
+                        "Location": this.selectedLocation.googlePlaceId,
+                        "StartTime": startTimeInput + ':00',
+                        "EndTime": endTime,
+                        "lat": this.selectedLocation.locationLat,
+                        "lng": this.selectedLocation.locationLng,
+                        "TransportationCategoryId": this.selectedTransportationCategoryId
+
+                    };
+                    console.log("scheduleDetail:", scheduleDetail); // 確保這裡的所有屬性都有正確的值
+
+                    try {
+                        const token = localStorage.getItem('token');
+                        const response = await fetch(`${baseAddress}/api/ScheduleDetails`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(scheduleDetail)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const dataresult = await response.json();
+                        console.log("dataresult:", response.json);
+
+                        // You can fetch additional information here if needed
+                        const picture = await fetchPlacePhotoUrl(dataresult.location);
+
+                        Swal.fire('成功', '行程已成功加入', 'success');
+                        // Optionally reload or update the schedule list here
+
+                    } catch (error) {
+                        console.error('Error posting schedule detail:', error);
+                        Swal.fire('錯誤', '新增行程發生錯誤，請稍後再試', 'error');
+                    }
+                },
                 //移除願望清單中的行程
                 async deleteSelectedDetail(detailId) {
                     try {
