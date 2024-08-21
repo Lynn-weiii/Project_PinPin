@@ -92,7 +92,7 @@
                                                     <div class="card-body">
                                                         <h5 class="card-title">{{ detail.name }}</h5>
                                                         <p class="card-text">{{ detail.address }}</p>
-                                                        @* <button class="btn btn-outline-primary" v-on:click="addtoSchedule()"><i class="fa-solid fa-calendar-days"></i></button> *@
+                                                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addtoScheduleModal"><i class="fa-solid fa-calendar-days"></i></button>
                                                         <button class="btn btn-outline-primary" v-on:click="deleteSelectedDetail(detail.id)"><i class="fa-solid fa-trash"></i></button>
                                                     </div>
                                                 </div>
@@ -415,6 +415,37 @@
         </div>
     </div>
 
+    <!--加入行程Modal addtoSchedule-->
+    <div class="modal fade" id="addtoScheduleModal" tabindex="-1" aria-labelledby="addtoScheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addtoScheduleModalLabel">加入行程</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <!-- Schedule Selection -->
+                        <div class="mb-3">
+                            <label for="schedule">選擇行程:</label>
+                            <select class="form-control schedule-select" v-model="selectedScheduleId">
+                                <option v-for="schedule in userschedules" :key="schedule.id" :value="schedule.id">
+                                    {{ schedule.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <!-- Details Form (Second Step) -->
+                        <div class="row w-100" v-if="selectedScheduleId">
+                            細節
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" v-on:click=""><i class="fa-solid fa-trash-can"></i>加入行程</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
 
@@ -453,7 +484,7 @@
         const vueApp = {
             data() {
                 return {
-                    isLoggedIn: false, 
+                    isLoggedIn: false,
                     userdata: [],
                     wishlists: [],
                     newWishlistName: '',
@@ -474,6 +505,9 @@
                     selectedLocationCategoryId: null,
                     locationCategories: [],
                     allLocationCategories: [],
+                    //加入行程
+                    selectedScheduleId:null,
+                    userschedules:[],
                     //以下為聊天室相關
                     isChooseChatroom: false,
                     selectedChatroom: "",
@@ -499,14 +533,32 @@
                     this.isLoggedIn = true;
                     await this.fetchWishlists();
                     await this.axiosUserData();
+                    // Fetch schedules
+                    const scheduleUri = `${baseAddress}/api/Schedules/AllSchedules`;
+                    const token = localStorage.getItem('token');
+                    axios.get(scheduleUri, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                        .then(response => {
+                            if (response.data.mainSchedules && response.data.groupSchedules) {
+                                this.schedules = [...response.data.mainSchedules, ...response.data.groupSchedules];
+                            } else if (response.data.mainSchedules) {
+                                this.schedules = response.data.mainSchedules;
+                            } else if (response.data.groupSchedules) {
+                                this.schedules = response.data.groupSchedules;
+                            }
+                            console.log("行程:", response.data);
+                            console.log(this.schedules);
+                        })
+                        .catch(error => {
+                            console.error('Error loading schedules:', error);
+                        });
                 } else {
                     this.isLoggedIn = false;
                     console.log("尚未登入");
                 }
-                // setTimeout(() => {
-                //     this.isLoading = false;
-                //     document.getElementById('preloader').style.display = 'none';
-                // }, 3000); // 假設數據載入需要3秒
 
                 const uri = `${baseAddress}/api/Wishlist/GetAllWishlist/${userId}`;
                 axios.get(uri).then(response => {
@@ -836,13 +888,13 @@
                 },
                 async axioshasAccess(scheduleId) {
                     try {
-                        const response =await axios.get(`${baseAddress}/api/ScheduleAuthorities/GetUserAuthority/${scheduleId}`,{
+                        const response = await axios.get(`${baseAddress}/api/ScheduleAuthorities/GetUserAuthority/${scheduleId}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`,
                             },
                         })
                         const data = response.data;
-                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 7 || ac==8 );
+                        this.hasAccess = data.authorityCategoryIds.some((ac) => ac == 7 || ac == 8);
                     } catch (error) {
                         console.log(error);
                     }
@@ -1002,7 +1054,7 @@
                         confirmButtonColor: "#198754",
                         cancelButtonColor: "#C38154",
                         confirmButtonText: "刪除它",
-                        cancelButtonText:"取消",
+                        cancelButtonText: "取消",
                         reverseButtons: true,
                     }).then(async (result) => {
                         if (result.isConfirmed) {
@@ -1091,9 +1143,7 @@
                     }
                 },
                 //加入行程
-                async addtoSchedule() {
-                    alert("AddtoSchedule");
-                },
+
                 //移除願望清單中的行程
                 async deleteSelectedDetail(detailId) {
                     try {
