@@ -28,7 +28,7 @@
         body {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            /* min-height: 100vh; */
         }
 
         .content {
@@ -59,10 +59,12 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-primary p-1">
-            <div class="container-fluid" id="vue-nav">
-                <a class="navbar-brand pt-0" asp-controller="Home" asp-action="Index">
+            <div class="d-flex justify-content-between" id="vue-nav" style="width: 100%;">
+                
+                <a class="navbar-brand pt-1 ps-2" asp-controller="Home" asp-action="Index">
                     <img src="~/images/logo.png" width="100px" />
                 </a>
+              
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -116,14 +118,14 @@
     
     @await Html.PartialAsync("_SideBarPartial")
     
-    <div class=".container-fluid">
+    @* <div class=".container-fluid"> *@
         <main role="main">
             @RenderBody()
         </main>
         <div id="modal-container"></div>
-    </div>
+    @* </div> *@
 
-    <footer class="navbar bg-black" id="nva-footer">
+    <footer class="bg-black py-2" id="nva-footer">
         <div class="container-fluid d-flex justify-content-center">
             <span class="text-muted"><a class="text-light">© 2024 by PinPinTeam.</a></span>
         </div>
