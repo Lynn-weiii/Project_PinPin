@@ -34,7 +34,7 @@
 //#region 初始化
 async function LoadScheduleInfo(scheduleId) {
     try {
-        
+
         const response = await fetch(`${baseAddress}/api/Schedules/Entereditdetailsch/${scheduleId}`, {
             method: 'GET',
             headers: {
@@ -49,7 +49,7 @@ async function LoadScheduleInfo(scheduleId) {
         const results = await response.json();
         const scheduleDateIdInfo = results.sceduleDateIdInfo;
         const scheduleDetail = results.scheduleDetail;
-        console.log(`scheduleDetail`,scheduleDetail)
+        console.log(`scheduleDetail`, scheduleDetail)
         if (!scheduleDetail) {
             throw new Error('scheduleDetail is undefined or invalid');
         }
@@ -62,8 +62,8 @@ async function LoadScheduleInfo(scheduleId) {
 
         const {
             name,
-            lat = 0,  // 默认值为 0，防止 `lat` 为 `null` 或 `undefined`
-            lng = 0,  // 默认值为 0，防止 `lng` 为 `null` 或 `undefined`
+            lat = 0,  
+            lng = 0,
             placeId,
             caneditdetail,
             canedittitle,
@@ -93,7 +93,7 @@ async function LoadScheduleInfo(scheduleId) {
             scheduleId,
         };
         updateUIWithScheduleInfo(data);
-        
+
         const response2 = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
             method: 'GET',
             headers: {
@@ -104,8 +104,8 @@ async function LoadScheduleInfo(scheduleId) {
         if (!response2.ok) {
             throw new Error(`Failed to fetch schedule details: ${response2.statusText}`);
         }
-        const data2= [];
-        const textResponse = await response2.text(); 
+        const data2 = [];
+        const textResponse = await response2.text();
         if (textResponse) {
             const jsonResponse = JSON.parse(textResponse);
 
@@ -144,19 +144,19 @@ async function LoadScheduleInfo(scheduleId) {
             }
         } else {
             console.log('Empty response, no data to process.');
-        }        
+        }
         generateDateList(scheduleDateIdInfo);
         generateTabLabel(scheduleDateIdInfo);
-        generateTabContents(data2, scheduleDateIdInfo); 
-        
-            
+        generateTabContents(data2, scheduleDateIdInfo);
+
+
         console.log('data2:', data2);
     } catch (error) {
         console.error('Error fetching schedule info:', error);
     }
 }
 function generateDefaultContent(scheduleDateIdInfo) {
-    const data2 = []; 
+    const data2 = [];
     generateDateList(scheduleDateIdInfo);
     generateTabLabel(scheduleDateIdInfo);
     generateTabContents(data2, scheduleDateIdInfo); // 传递空的 data2
@@ -179,51 +179,51 @@ function updateUIWithScheduleInfo(data) {
     initMap(data.scheduleId, data.name, position, data.placeId);
 
     if (data.canedittitle) {
-        
+
     } else {
         console.log('canedittitle is false');
     }
 }
 async function fetchPlacePhotoUrl(placeId) {
-const { PlacesService } = await google.maps.importLibrary("places");
-const map = new google.maps.Map(document.createElement('div'));
-const placesService = new PlacesService(map);
+    const { PlacesService } = await google.maps.importLibrary("places");
+    const map = new google.maps.Map(document.createElement('div'));
+    const placesService = new PlacesService(map);
 
-return new Promise((resolve, reject) => {
-    const request = {
-        placeId: placeId,
-        fields: ['photos']
-    };
+    return new Promise((resolve, reject) => {
+        const request = {
+            placeId: placeId,
+            fields: ['photos']
+        };
 
-    placesService.getDetails(request, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            if (place.photos && place.photos.length > 0) {
-                const picture = place.photos[0].getUrl();
-                resolve(picture); // 返回照片 URL
+        placesService.getDetails(request, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                if (place.photos && place.photos.length > 0) {
+                    const picture = place.photos[0].getUrl();
+                    resolve(picture); // 返回照片 URL
+                } else {
+                    resolve('/images/NoImg.png'); // 没有照片时返回 null
+                }
             } else {
-                resolve('/images/NoImg.png'); // 没有照片时返回 null
+                reject('Error fetching place details: ' + status);
             }
-        } else {
-            reject('Error fetching place details: ' + status);
-        }
+        });
     });
-});
 }
 function handleResponseErrors(response) {
-switch (response.status) {
-    case 204:
-        alert('無法找到相關日程資訊!');
-        break;
-    case 401:
-        alert('請重新登入再使用功能!');
-        goToLoginPage();
-        break;
-    default:
-        response.json().then(errorResult => {
-            alert(errorResult.message || '發生錯誤');
-        });
-        break;
-}
+    switch (response.status) {
+        case 204:
+            alert('無法找到相關日程資訊!');
+            break;
+        case 401:
+            alert('請重新登入再使用功能!');
+            goToLoginPage();
+            break;
+        default:
+            response.json().then(errorResult => {
+                alert(errorResult.message || '發生錯誤');
+            });
+            break;
+    }
 }
 //#endregion
 
@@ -324,7 +324,7 @@ async function initMap(scheduleId, name, position, placeId) {
             performNearbySearch(place.geometry.location, keyword, place.name, scheduleId);
         });
     });
-    
+
     keyword = document.getElementById('search_input_field').addEventListener('keyup', function (event) {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -354,7 +354,7 @@ function clearMarkers() {
     markers = [];
     directionsRenderer.set('directions', null);
 }
-async function performNearbySearch(location, keyword, name, scheduleId) {    
+async function performNearbySearch(location, keyword, name, scheduleId) {
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const request = {
         location: location,
@@ -383,7 +383,7 @@ async function performNearbySearch(location, keyword, name, scheduleId) {
                     position: place.geometry.location,
                     title: place.name,
                 });
-                marker.placeInfo = { name, scheduleId }; 
+                marker.placeInfo = { name, scheduleId };
                 markers.push(marker);
 
                 google.maps.event.addListener(marker, 'click', function () {
@@ -425,7 +425,7 @@ async function geocodeLatLng(latlng) {
                                 position: latlng,
                                 map: map
                             });
-                            marker.placeInfo = { name, scheduleId }; 
+                            marker.placeInfo = { name, scheduleId };
                             markers.push(marker);
                             console.log('Place details:', { place, name, scheduleId });
 
@@ -449,11 +449,12 @@ async function geocodeLatLng(latlng) {
 
 //#region 景點詳細資訊 createInfoWindowContent(place, name, scheduleId)
 function createInfoWindowContent(place, name, scheduleId) {
+    
     const imageUrl = place.photos && place.photos.length > 0
         ? place.photos[0].getUrl({ maxWidth: 290, maxHeight: 290 })
-        : ''; 
+        : '';
 
-    const starsHtml = getStarRating(place.rating); 
+    const starsHtml = getStarRating(place.rating);
 
     var p = {
         lat: place.geometry.location.lat(),
@@ -461,7 +462,7 @@ function createInfoWindowContent(place, name, scheduleId) {
         placeId: place.place_id || '',
         name: place.name || ''
     };
-    
+
     p.placeId = p.placeId.replace(/'/g, "\\'");
     p.name = p.name.replace(/'/g, "\\'");
 
@@ -499,7 +500,7 @@ function createInfoWindowContent(place, name, scheduleId) {
     content += `</ul>
             </div>
             <div class="btn-container mb-1" style="font-size:14px;margin-top: 5px;display:flex;position:absolute;bottom: 10px;right: 10px;">
-                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" data-lat="${p.lat}" data-lng="${p.lng}" data-placeId="${p.placeId}" data-name="${p.name}" data-bs-toggle="modal" data-bs-target="#AddPointWhichDayList" />
+                <button class="btn btn-primary btn-sm" id="add-place-btn" data-id="${scheduleId}" data-scheduleDayId="${p.scheduleDayId}" data-lat="${p.lat}" data-lng="${p.lng}" data-placeId="${p.placeId}" data-name="${p.name}" data-bs-toggle="modal" data-bs-target="#AddPointWhichDayList" />
                     +<strong style="margin-left: 10px;">加入行程</strong>
                 </button>
                 <button class="btn btn-primary mx-3 btn-sm" id="wishlist-btn" onclick="ShowWishList('${p.lat}', '${p.lng}', '${p.placeId}', '${p.name}')" data-bs-toggle="modal" data-bs-target="#PopWishList">
@@ -533,7 +534,79 @@ function getStarRating(rating) {
 }
 //#endregion
 
-/*#region 新增景點到日程*/
+//#region 新增景點到日程
+$('#AddPointWhichDayList').on('shown.bs.modal', async function () {
+    var daylistSelected = $('#date-list option:selected');
+    var scheduleDayId = daylistSelected.attr('data-schdule_day_id');
+    console.log(`Initial day selected: ${daylistSelected.text()}, Id: ${scheduleDayId}`);
+    console.log('AddPointWhichDayList shown.bs.modal');
+    scheduleId = sessionStorage.getItem('scheduleId');
+    await updateStartTime(scheduleId, scheduleDayId);
+});
+
+$('#date-list').on('change', async function () {
+    scheduleId = sessionStorage.getItem('scheduleId');
+    daylistSelected = $('#date-list option:selected');
+    scheduleDayId = daylistSelected.attr('data-schdule_day_id');
+    console.log(`Change detected! ${scheduleId} daylistSelectedId: ${scheduleDayId}`);
+    await updateStartTime(scheduleId, scheduleDayId);
+});
+
+        
+async function updateStartTime(scheduleId, scheduleDayId) {
+    try {
+        
+        const response = await fetch(`${baseAddress}/api/ScheduleDetails/${scheduleId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                //'Content-Type': 'application/json'
+            }
+        });
+
+        let startTime = "08:00";
+
+        if (response.ok) {
+            const result = await response.text();
+            console.log('result:', result);
+            const jsonResponse = JSON.parse(result);
+            console.log('jsonResponse:', jsonResponse);
+
+            let maxRecord = null;
+            Object.keys(jsonResponse.scheduleDetails).forEach(dayId => {
+                const items = jsonResponse.scheduleDetails[dayId];
+
+                items.forEach(item => {
+                    if (item.scheduleDayId == scheduleDayId &&
+                        (!maxRecord || item.sort > maxRecord.sort)) {
+                        maxRecord = item;
+                        startTime = maxRecord.endTime.substring(0, 5);
+                        return;
+                    }
+                });
+
+            });
+
+            $('#start-time').val(startTime);
+
+            const dictionary = {
+                'ScheduleDaysId': maxRecord.scheduleDayId,
+                'Sort': maxRecord.sort || null,
+                'ScheduleEndTime': maxRecord.endTime,
+            };
+            console.log('Dictionary:', dictionary);
+        } else {
+            console.error('Failed to fetch schedule details:', response.statusText);
+        }
+
+        
+
+    } catch (error) {
+        console.error('Error fetching schedule details:', error);
+    }
+}
+
+
 $('#addPointWhichDayList').off('click').on('click', function () {
     var lat = $('#add-place-btn').attr('data-lat');
     var lng = $('#add-place-btn').attr('data-lng');
@@ -541,7 +614,12 @@ $('#addPointWhichDayList').off('click').on('click', function () {
     var name = $('#add-place-btn').attr('data-name');
     addscheduledate(lat, lng, placeId, name);
 });
+
+
 async function addscheduledate(lat, lng, placeId, name) {
+
+    var schduleDayId = $('.tab-button.active').data('data-schdule_day_id');
+    console.log(`addsch`, schduleDayId)
     $('#AddPointWhichDayList').modal('show');
     var daylistSelected = $('#date-list option:selected');
     var daylistSelectedId = daylistSelected.attr('data-schdule_day_id');
@@ -676,34 +754,36 @@ async function addscheduledate(lat, lng, placeId, name) {
 //#endregion
 
 //#region 產生日期列表 generateDateList(scheduleDateIdInfo)
-    function generateDateList(scheduleDateIdInfo) {
-        var dateList = document.getElementById("date-list");
-        dateList.innerHTML = '';
-        var scheduleId = sessionStorage.getItem("scheduleId");
-        console.log(`generateDateList get scheduleId: ${scheduleId}`);
-        if (typeof scheduleDateIdInfo === 'object' && scheduleDateIdInfo !== null) {
-            Object.keys(scheduleDateIdInfo).forEach((key) => {
-                const dateStr = scheduleDateIdInfo[key];
-                const dateObj = new Date(dateStr);
-                if (isNaN(dateObj.getTime())) {
-                    console.error(`Invalid date: ${dateStr} for key ${key}`);
-                    return;
-                }
+function generateDateList(scheduleDateIdInfo) {
+    var dateList = document.getElementById("date-list");
+    dateList.innerHTML = '';
+    var scheduleId = sessionStorage.getItem("scheduleId");
+    console.log(`generateDateList get scheduleId: ${scheduleId}`);
+    if (typeof scheduleDateIdInfo === 'object' && scheduleDateIdInfo !== null) {
+        Object.keys(scheduleDateIdInfo).forEach((key) => {
+            const dateStr = scheduleDateIdInfo[key];
+            const dateObj = new Date(dateStr);
+            if (isNaN(dateObj.getTime())) {
+                console.error(`Invalid date: ${dateStr} for key ${key}`);
+                return;
+            }
 
-                const formattedDate = `${dateObj.getFullYear()}/${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
-            
-                const dateItem = document.createElement('option');
-                dateItem.setAttribute('class', 'date-item');
-                dateItem.setAttribute('data-scheduleId', `${scheduleId }`);
-                dateItem.setAttribute('data-schdule_day_id', key);
-                dateItem.textContent = formattedDate; 
+            const formattedDate = `${dateObj.getFullYear()}/${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
 
-                dateList.appendChild(dateItem);
-            });
-        } else {
-            console.error('scheduleDateIdInfo is not an array, unable to iterate.');
-        }
+            const dateItem = document.createElement('option');
+            let i = 1;
+            dateItem.setAttribute('value', i );
+            dateItem.setAttribute('class', 'date-item');
+            dateItem.setAttribute('data-scheduleId', `${scheduleId}`);
+            dateItem.setAttribute('data-schdule_day_id', key);
+            dateItem.textContent = formattedDate;
+            i++;
+            dateList.appendChild(dateItem);
+        });
+    } else {
+        console.error('scheduleDateIdInfo is not an array, unable to iterate.');
     }
+}
 //#endregion
 
 //#region 產生行程列表 generateTabs(data)
@@ -732,7 +812,7 @@ async function generateTabLabel(scheduleDateIdInfo) {
 
             tablabels.appendChild(tabLabel);
 
-            
+
             isFirst = false;
         }
     } else {
@@ -785,9 +865,9 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                     contentItem.setAttribute('data-sort', `${place.sort}`);
                     contentItem.setAttribute('data-lat', `${place.lat}`);
                     contentItem.setAttribute('data-lng', `${place.lng}`);
-                    contentItem.setAttribute('data-placeid', place.placeId);
-                    contentItem.setAttribute('data-endtime', place.endTime);
-                    contentItem.setAttribute('data-transportationmodeid', place.transportation.transportationCategoryId);
+                    contentItem.setAttribute('data-placeid', `${place.placeId}`);
+                    contentItem.setAttribute('data-endtime', `${place.endTime}`);
+                    contentItem.setAttribute('data-transportationCategoryId', `${place.transportationCategoryId}`);
                     contentItem.setAttribute('draggable', 'true');
                     contentItem.addEventListener('dragstart', handleDragStart);
                     contentItem.addEventListener('dragover', handleDragOver);
@@ -823,7 +903,7 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                             const routeDiv = document.createElement('div');
                             routeDiv.classList.add('route-info');
                             routeDiv.innerHTML = `
-                                <div class="route-description mt-2 mb-2">
+                                <div class="route-description mt-2 mb-2 d-none">
                                     <span class="route-icon">${getTravelModeIcon(routeInfo.travelMode)}</span>
                                     <span>${routeInfo.durationText}</span> (${routeInfo.distanceText})
                                 </div>
@@ -853,8 +933,7 @@ async function generateTabContents(data2, scheduleDateIdInfo) {
                 isFirst = false;
             }
         }
-
-        // Initialize the map markers only after all data is processed
+        
         if (MarksData.length > 0) {
             initMarkers(MarksData);
         }
@@ -867,7 +946,7 @@ async function getRouteInfo(origin, destination, categoryId) {
     const fallbackTravelModes = [
         google.maps.TravelMode.TRANSIT,
         google.maps.TravelMode.DRIVING,
-        google.maps.TravelMode.WALKING,        
+        google.maps.TravelMode.WALKING,
         google.maps.TravelMode.BICYCLING
     ].filter(mode => mode !== primaryTravelMode);
     try {
@@ -959,7 +1038,7 @@ function getTravelModeIcon(travelMode) {
     }
 }
 function initMarkers(markersData) {
-    clearMarkers(); 
+    clearMarkers();
 
     markersData.forEach(markerData => {
         const marker = new google.maps.Marker({
@@ -968,10 +1047,10 @@ function initMarkers(markersData) {
             title: markerData.title
         });
 
-        markers.push(marker); 
+        markers.push(marker);
     });
 
-    
+
     if (markersData.length > 0) {
         map.setCenter({ lat: markersData[0].lat, lng: markersData[0].lng });
         map.setZoom(15); // 根据需要调整缩放级别
@@ -1061,7 +1140,7 @@ function tabsscoller() {
 
                 if (locations.length > 0) {
                     initMarkers(locations);
-                    calculateAndDisplayRoute(locations); 
+                    calculateAndDisplayRoute(locations);
                 }
             } else {
                 console.error("Content element not found for ID:", id);
@@ -1111,6 +1190,8 @@ async function AddPointToWishList() {
                         showConfirmButton: false,
                         timer: 1500
                     });
+                    $('#duration-hours').val('');
+                    $('#duration-minutes').val('');
                 } else {
                     return response.json().then(data => {
                         Swal.fire({
@@ -1163,7 +1244,7 @@ async function ShowWishList(lat, lng, placeId, name) {
         var wishlistContent = document.getElementById('wishlist_content');
         var locationCategoriesContent = document.getElementById('location_categories_content');
 
-        wishlistContent.innerHTML = ''; 
+        wishlistContent.innerHTML = '';
         locationCategoriesContent.innerHTML = '';
 
         wishlistOptions.forEach(optionData => {
@@ -1182,7 +1263,7 @@ async function ShowWishList(lat, lng, placeId, name) {
         wishlistContent.addEventListener('change', function () {
             var selectedWishlistId = this.value;
             locationCategoriesContent.innerHTML = '';
-                
+
             var selectedWishlist = wishlistOptions.find(wishlist => wishlist.id == selectedWishlistId);
             if (selectedWishlist && selectedWishlist.locationCategories) {
                 selectedWishlist.locationCategories.forEach(categoryData => {
@@ -1270,7 +1351,7 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
 
                 if (contentItem) {
                     const tabContent = contentItem.parentElement;
-                    contentItem.remove(); // 删除选中的内容项
+                    contentItem.remove(); 
                     const remainingItems = tabContent.querySelectorAll('.content-item').length;
 
                     if (remainingItems === 0) {
@@ -1278,12 +1359,12 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
                         noContentMessage.setAttribute('id', `tab${scheduleDayId}`);
                         noContentMessage.classList.add('no-content-message');
                         noContentMessage.textContent = '目前沒有安排的景點唷~';
-                        console.log('Appending noContentMessage:', noContentMessage); // 确认 noContentMessage 已正确创建
-                        console.log('TabContent before appending:', tabContent); // 检查 tabContent 是否有效
+                        console.log('Appending noContentMessage:', noContentMessage); 
+                        console.log('TabContent before appending:', tabContent); 
                         setTimeout(() => {
                             tabContent.appendChild(noContentMessage);
-                        },200);
-                        
+                        }, 200);
+
                         clearMarkers(); // 清除地图标记
                     } else {
                         const remainingElements = Array.from(tabContent.querySelectorAll('.content-item'));
@@ -1312,7 +1393,7 @@ async function DeleteSchedule(id, scheduleDayId, scheduleId) {
                 icon: 'error',
                 showConfirmButton: true
             });
-    } 
+    }
 }
 //#endregion
 
@@ -1326,16 +1407,16 @@ function insertTabContentItem(scheduleDayId, dataresults) {
 
     console.log(`strat insertTab`, dataresults)
     const contentItem = document.createElement('div');
-    
+
     contentItem.classList.add('content-item');
     contentItem.setAttribute('data-id', `${dataresults.Id}`);
     contentItem.setAttribute('data-ScheduleDayId', `${dataresults.ScheduleDayId}`);
     contentItem.setAttribute('data-sort', `${dataresults.Sort}`);
     contentItem.setAttribute('data-lat', `${dataresults.lat}`);
     contentItem.setAttribute('data-lng', `${dataresults.lng}`);
-    contentItem.setAttribute('data-placeid', dataresults.placeId);
-    contentItem.setAttribute('data-endtime', dataresults.EndTime);
-    contentItem.setAttribute('data-transportationmodeid', dataresults.TransportationCategoryId);
+    contentItem.setAttribute('data-placeid', `${dataresults.placeId}`);
+    contentItem.setAttribute('data-endtime', `${dataresults.EndTime}`);
+    contentItem.setAttribute('data-transportationCategoryId', `${dataresults.TransportationCategoryId}`);
     contentItem.setAttribute('draggable', 'true');
     contentItem.addEventListener('dragstart', handleDragStart);
     contentItem.addEventListener('dragover', handleDragOver);
@@ -1377,7 +1458,7 @@ function insertTabContentItem(scheduleDayId, dataresults) {
         tabContent.appendChild(contentItem);
     }
     refreshTabContentItemNumbers(scheduleDayId);
-    
+
     addMarkerToMap({
         lat: dataresults.lat,
         lng: dataresults.lng,
@@ -1395,8 +1476,6 @@ function insertTabContentItem(scheduleDayId, dataresults) {
 
         marker.placeInfo = placeInfo;
         markers.push(marker);
-
-        // 点击标记时，显示信息窗口
         google.maps.event.addListener(marker, 'click', function () {
             infowindow.setContent(createInfoWindowContent({ geometry: { location: marker.position }, ...placeInfo }, title, placeInfo.scheduleId));
             infowindow.open(map, marker);
@@ -1410,7 +1489,7 @@ function refreshTabContentItemNumbers(scheduleDayId) {
         console.error(`No tab content found for scheduleDayId: ${scheduleDayId}`);
         return;
     }
-    
+
     const contentItems = Array.from(tabContent.querySelectorAll('.content-item'));
 
 
@@ -1419,9 +1498,9 @@ function refreshTabContentItemNumbers(scheduleDayId) {
         const sortB = parseInt(b.getAttribute('data-sort'), 10);
         return sortA - sortB;
     });
-    
+
     tabContent.innerHTML = '';
-    
+
     contentItems.forEach((item, index) => {
         const numberElement = item.querySelector('.content-item-number');
         if (numberElement) {
@@ -1575,18 +1654,18 @@ function calculateEndTime() {
         let endHours = hours + durationHours;
         let endMinutes = minutes + durationMinutes;
 
-        
+
         if (endMinutes >= 60) {
             endHours += Math.floor(endMinutes / 60);
             endMinutes = endMinutes % 60;
         }
 
-        
+
         if (endHours >= 24) {
             endHours = endHours % 24;
         }
 
-        
+
         const formattedEndHours = String(endHours).padStart(2, '0');
         const formattedEndMinutes = String(endMinutes).padStart(2, '0');
 
@@ -1617,9 +1696,9 @@ document.getElementById('tab-contents').addEventListener('click', function (even
         map.setCenter(position);
         map.setZoom(16);
         if (marker) {
-            marker.setMap(null); 
+            marker.setMap(null);
         }
-        
+
         marker = new google.maps.Marker({
             position: position,
             map: map
