@@ -28,7 +28,7 @@ namespace PinPinServer.Services
         }
         public async Task<string> GetCurrentWeatherData(string units, decimal lat, decimal lon)
         {
-            string weatherAPI = $"data/2.5/weather?lat={lat}&lon={lon}&appid={_apiKey}&units={units}";
+            string weatherAPI = $"data/2.5/weather?lat={lat}&lon={lon}&appid={_apiKey}&units={units}&lang=zh_tw";
             HttpResponseMessage response = await _httpClient.GetAsync(weatherAPI);
             if (!response.IsSuccessStatusCode)
             {
@@ -42,12 +42,15 @@ namespace PinPinServer.Services
         {
             JsonDocument document = JsonDocument.Parse(data);
             JsonElement root = document.RootElement;
-            string weatherStatus = root.GetProperty("weather").GetProperty("description").ToString();
+
+            // "weather" 是一個陣列，需要取陣列的第一個元素
+            string weatherStatus = root.GetProperty("weather")[0].GetProperty("description").GetString();
             double temp = root.GetProperty("main").GetProperty("temp").GetDouble();
             double windSpeed = root.GetProperty("wind").GetProperty("speed").GetDouble();
             int humidity = root.GetProperty("main").GetProperty("humidity").GetInt32();
             string cityName = root.GetProperty("name").ToString();
             string country = root.GetProperty("sys").GetProperty("country").ToString();
+
 
             WeatherDataDTO weatherData = new WeatherDataDTO
             {

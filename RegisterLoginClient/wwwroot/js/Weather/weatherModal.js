@@ -9,11 +9,13 @@
       const chartInstance = ref(null);
       const countryName = ref("");
       const cityName = ref("");
+      const currentWeatherData = ref([]);
 
       const init = async () => {
         $("#weatherModal").modal("show");
         await getSchedleInfo();
         await getWeatherData();
+        await getCurrentWeatherData();
         initWeatherChart();
         console.log(scheduleInfo.value);
         console.log(weatherData.value);
@@ -33,6 +35,28 @@
           cityName.value = response.data[0].CityName;
           countryName.value = response.data[0].Country;
           weatherData.value = response.data;
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      const getCurrentWeatherData = async () => {
+        try {
+          let response = await axios.get(
+            `${baseAddress}/api/Weather/GetCurrentWeatherInfo`,
+            {
+              params: {
+                lat: scheduleInfo.value.scheduleDetail[0].lat,
+                lon: scheduleInfo.value.scheduleDetail[0].lng,
+                units: "metric",
+              },
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          currentWeatherData.value = response.data;
+          console.log(currentWeatherData.value);
         } catch (error) {
           console.log(error);
         }
@@ -229,6 +253,7 @@
         weatherData,
         cityName,
         countryName,
+        currentWeatherData,
       };
     },
   }).mount("#weather-container");
