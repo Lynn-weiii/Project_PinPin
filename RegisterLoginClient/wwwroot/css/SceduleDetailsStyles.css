@@ -1,4 +1,4 @@
-﻿:root {
+﻿﻿:root {
     --darkgreen: #435a4f;
     --white: #f6f4e8;
 }
@@ -22,13 +22,13 @@
 #search_input {
     z-index: 1;
     width: 300px; /* 可以根据需要调整宽度 */
-    margin: 10px; 
+    margin: 10px;
 }
 
-#search_input input {
-    width: 100%;
-    border: 2px solid black;
-}
+    #search_input input {
+        width: 100%;
+        border: 2px solid black;
+    }
 
 @media (min-width: 998.1px) {
     .row-cols-md-2 {
@@ -46,7 +46,6 @@
         flex: 0 0 70%; /* 占据 70% */
         /*max-width: 70%;*/
         box-sizing: border-box; /* 包含边距和边框 */
-       
     }
 }
 
@@ -66,7 +65,7 @@
     position: relative;
     background: rgba(0, 0, 0, 0.4) url('') no-repeat center center; /* 40% 灰色遮罩 */
     background-size: cover; /* 确保背景图像覆盖整个元素 */
-    overflow:hidden;
+    overflow: hidden;
     height: 180px; /* 根据需要调整高度 */
     color: white;
     display: flex;
@@ -75,24 +74,24 @@
     align-items: center;
     text-align: center;
     width: 100%; /* 确保宽度填满父元素 */
-    border-radius:15px;
+    border-radius: 15px;
 }
 
-.theme-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4); /* 40% 灰色透明度 */
-    z-index: 1; /* 确保覆盖层在背景图像之上 */
-}
+    .theme-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4); /* 40% 灰色透明度 */
+        z-index: 1; /* 确保覆盖层在背景图像之上 */
+    }
 
-.theme-header h1 {
-    font-size: 2em;
-    margin: 0;
-}
+    .theme-header h1 {
+        font-size: 2em;
+        margin: 0;
+    }
 
 #theme-name {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
@@ -117,7 +116,6 @@
 }
 
 #theme-header .btn:hover, #theme-header .btn:focus, #theme-header .btn:active {
-
     color: var(--white); /* 文字颜色为白色 */
     transform: scale(1.15); /* 略微放大 */
     box-shadow: none; /* 移除可能的阴影效果 */
@@ -170,12 +168,12 @@
     font-weight: bold;
 }
 
-#mapsection.close:hover,
-#mapsection.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
+    #mapsection.close:hover,
+    #mapsection.close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 /*#endregion*/
 
 /*#region 星星評價*/
@@ -209,8 +207,9 @@
 
 /*#region 左邊預覽列表*/
 @import url('https://fonts.googleapis.com/css2?family=Jost:wght@100;300;400;700&display=swap');
-.delete_btn{
-    z-index:1;
+
+.delete_btn {
+    z-index: 1;
 }
 
 #scheduledetailprivewsection .wrapper {
@@ -239,18 +238,18 @@
     font-size: 14px;
     cursor: pointer;
     transition: 0.5s;
-    border-radius:5px;
-    border:1px solid var(--bs-gray-200);
-    border-block-end:none;
+    border-radius: 5px;
+    border: 1px solid var(--bs-gray-200);
+    border-block-end: none;
 }
 
-#scheduledetailprivewsection button:hover {
-    background-color: #d5e3ff;
-}
+    #scheduledetailprivewsection button:hover {
+        background-color: #d5e3ff;
+    }
 
-#scheduledetailprivewsection button.active {
-    background-color: white;
-}
+    #scheduledetailprivewsection button.active {
+        background-color: white;
+    }
 
 #scheduledetailprivewsection .active {
     background-color: white;
@@ -264,12 +263,12 @@
 #scheduledetailprivewsection .content {
     display: none;
     padding: 10px 20px;
-    height:500px;
+    height: 500px;
 }
 
-#scheduledetailprivewsection .content.active {
-    display: block;
-}
+    #scheduledetailprivewsection .content.active {
+        display: block;
+    }
 /* 整個滾動條 */
 #scheduledetailprivewsection ::-webkit-scrollbar {
     width: 5px;
@@ -294,11 +293,11 @@
     /* 圓角 */
 }
 
-/* 滾動條滑塊在懸停時的顏色 */
-#scheduledetailprivewsection ::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
-    /* 懸停時的顏色 */
-}
+    /* 滾動條滑塊在懸停時的顏色 */
+    #scheduledetailprivewsection ::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+        /* 懸停時的顏色 */
+    }
 
 
 /* 滾動條按鈕在懸停時的顏色 */
@@ -342,7 +341,6 @@
 #scheduledetailprivewsection .content-item-image {
     width: 120px;
     height: 120px;
-    
     border-radius: 10px;
     object-fit: cover;
 }
