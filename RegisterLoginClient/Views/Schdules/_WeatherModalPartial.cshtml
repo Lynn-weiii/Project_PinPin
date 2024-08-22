@@ -11,46 +11,35 @@
                 <div class="modal-body">
                     <!-- 顯示旅行名稱和目的地 -->
                     <div id="tripInfo" class="row mb-3">
-                        <!-- 行程名稱 -->
-                        <div class="col-12">
-                            <div class="text-start fs-2">
-                                <p><i class="fa-solid fa-suitcase me-2"></i><strong>行程名稱:</strong> <span>{{ scheduleName }}</span></p>
-                            </div>
-                        </div>
 
                         <!-- 城市、國家、天氣狀況和溫度 -->
-                        <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div class="col-12 d-flex justify-content-between">
                             <!-- 左側：城市和國家 -->
                             <div class="d-flex flex-column">
-                                <div class="text-start fs-3">
+                                <div class="text-start fs-2">
                                     <p><i class="fa-solid fa-city me-2"></i><strong>城市:</strong> <span>{{ cityName }}</span></p>
                                 </div>
-                                <div class="text-start fs-5">
+                                <div class="text-start fs-4">
                                     <p><i class="fa-solid fa-flag me-2"></i><strong>國家:</strong> <span>{{ countryName }}</span></p>
                                 </div>
                             </div>
 
                             <!-- 右側：天氣狀況和溫度 -->
-                            <div class="d-flex flex-column text-end">
+                            <div class="d-flex flex-column">
                                 <div class="fs-3">
                                     <p><i class="fa-solid fa-cloud-sun me-2"></i><strong>天氣狀況:</strong> <span>{{ currentWeatherData.WeatherStatus }}</span></p>
+                                </div>
+                                <div class="fs-4">
+                                <p><i class="fa-solid fa-wind me-2"></i><strong>風速:</strong> <span>{{ currentWeatherData.WindSpeed }} km/h</span></p>
+                                </div>
+                                <div class="fs-4">
+                                    <p><i class="fa-solid fa-tint me-2"></i><strong>濕度:</strong> <span>{{ currentWeatherData.Humidity }}%</span></p>
                                 </div>
                                 <div class="fs-3">
                                     <p><i class="fa-solid fa-thermometer-half me-2"></i><strong>溫度:</strong> <span>{{ currentWeatherData.Temp }} °C</span></p>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- 降雨機率、風速和濕度部分放同一行 -->
-                        <div class="col-12 d-flex justify-content-start">
-                            <div class="text-end fs-5 me-3">
-                                <p><i class="fa-solid fa-wind me-2"></i><strong>風速:</strong> <span>{{ currentWeatherData.WindSpeed }} km/h</span></p>
-                            </div>
-                            <div class="text-end fs-5">
-                                <p><i class="fa-solid fa-tint me-2"></i><strong>濕度:</strong> <span>{{ currentWeatherData.Humidity }}%</span></p>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- 增加標題和按鈕區域 -->
                     <div class="d-flex justify-content-between align-items-end mb-1" style="height: 50px;">
