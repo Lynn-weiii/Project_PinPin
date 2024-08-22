@@ -21,5 +21,7 @@
         public string Country { get; set; } = string.Empty;
 
         public string WeatherStatus { get; set; } = string.Empty;
+
+        public string Icon { get; set; } = "04n";
     }
 }

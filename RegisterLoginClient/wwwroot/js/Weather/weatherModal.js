@@ -149,17 +149,19 @@
                     let windSpeed =
                       weatherData.value[index].WindSpeed.toFixed(1);
                     let humidity = weatherData.value[index].Humidity;
+                    let weatherStatus = weatherData.value[index].WeatherStatus;
                     return [
                       `溫度: ${temp} °C`,
                       `降雨機率: ${chanceOfRain}%`,
                       `風速: ${windSpeed} km/h`,
                       `濕度: ${humidity}%`,
+                      `天氣: ${weatherStatus}`,
                     ];
                   },
                 },
               },
               title: {
-                display: true,
+                display: false,
                 text: "天氣預報",
                 font: {
                   size: 24,

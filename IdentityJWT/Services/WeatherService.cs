@@ -17,7 +17,7 @@ namespace PinPinServer.Services
         //呼叫獲取天氣資料的API
         public async Task<string> GetWeatherData(string units, decimal lat, decimal lon)
         {
-            string weatherAPI = $"data/2.5/forecast?lat={lat}&lon={lon}&appid={_apiKey}&units={units}";
+            string weatherAPI = $"data/2.5/forecast?lat={lat}&lon={lon}&appid={_apiKey}&units={units}&lang=zh_tw";
             HttpResponseMessage response = await _httpClient.GetAsync(weatherAPI);
             if (!response.IsSuccessStatusCode)
             {
@@ -44,22 +44,23 @@ namespace PinPinServer.Services
             JsonElement root = document.RootElement;
 
             // "weather" 是一個陣列，需要取陣列的第一個元素
-            string weatherStatus = root.GetProperty("weather")[0].GetProperty("description").GetString();
+            string weatherStatus = root.GetProperty("weather")[0].GetProperty("description").ToString();
             double temp = root.GetProperty("main").GetProperty("temp").GetDouble();
             double windSpeed = root.GetProperty("wind").GetProperty("speed").GetDouble();
             int humidity = root.GetProperty("main").GetProperty("humidity").GetInt32();
             string cityName = root.GetProperty("name").ToString();
             string country = root.GetProperty("sys").GetProperty("country").ToString();
-
+            string icon = root.GetProperty("weather")[0].GetProperty("icon").ToString();
 
             WeatherDataDTO weatherData = new WeatherDataDTO
             {
-                CityName=cityName,
-                Country=country,
-                Temp=temp,
-                WindSpeed=windSpeed,
-                Humidity=humidity,
-                WeatherStatus=weatherStatus,
+                CityName = cityName,
+                Country = country,
+                Temp = temp,
+                WindSpeed = windSpeed,
+                Humidity = humidity,
+                WeatherStatus = weatherStatus,
+                Icon = icon
             };
 
             //轉成JSON格式
@@ -83,6 +84,8 @@ namespace PinPinServer.Services
                 double temp = jsonElement.GetProperty("main").GetProperty("temp").GetDouble();
                 int humidity = jsonElement.GetProperty("main").GetProperty("humidity").GetInt32();
                 double windSpeed = jsonElement.GetProperty("wind").GetProperty("speed").GetDouble();
+                string weatherStatus = jsonElement.GetProperty("weather")[0].GetProperty("description").ToString();
+                string icon = jsonElement.GetProperty("weather")[0].GetProperty("icon").ToString();
 
                 DateTime date = DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime;
 
@@ -96,6 +99,8 @@ namespace PinPinServer.Services
                     WindSpeed = windSpeed,
                     CityName = cityName,
                     Country = country,
+                    WeatherStatus = weatherStatus,
+                    Icon = icon,
                 });
             }
 
@@ -108,10 +113,12 @@ namespace PinPinServer.Services
                     IsMorning = g.Key.IsMorning,
                     Temp = g.Average(data => data.Temp),
                     ChanceOfRain = g.Average(data => data.ChanceOfRain),
-                    WindSpeed=g.Average(data => data.WindSpeed),
-                    Humidity=(int)g.Average(data=> data.Humidity),
-                    CityName=g.First().CityName,
-                    Country=g.First().Country,
+                    WindSpeed = g.Average(data => data.WindSpeed),
+                    Humidity = (int)g.Average(data => data.Humidity),
+                    CityName = g.First().CityName,
+                    Country = g.First().Country,
+                    WeatherStatus = g.First().WeatherStatus,
+                    Icon = g.First().Icon,
                 }).ToList();
 
             //轉成JSON格式
