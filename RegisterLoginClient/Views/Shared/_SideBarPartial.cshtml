@@ -520,34 +520,131 @@
     }
     //解密token取得ID END
 
+    // function calculateEndTime(startTime, durationHours, durationMinutes) {
+    //     解析開始時間
+    //     const [startHours, startMinutes] = startTime.split(':').map(Number);
+    //     const startDate = new Date();
+    //     startDate.setHours(startHours);
+    //     startDate.setMinutes(startMinutes);
+
+    //     // 計算結束時間
+    //     const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
+
+    //     // 返回結束時間的格式為 'HH:MM'
+    //     const endHours = endDate.getHours().toString().padStart(2, '0');
+    //     const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+    //     return `${endHours}:${endMinutes}`;
+    // }
+
     function calculateEndTime(startTime, durationHours, durationMinutes) {
+        console.log("Start Time:", startTime); // 確認 startTime
+        console.log("Duration Hours:", durationHours); // 確認 durationHours
+        console.log("Duration Minutes:", durationMinutes); // 確認 durationMinutes
+
         // 解析開始時間
-        // const [startHours, startMinutes] = startTime.split(':').map(Number);
-        // const startDate = new Date();
-        // startDate.setHours(startHours);
-        // startDate.setMinutes(startMinutes);
-
-        // // 計算結束時間
-        // const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
-
-        // // 返回結束時間的格式為 'HH:MM'
-        // const endHours = endDate.getHours().toString().padStart(2, '0');
-        // const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
-        // return `${endHours}:${endMinutes}`;
         const [startHours, startMinutes] = startTime.split(':').map(Number);
         const startDate = new Date();
         startDate.setHours(startHours);
         startDate.setMinutes(startMinutes);
+        console.log("Start Date:", startDate); // 確認 startDate
 
         // 計算結束時間
         const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
+        console.log("End Date:", endDate); // 確認 endDate
 
-        // 返回結束時間的格式為 'HH:mm:ss'
+        // 返回結束時間的格式為 'HH:MM'
         const endHours = endDate.getHours().toString().padStart(2, '0');
         const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
-        const endSeconds = endDate.getSeconds().toString().padStart(2, '0');
-        return `${endHours}:${endMinutes}:${endSeconds}`;
+        return `${endHours}:${endMinutes}`;
     }
+
+
+
+    // function insertTabContentItem(scheduleDayId, dataresults) {
+    //     const tabContent = document.querySelector(`.content[data-schdule_day_id="${scheduleDayId}"]`);
+    //     if (!tabContent) {
+    //         console.error(`No tab content found for scheduleDayId: ${scheduleDayId}`);
+    //         return;
+    //     }
+
+    //     console.log(`strat insertTab`, dataresults)
+    //     const contentItem = document.createElement('div');
+
+    //     contentItem.classList.add('content-item');
+    //     contentItem.setAttribute('data-id', `${dataresults.Id}`);
+    //     contentItem.setAttribute('data-ScheduleDayId', `${dataresults.ScheduleDayId}`);
+    //     contentItem.setAttribute('data-sort', `${dataresults.Sort}`);
+    //     contentItem.setAttribute('data-lat', `${dataresults.lat}`);
+    //     contentItem.setAttribute('data-lng', `${dataresults.lng}`);
+    //     contentItem.setAttribute('data-placeid', `${dataresults.placeId}`);
+    //     contentItem.setAttribute('data-endtime', `${dataresults.EndTime}`);
+    //     contentItem.setAttribute('data-transportationCategoryId', `${dataresults.TransportationCategoryId}`);
+    //     contentItem.setAttribute('draggable', 'true');
+    //     contentItem.addEventListener('dragstart', handleDragStart);
+    //     contentItem.addEventListener('dragover', handleDragOver);
+    //     contentItem.addEventListener('drop', handleDrop);
+    //     contentItem.innerHTML = `
+    //         <div class="content-item-header">
+    //             <span class="content-item-number"></span>
+    //             <img src="${dataresults.pictureUrl || '~/images/NoImg.png'}" alt="${dataresults.LocationName || 'default'}" class="content-item-image">
+    //         </div>
+    //         <div class="content-item-body">
+    //             <div class="content-item-time">
+    //                 <span class="icon">${getTransportationMode(dataresults.TransportationCategoryId) || '❓'}</span>
+    //                 <span class="time">${dataresults.StartTime}</span>
+    //             </div>
+    //             <div class="content-item-location">
+    //                 ${dataresults.LocationName} <img src="/images/location.png" class="setlocation" style="width:20px;height:20px" data-lat="${dataresults.lat}" data-lng="${dataresults.lng}">
+    //             <div class="content-item-detail">
+    //                 ${dataresults.EndTime} 離開
+    //             </div>
+    //             <div class="button-group">
+    //                 <button class="delete-btn" data-scheduleDayId="${dataresults.ScheduleDayId}" data-id="${dataresults.Id}">
+    //                     刪除景點
+    //                 </button>
+    //             </div>
+    //         </div>
+    //     `;
+    //     console.log(`insertTabContentItem`, contentItem)
+    //     let inserted = false;
+    //     const contentItems = Array.from(tabContent.querySelectorAll('.content-item'));
+    //     for (let i = 0; i < contentItems.length; i++) {
+    //         const currentSort = parseInt(contentItems[i].getAttribute('data-sort'), 10);
+    //         if (dataresults.Sort < currentSort) {
+    //             tabContent.insertBefore(contentItem, contentItems[i]);
+    //             inserted = true;
+    //             break;
+    //         }
+    //     }
+    //     if (!inserted) {
+    //         tabContent.appendChild(contentItem);
+    //     }
+    //     refreshTabContentItemNumbers(scheduleDayId);
+
+    //     addMarkerToMap({
+    //         lat: dataresults.lat,
+    //         lng: dataresults.lng,
+    //         title: dataresults.LocationName,
+    //         placeInfo: { name: dataresults.LocationName, scheduleId: dataresults.scheduleDayId }
+    //     });
+
+
+    //     function addMarkerToMap({ lat, lng, title, placeInfo }) {
+    //         const marker = new google.maps.Marker({
+    //             position: { lat, lng },
+    //             map: map,
+    //             title: title,
+    //         });
+
+    //         marker.placeInfo = placeInfo;
+    //         markers.push(marker);
+    //         google.maps.event.addListener(marker, 'click', function () {
+    //             infowindow.setContent(createInfoWindowContent({ geometry: { location: marker.position }, ...placeInfo }, title, placeInfo.scheduleId));
+    //             infowindow.open(map, marker);
+    //         });
+    //     }
+    // }
+
 
     document.addEventListener('DOMContentLoaded', async function () {
         const vueApp = {
@@ -1254,8 +1351,19 @@
                     const durationHours = parseInt(document.getElementById('duration-hours').value, 10) || 0;
                     const durationMinutes = parseInt(document.getElementById('duration-minutes').value, 10) || 0;
 
+                    // // 計算結束時間
+                    // const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
+
+                    // // 更新結束時間輸入框的值
+                    // document.getElementById('end-time').value = endTime;
+
                     // 計算結束時間
                     const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
+
+                    if (endTime === undefined) {
+                        console.error('EndTime is undefined');
+                        return;
+                    }
 
                     // 更新結束時間輸入框的值
                     document.getElementById('end-time').value = endTime;
@@ -1265,8 +1373,8 @@
                         "ScheduleDayId": 39,
                         "LocationName": this.selectedLocation.name,
                         "Location": this.selectedLocation.googlePlaceId,
-                        "StartTime": startTimeInput + ':00',
-                        "EndTime": '13:00:00',
+                        "StartTime": startTimeInput,
+                        "EndTime": endTime,
                         "lat": this.selectedLocation.locationLat,
                         "lng": this.selectedLocation.locationLng,
                         "TransportationCategoryId": this.selectedTransportationCategoryId
@@ -1289,7 +1397,10 @@
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
 
-                        Swal.fire('成功', '行程已成功加入', 'success');
+                        Swal.fire('成功', '行程已成功加入', 'success').then(() => {
+                            console.log(`go refresh add schedule id :${scheduleId}`);
+                            //insertTabContentItem(dataresult.scheduleDayId, dataresults);
+                        });
                         // Optionally reload or update the schedule list here
 
                     } catch (error) {
@@ -1393,5 +1504,11 @@
 
         };
         Vue.createApp(vueApp).mount('#appSidebar');
+        flatpickr("#start-time", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: false
+        });
     });
 </script>
