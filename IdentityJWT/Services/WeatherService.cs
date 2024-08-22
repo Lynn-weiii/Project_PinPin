@@ -26,7 +26,43 @@ namespace PinPinServer.Services
             }
             return ProcessWeatherData(await response.Content.ReadAsStringAsync());
         }
+        public async Task<string> GetCurrentWeatherData(string units, decimal lat, decimal lon)
+        {
+            string weatherAPI = $"data/2.5/weather?lat={lat}&lon={lon}&appid={_apiKey}&units={units}";
+            HttpResponseMessage response = await _httpClient.GetAsync(weatherAPI);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("獲取資料失敗");
+                return string.Empty;
+            }
+            return ProcessCurrentWeatherData(await response.Content.ReadAsStringAsync());
+        }
 
+        private string ProcessCurrentWeatherData(string data)
+        {
+            JsonDocument document = JsonDocument.Parse(data);
+            JsonElement root = document.RootElement;
+            string weatherStatus = root.GetProperty("weather").GetProperty("description").ToString();
+            double temp = root.GetProperty("main").GetProperty("temp").GetDouble();
+            double windSpeed = root.GetProperty("wind").GetProperty("speed").GetDouble();
+            int humidity = root.GetProperty("main").GetProperty("humidity").GetInt32();
+            string cityName = root.GetProperty("name").ToString();
+            string country = root.GetProperty("sys").GetProperty("country").ToString();
+
+            WeatherDataDTO weatherData = new WeatherDataDTO
+            {
+                CityName=cityName,
+                Country=country,
+                Temp=temp,
+                WindSpeed=windSpeed,
+                Humidity=humidity,
+                WeatherStatus=weatherStatus,
+            };
+
+            //轉成JSON格式
+            string jsonString = JsonSerializer.Serialize(weatherData);
+            return jsonString;
+        }
         //處理獲取的資料
         private string ProcessWeatherData(string data)
         {
