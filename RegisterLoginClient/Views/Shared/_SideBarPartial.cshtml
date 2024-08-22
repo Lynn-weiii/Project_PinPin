@@ -1259,13 +1259,14 @@
 
                     // 更新結束時間輸入框的值
                     document.getElementById('end-time').value = endTime;
+
                     const scheduleDetail = {
                         //"ScheduleDayId": this.selectedDate,
-                        "ScheduleDayId": 41,
+                        "ScheduleDayId": 39,
                         "LocationName": this.selectedLocation.name,
                         "Location": this.selectedLocation.googlePlaceId,
                         "StartTime": startTimeInput + ':00',
-                        "EndTime": endTime,
+                        "EndTime": '13:00:00',
                         "lat": this.selectedLocation.locationLat,
                         "lng": this.selectedLocation.locationLng,
                         "TransportationCategoryId": this.selectedTransportationCategoryId
@@ -1288,12 +1289,6 @@
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
 
-                        const dataresult = await response.json();
-                        console.log("dataresult:", response.json);
-
-                        // You can fetch additional information here if needed
-                        const picture = await fetchPlacePhotoUrl(dataresult.location);
-
                         Swal.fire('成功', '行程已成功加入', 'success');
                         // Optionally reload or update the schedule list here
 
@@ -1301,6 +1296,14 @@
                         console.error('Error posting schedule detail:', error);
                         Swal.fire('錯誤', '新增行程發生錯誤，請稍後再試', 'error');
                     }
+                    //關閉modal
+                    const addtoScheduleElement = document.getElementById('addtoScheduleModal');
+                    const addtoScheduleModal = bootstrap.Modal.getInstance(addtoScheduleElement);
+                    addtoScheduleModal.hide();
+
+                    const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
+                    const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement);
+                    sidebarOffcanvas.hide();
                 },
                 //移除願望清單中的行程
                 async deleteSelectedDetail(detailId) {
