@@ -17,8 +17,6 @@
         await getWeatherData();
         await getCurrentWeatherData();
         initWeatherChart();
-        console.log(scheduleInfo.value);
-        console.log(weatherData.value);
       };
       const getWeatherData = async () => {
         try {
@@ -56,7 +54,6 @@
             }
           );
           currentWeatherData.value = response.data;
-          console.log(currentWeatherData.value);
         } catch (error) {
           console.log(error);
         }
@@ -141,11 +138,7 @@
               tooltip: {
                 callbacks: {
                   title: function (tooltipItems) {
-                    // 這裡可以返回工具提示的標題，通常是日期
-                    let date = new Date(tooltipItems[0].label);
-                    return `${date.getMonth() + 1}/${date.getDate()} ${
-                      tooltipItems[0].raw.IsMorning ? "AM" : "PM"
-                    }`;
+                    return tooltipItems[0].label;
                   },
                   label: function (tooltipItem) {
                     let index = tooltipItem.dataIndex;
@@ -156,17 +149,19 @@
                     let windSpeed =
                       weatherData.value[index].WindSpeed.toFixed(1);
                     let humidity = weatherData.value[index].Humidity;
+                    let weatherStatus = weatherData.value[index].WeatherStatus;
                     return [
                       `溫度: ${temp} °C`,
                       `降雨機率: ${chanceOfRain}%`,
                       `風速: ${windSpeed} km/h`,
                       `濕度: ${humidity}%`,
+                      `天氣: ${weatherStatus}`,
                     ];
                   },
                 },
               },
               title: {
-                display: true,
+                display: false,
                 text: "天氣預報",
                 font: {
                   size: 24,
