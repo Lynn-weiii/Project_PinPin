@@ -10,5 +10,16 @@
 
         //true為上午fales為下午
         public bool IsMorning { get; set; }
+
+        //濕度
+        public int Humidity { get; set; }
+
+        public double WindSpeed { get; set; }
+
+        public string CityName { get; set; } = string.Empty;
+
+        public string Country { get; set; } = string.Empty;
+
+        public string WeatherStatus { get; set; } = string.Empty;
     }
 }
