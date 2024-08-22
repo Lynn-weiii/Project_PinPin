@@ -92,7 +92,7 @@
                                                     <div class="card-body">
                                                         <h5 class="card-title">{{ detail.name }}</h5>
                                                         <p class="card-text">{{ detail.address }}</p>
-                                                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addtoScheduleModal" v-on:click="setSelectedLocation(detail)"><i class="fa-solid fa-calendar-days"></i></button>
+                                                       @*  <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addtoScheduleModal" v-on:click="setSelectedLocation(detail)"><i class="fa-solid fa-calendar-days"></i></button> *@
                                                         <button class="btn btn-outline-primary" v-on:click="deleteSelectedDetail(detail.id)"><i class="fa-solid fa-trash"></i></button>
                                                     </div>
                                                 </div>
@@ -415,7 +415,7 @@
         </div>
     </div>
 
-    <!--加入行程Modal addtoSchedule-->
+   @*  <!--加入行程Modal addtoSchedule-->
     <div class="modal fade" id="addtoScheduleModal" tabindex="-1" aria-labelledby="addtoScheduleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -485,7 +485,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> *@
 </div>
 <script>
 
@@ -520,129 +520,27 @@
     }
     //解密token取得ID END
 
+
     // function calculateEndTime(startTime, durationHours, durationMinutes) {
-    //     解析開始時間
+    //     console.log("Start Time:", startTime); // 確認 startTime
+    //     console.log("Duration Hours:", durationHours); // 確認 durationHours
+    //     console.log("Duration Minutes:", durationMinutes); // 確認 durationMinutes
+
+    //     // 解析開始時間
     //     const [startHours, startMinutes] = startTime.split(':').map(Number);
     //     const startDate = new Date();
     //     startDate.setHours(startHours);
     //     startDate.setMinutes(startMinutes);
+    //     console.log("Start Date:", startDate); // 確認 startDate
 
     //     // 計算結束時間
     //     const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
+    //     console.log("End Date:", endDate); // 確認 endDate
 
     //     // 返回結束時間的格式為 'HH:MM'
     //     const endHours = endDate.getHours().toString().padStart(2, '0');
     //     const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
     //     return `${endHours}:${endMinutes}`;
-    // }
-
-    function calculateEndTime(startTime, durationHours, durationMinutes) {
-        console.log("Start Time:", startTime); // 確認 startTime
-        console.log("Duration Hours:", durationHours); // 確認 durationHours
-        console.log("Duration Minutes:", durationMinutes); // 確認 durationMinutes
-
-        // 解析開始時間
-        const [startHours, startMinutes] = startTime.split(':').map(Number);
-        const startDate = new Date();
-        startDate.setHours(startHours);
-        startDate.setMinutes(startMinutes);
-        console.log("Start Date:", startDate); // 確認 startDate
-
-        // 計算結束時間
-        const endDate = new Date(startDate.getTime() + (durationHours * 60 + durationMinutes) * 60000);
-        console.log("End Date:", endDate); // 確認 endDate
-
-        // 返回結束時間的格式為 'HH:MM'
-        const endHours = endDate.getHours().toString().padStart(2, '0');
-        const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
-        return `${endHours}:${endMinutes}`;
-    }
-
-
-
-    // function insertTabContentItem(scheduleDayId, dataresults) {
-    //     const tabContent = document.querySelector(`.content[data-schdule_day_id="${scheduleDayId}"]`);
-    //     if (!tabContent) {
-    //         console.error(`No tab content found for scheduleDayId: ${scheduleDayId}`);
-    //         return;
-    //     }
-
-    //     console.log(`strat insertTab`, dataresults)
-    //     const contentItem = document.createElement('div');
-
-    //     contentItem.classList.add('content-item');
-    //     contentItem.setAttribute('data-id', `${dataresults.Id}`);
-    //     contentItem.setAttribute('data-ScheduleDayId', `${dataresults.ScheduleDayId}`);
-    //     contentItem.setAttribute('data-sort', `${dataresults.Sort}`);
-    //     contentItem.setAttribute('data-lat', `${dataresults.lat}`);
-    //     contentItem.setAttribute('data-lng', `${dataresults.lng}`);
-    //     contentItem.setAttribute('data-placeid', `${dataresults.placeId}`);
-    //     contentItem.setAttribute('data-endtime', `${dataresults.EndTime}`);
-    //     contentItem.setAttribute('data-transportationCategoryId', `${dataresults.TransportationCategoryId}`);
-    //     contentItem.setAttribute('draggable', 'true');
-    //     contentItem.addEventListener('dragstart', handleDragStart);
-    //     contentItem.addEventListener('dragover', handleDragOver);
-    //     contentItem.addEventListener('drop', handleDrop);
-    //     contentItem.innerHTML = `
-    //         <div class="content-item-header">
-    //             <span class="content-item-number"></span>
-    //             <img src="${dataresults.pictureUrl || '~/images/NoImg.png'}" alt="${dataresults.LocationName || 'default'}" class="content-item-image">
-    //         </div>
-    //         <div class="content-item-body">
-    //             <div class="content-item-time">
-    //                 <span class="icon">${getTransportationMode(dataresults.TransportationCategoryId) || '❓'}</span>
-    //                 <span class="time">${dataresults.StartTime}</span>
-    //             </div>
-    //             <div class="content-item-location">
-    //                 ${dataresults.LocationName} <img src="/images/location.png" class="setlocation" style="width:20px;height:20px" data-lat="${dataresults.lat}" data-lng="${dataresults.lng}">
-    //             <div class="content-item-detail">
-    //                 ${dataresults.EndTime} 離開
-    //             </div>
-    //             <div class="button-group">
-    //                 <button class="delete-btn" data-scheduleDayId="${dataresults.ScheduleDayId}" data-id="${dataresults.Id}">
-    //                     刪除景點
-    //                 </button>
-    //             </div>
-    //         </div>
-    //     `;
-    //     console.log(`insertTabContentItem`, contentItem)
-    //     let inserted = false;
-    //     const contentItems = Array.from(tabContent.querySelectorAll('.content-item'));
-    //     for (let i = 0; i < contentItems.length; i++) {
-    //         const currentSort = parseInt(contentItems[i].getAttribute('data-sort'), 10);
-    //         if (dataresults.Sort < currentSort) {
-    //             tabContent.insertBefore(contentItem, contentItems[i]);
-    //             inserted = true;
-    //             break;
-    //         }
-    //     }
-    //     if (!inserted) {
-    //         tabContent.appendChild(contentItem);
-    //     }
-    //     refreshTabContentItemNumbers(scheduleDayId);
-
-    //     addMarkerToMap({
-    //         lat: dataresults.lat,
-    //         lng: dataresults.lng,
-    //         title: dataresults.LocationName,
-    //         placeInfo: { name: dataresults.LocationName, scheduleId: dataresults.scheduleDayId }
-    //     });
-
-
-    //     function addMarkerToMap({ lat, lng, title, placeInfo }) {
-    //         const marker = new google.maps.Marker({
-    //             position: { lat, lng },
-    //             map: map,
-    //             title: title,
-    //         });
-
-    //         marker.placeInfo = placeInfo;
-    //         markers.push(marker);
-    //         google.maps.event.addListener(marker, 'click', function () {
-    //             infowindow.setContent(createInfoWindowContent({ geometry: { location: marker.position }, ...placeInfo }, title, placeInfo.scheduleId));
-    //             infowindow.open(map, marker);
-    //         });
-    //     }
     // }
 
 
@@ -672,12 +570,12 @@
                     locationCategories: [],
                     allLocationCategories: [],
                     //以下為[加入行程]相關
-                    selectedLocation: null,
-                    selectedScheduleId: null,
-                    userschedules: [],
-                    scheduleDates: [],
-                    selectedDate: null,
-                    selectedTransportationCategoryId: null,
+                    // selectedLocation: null,
+                    // selectedScheduleId: null,
+                    // userschedules: [],
+                    // scheduleDates: [],
+                    // selectedDate: null,
+                    // selectedTransportationCategoryId: null,
                     //以下為聊天室相關
                     isChooseChatroom: false,
                     selectedChatroom: "",
@@ -1310,112 +1208,112 @@
                         console.error('Error updating location category:', error);
                     }
                 },
-                //以下為[加入行程]相關方法
-                setSelectedLocation(detail) {
-                    this.selectedLocation = detail;
-                    console.log("選中的地點:", this.selectedLocation);
-                },
-                onScheduleChange() {
-                    // 取得選中的行程
-                    const selectedSchedule = this.userschedules.find(schedule => schedule.id === this.selectedScheduleId);
-                    console.log("選中的行程:", selectedSchedule);
+                // //以下為[加入行程]相關方法
+                // setSelectedLocation(detail) {
+                //     this.selectedLocation = detail;
+                //     console.log("選中的地點:", this.selectedLocation);
+                // },
+                // onScheduleChange() {
+                //     // 取得選中的行程
+                //     const selectedSchedule = this.userschedules.find(schedule => schedule.id === this.selectedScheduleId);
+                //     console.log("選中的行程:", selectedSchedule);
 
-                    if (selectedSchedule) {
-                        // 產生日期範圍
-                        this.generateDateRange(selectedSchedule.startTime, selectedSchedule.endTime);
-                    }
-                },
-                // 產生所選中的行程日期範圍
-                generateDateRange(startTime, endTime) {
-                    const start = new Date(startTime);
-                    const end = new Date(endTime);
-                    const dateArray = [];
-                    let currentDate = start;
+                //     if (selectedSchedule) {
+                //         // 產生日期範圍
+                //         this.generateDateRange(selectedSchedule.startTime, selectedSchedule.endTime);
+                //     }
+                // },
+                // // 產生所選中的行程日期範圍
+                // generateDateRange(startTime, endTime) {
+                //     const start = new Date(startTime);
+                //     const end = new Date(endTime);
+                //     const dateArray = [];
+                //     let currentDate = start;
 
-                    while (currentDate <= end) {
-                        const formattedDate = currentDate.toISOString().split('T')[0];
-                        dateArray.push(formattedDate);
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
+                //     while (currentDate <= end) {
+                //         const formattedDate = currentDate.toISOString().split('T')[0];
+                //         dateArray.push(formattedDate);
+                //         currentDate.setDate(currentDate.getDate() + 1);
+                //     }
 
-                    this.scheduleDates = dateArray;
-                    console.log("生成的日期範圍:", this.scheduleDates);
-                },
-                //加入行程
-                async addToSchedule() {
-                    if (!this.selectedScheduleId || !this.selectedDate || !this.selectedLocation) {
-                        Swal.fire('提示', '請選擇行程、日期及地點', 'warning');
-                        return;
-                    }
-                    const startTimeInput = document.getElementById('start-time').value;
-                    const durationHours = parseInt(document.getElementById('duration-hours').value, 10) || 0;
-                    const durationMinutes = parseInt(document.getElementById('duration-minutes').value, 10) || 0;
+                //     this.scheduleDates = dateArray;
+                //     console.log("生成的日期範圍:", this.scheduleDates);
+                // },
+                // //加入行程
+                // async addToSchedule() {
+                //     if (!this.selectedScheduleId || !this.selectedDate || !this.selectedLocation) {
+                //         Swal.fire('提示', '請選擇行程、日期及地點', 'warning');
+                //         return;
+                //     }
+                //     const startTimeInput = document.getElementById('start-time').value;
+                //     const durationHours = parseInt(document.getElementById('duration-hours').value, 10) || 0;
+                //     const durationMinutes = parseInt(document.getElementById('duration-minutes').value, 10) || 0;
 
-                    // // 計算結束時間
-                    // const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
+                //     // // 計算結束時間
+                //     // const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
 
-                    // // 更新結束時間輸入框的值
-                    // document.getElementById('end-time').value = endTime;
+                //     // // 更新結束時間輸入框的值
+                //     // document.getElementById('end-time').value = endTime;
 
-                    // 計算結束時間
-                    const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
+                //     // 計算結束時間
+                //     const endTime = calculateEndTime(startTimeInput, durationHours, durationMinutes);
 
-                    if (endTime === undefined) {
-                        console.error('EndTime is undefined');
-                        return;
-                    }
+                //     if (endTime === undefined) {
+                //         console.error('EndTime is undefined');
+                //         return;
+                //     }
 
-                    // 更新結束時間輸入框的值
-                    document.getElementById('end-time').value = endTime;
+                //     // 更新結束時間輸入框的值
+                //     document.getElementById('end-time').value = endTime;
 
-                    const scheduleDetail = {
-                        //"ScheduleDayId": this.selectedDate,
-                        "ScheduleDayId": 39,
-                        "LocationName": this.selectedLocation.name,
-                        "Location": this.selectedLocation.googlePlaceId,
-                        "StartTime": startTimeInput,
-                        "EndTime": endTime,
-                        "lat": this.selectedLocation.locationLat,
-                        "lng": this.selectedLocation.locationLng,
-                        "TransportationCategoryId": this.selectedTransportationCategoryId
+                //     const scheduleDetail = {
+                //         //"ScheduleDayId": this.selectedDate,
+                //         "ScheduleDayId": 39,
+                //         "LocationName": this.selectedLocation.name,
+                //         "Location": this.selectedLocation.googlePlaceId,
+                //         "StartTime": startTimeInput,
+                //         "EndTime": endTime,
+                //         "lat": this.selectedLocation.locationLat,
+                //         "lng": this.selectedLocation.locationLng,
+                //         "TransportationCategoryId": this.selectedTransportationCategoryId
 
-                    };
-                    console.log("scheduleDetail:", scheduleDetail); // 確保這裡的所有屬性都有正確的值
+                //     };
+                //     console.log("scheduleDetail:", scheduleDetail); // 確保這裡的所有屬性都有正確的值
 
-                    try {
-                        const token = localStorage.getItem('token');
-                        const response = await fetch(`${baseAddress}/api/ScheduleDetails`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(scheduleDetail)
-                        });
+                //     try {
+                //         const token = localStorage.getItem('token');
+                //         const response = await fetch(`${baseAddress}/api/ScheduleDetails`, {
+                //             method: 'POST',
+                //             headers: {
+                //                 'Authorization': `Bearer ${token}`,
+                //                 'Content-Type': 'application/json'
+                //             },
+                //             body: JSON.stringify(scheduleDetail)
+                //         });
 
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
+                //         if (!response.ok) {
+                //             throw new Error(`HTTP error! status: ${response.status}`);
+                //         }
 
-                        Swal.fire('成功', '行程已成功加入', 'success').then(() => {
-                            console.log(`go refresh add schedule id :${scheduleId}`);
-                            //insertTabContentItem(dataresult.scheduleDayId, dataresults);
-                        });
-                        // Optionally reload or update the schedule list here
+                //         Swal.fire('成功', '行程已成功加入', 'success').then(() => {
+                //             console.log(`go refresh add schedule id :${scheduleId}`);
+                //             //insertTabContentItem(dataresult.scheduleDayId, dataresults);
+                //         });
+                //         // Optionally reload or update the schedule list here
 
-                    } catch (error) {
-                        console.error('Error posting schedule detail:', error);
-                        Swal.fire('錯誤', '新增行程發生錯誤，請稍後再試', 'error');
-                    }
-                    //關閉modal
-                    const addtoScheduleElement = document.getElementById('addtoScheduleModal');
-                    const addtoScheduleModal = bootstrap.Modal.getInstance(addtoScheduleElement);
-                    addtoScheduleModal.hide();
+                //     } catch (error) {
+                //         console.error('Error posting schedule detail:', error);
+                //         Swal.fire('錯誤', '新增行程發生錯誤，請稍後再試', 'error');
+                //     }
+                //     //關閉modal
+                //     const addtoScheduleElement = document.getElementById('addtoScheduleModal');
+                //     const addtoScheduleModal = bootstrap.Modal.getInstance(addtoScheduleElement);
+                //     addtoScheduleModal.hide();
 
-                    const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
-                    const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement);
-                    sidebarOffcanvas.hide();
-                },
+                //     const sidebarOffcanvasElement = document.getElementById('sideBarOffcanvas');
+                //     const sidebarOffcanvas = bootstrap.Offcanvas.getInstance(sidebarOffcanvasElement);
+                //     sidebarOffcanvas.hide();
+                // },
                 //移除願望清單中的行程
                 async deleteSelectedDetail(detailId) {
                     try {
@@ -1504,11 +1402,5 @@
 
         };
         Vue.createApp(vueApp).mount('#appSidebar');
-        flatpickr("#start-time", {
-            enableTime: true,
-            noCalendar: true,
-            dateFormat: "H:i",
-            time_24hr: false
-        });
     });
 </script>

@@ -66,7 +66,7 @@ function createGroupCourseCard(gcourse) {
                             <ul class="dropdown-menu" aria-labelledby="courseDropdown-${gcourse.id}">
                                 <li><a class="memberdrop dropdown-item" data-fun="CheckManager" data-gsche="${gcourse.id}" data-name="${gcourse.name}">查看成員</a></li>
                                 ${inviteMemberItem} <!-- Conditionally added menu item -->
-                                <li><a class="memberdrop dropdown-item" data-fun="Exit" data-exitid="${gcourse.userId}" data-name="${gcourse.name}">離開</a></li>
+                                <li><a class="memberdrop dropdown-item" data-fun="Exit" data-exitid="${gcourse.userId}" data-name="${gcourse.name}" id="leavegroup">離開</a></li>
                             </ul>
                         </div>
                     </div>

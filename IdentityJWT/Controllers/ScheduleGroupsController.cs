@@ -221,7 +221,12 @@ namespace PinPinTest.Controllers
         [HttpPut("Memberexit")]
         public async Task<ActionResult> Memberexit([FromBody] exitmemberDTO exitDTO)
         {
+            int jwtuserId = _getUserId.PinGetUserId(User).Value;
             int userId = exitDTO.UserID;
+            if(userId == 0)
+            {
+                userId = jwtuserId;
+            }
             var ismember = await _context.ScheduleGroups
                 .FirstOrDefaultAsync(s => s.UserId == userId && s.ScheduleId == exitDTO.ScheduleID && s.LeftDate == null);
 
